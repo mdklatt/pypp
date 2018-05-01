@@ -6,21 +6,21 @@
 
 
 using std::string;
-using std::tolower;
-using std::toupper;
 using std::transform;
 
 
 string pypp::lower(string str)
 {
-    transform(str.begin(), str.end(), str.begin(), tolower);
+    // TODO: Use std::tolower for locale awareness.
+    transform(str.begin(), str.end(), str.begin(), ::tolower);
     return str;
 }
 
 
 string pypp::upper(string str)
 {
-    transform(str.begin(), str.end(), str.begin(), toupper);
+    // TODO: Use std::toupper for locale awareness.
+    transform(str.begin(), str.end(), str.begin(), ::toupper);
     return str;
 }
 
