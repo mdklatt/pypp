@@ -3,6 +3,8 @@
 #include <cctype>
 #include <algorithm>
 #include <iterator>
+#include <ios>
+#include <sstream>
 #include "string.hpp"
 
 
@@ -10,6 +12,59 @@ using std::next;
 using std::string;
 using std::transform;
 using std::vector;
+
+
+namespace {  // internal linkage
+
+/// Split string on whitespace.
+///
+vector<string> split_space(const string& str, ssize_t maxsplit)
+{
+    vector<string> items;
+    std::istringstream stream(str);
+    ssize_t count(0);
+    string item;
+    while (stream >> item) {
+        if (maxsplit >= 0 and count++ >= maxsplit) {
+            // Exceeded max splits, consume the rest of the string.
+            char c;
+            while (stream.get(c)) {
+                // TODO: This seems very inefficient.
+                item += c;
+            }
+        }
+        items.emplace_back(item);
+    }
+    return items;
+}
+
+
+/// Split string on a delimiter.
+///
+vector<string> split_delim(const string& str, const string& sep, ssize_t maxsplit)
+{
+    vector<string> items;
+    string::size_type beg(0);
+    ssize_t count(0);
+    while (beg <= str.length()) {
+        string::size_type pos(0);
+        if (maxsplit >= 0 and count++ >= maxsplit) {
+            // Exceeded max splits, consume the rest of the string.
+            pos = str.length();
+        }
+        else {
+            pos = str.find(sep, beg);
+            if (pos == string::npos) {
+                pos = str.length();
+            }
+        }
+        items.emplace_back(str.substr(beg, pos - beg));
+        beg = pos + sep.length();
+    }
+    return items;
+}
+
+}  // namespace
 
 
 string pypp::lower(string str)
@@ -63,12 +118,19 @@ string pypp::strip(const string& str)
 }
 
 
-string pypp::join(const vector<string>& items, const string& delim)
+string pypp::join(const vector<string>& items, const string& sep)
 {
     string joined(items.front());
     for (auto iter(next(items.cbegin())); iter != items.cend(); ++iter) {
         // Skip first element to avoid leading delimiter.
-        joined += delim + *iter;
+        joined += sep + *iter;
     }
     return joined;
 }
+
+
+vector<string> pypp::split(const string& str, const string& sep, ssize_t maxsplit)
+{
+    return sep.empty() ? split_space(str, maxsplit) : split_delim(str, sep, maxsplit);
+}
+

@@ -85,3 +85,27 @@ TEST(string, join)
     static const string joined("a,b,c");
     ASSERT_EQ(join({"a", "b", "c", }, ","), joined);
 }
+
+
+/// Test the split() function with whitespace.
+///
+TEST(string, split_space)
+{
+    static const vector<string> items({"abc", "xyz", "123"});
+    static const string joined(" \rabc\t xyz \n123 \n");
+    ASSERT_EQ(split(joined), items);
+    ASSERT_EQ(split(joined, "", 1), vector<string>({"abc", "xyz \n123 \n"}));
+    //ASSERT_EQ(split(joined, "", 1), vector<string>({"", "abc", "00xyz00"}));
+}
+
+
+/// Test the split() function with a delimiter.
+///
+TEST(string, split_delim)
+{
+    static const vector<string> items({"", "abc", "", "xyz", ""});
+    static const string joined("00abc0000xyz00");
+    ASSERT_EQ(split(joined, "00"), items);
+    ASSERT_EQ(split(joined, "00", 0), vector<string>{joined});
+    ASSERT_EQ(split(joined, "00", 2), vector<string>({"", "abc", "00xyz00"}));
+}
