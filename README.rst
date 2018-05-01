@@ -2,6 +2,15 @@
 py++
 ####
 
+.. |travis.png| image:: https://travis-ci.org/mdklatt/pypp.png?branch=master
+   :alt: Travis CI build status
+   :target: `travis`_
+.. _travis: https://travis-ci.org/mdklatt/pypp
+.. _py++: http://github.com/mdklatt/pypp
+
+
+|travis.png|
+
 Python functions you wish C++ had.
 
 
@@ -39,6 +48,7 @@ Doxygen documentation can be integrated into Sphinx using the* `Breathe`_
 extension.
 
 
+==========
 Test Suite
 ==========
 .. code-block:: console

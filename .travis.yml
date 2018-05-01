@@ -1,0 +1,25 @@
+## Travis CI configuration for the py++ library.
+##
+##   <https://travis-ci.org/mdklatt/pypp>
+##
+language: cpp
+
+compiler:
+  - clang
+  - gcc
+
+branches:
+  only:
+    - master
+    - dev
+
+sudo: false
+dist: trusty  # beta; needed for C++11
+
+before_script:
+  - mkdir build && cd build
+  - cmake -DCMAKE_BUILD_TYPE=Debug ../
+  - cmake --build .
+  
+script:
+  - test/test_pypp
