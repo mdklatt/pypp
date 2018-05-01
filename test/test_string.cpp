@@ -38,9 +38,13 @@ TEST(string, upper)
 ///
 TEST(string, lstrip)
 {
-    static const string stripped("abc \r\t\n");
+    static const string space("\r\t\n ");
+    static const string empty;
+    static const string stripped("abc" + space);
     ASSERT_EQ(lstrip(stripped), stripped);
-    ASSERT_EQ(lstrip("\r\t\n abc \r\t\n"), stripped);
+    ASSERT_EQ(lstrip(space + "abc" + space), stripped);
+    ASSERT_EQ(lstrip(space), empty);
+    ASSERT_EQ(lstrip(empty), empty);
 }
 
 
@@ -48,9 +52,13 @@ TEST(string, lstrip)
 ///
 TEST(string, rstrip)
 {
-    static const string stripped("\r\t\n abc");
+    static const string space("\r\t\n ");
+    static const string empty;
+    static const string stripped(space + "abc");
     ASSERT_EQ(rstrip(stripped), stripped);
-    ASSERT_EQ(rstrip("\r\t\n abc \r\t\n"), stripped);
+    ASSERT_EQ(rstrip(space + "abc" + space), stripped);
+    ASSERT_EQ(rstrip(space), empty);
+    ASSERT_EQ(rstrip(empty), empty);
 }
 
 
@@ -58,7 +66,11 @@ TEST(string, rstrip)
 ///
 TEST(string, strip)
 {
+    static const string space("\r\t\n ");
+    static const string empty;
     static const string stripped("abc");
     ASSERT_EQ(strip(stripped), stripped);
-    ASSERT_EQ(strip("\r\t\n abc \r\t\n"), stripped);
+    ASSERT_EQ(strip(space + "abc" + space), stripped);
+    ASSERT_EQ(strip(space), empty);
+    ASSERT_EQ(strip(empty), empty);
 }

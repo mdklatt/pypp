@@ -27,17 +27,26 @@ string pypp::upper(string str)
 
 string pypp::lstrip(const string& str)
 {
-    string::size_type pos(0);
-    while (isspace(str[pos++]));  // one past first valid char
-    return str.substr(--pos);
+    const auto end(str.cend());
+    auto pos(str.cbegin());
+    for (; pos != end; ++pos) {
+        if (not isspace(*pos)) {
+            break;  // at first valid character
+        }
+    }
+    return string(pos, end);
 }
 
 
 string pypp::rstrip(const string& str)
 {
-    string::size_type pos(str.size());
-    while (isspace(str[--pos]));  // last valid char
-    return str.substr(0, ++pos);
+    auto pos(str.crbegin());
+    for (; pos != str.crend(); ++pos) {
+        if (not isspace(*pos)) {
+            break;  // at last valid character
+        }
+    }
+    return string(str.cbegin(), pos.base());
 }
 
 

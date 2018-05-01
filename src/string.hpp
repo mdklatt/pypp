@@ -23,7 +23,7 @@ std::string lower(std::string str);
 std::string upper(std::string str);
 
 
-/// Remove leading whitespace.
+/// Remove leading whitespace from a string.
 ///
 /// @param str input string
 /// @return modified string
