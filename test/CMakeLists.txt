@@ -8,5 +8,5 @@ add_subdirectory(lib/gtest)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
-add_executable(${PROJECT_NAME} test_module.cpp)
+add_executable(${PROJECT_NAME} test_string.cpp)
 target_link_libraries(${PROJECT_NAME} pypp gtest gtest_main)
