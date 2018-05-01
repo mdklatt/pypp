@@ -4,6 +4,7 @@
 /// test runner.
 ///
 #include <string>
+#include <vector>
 #include <gtest/gtest.h>
 #include "string.hpp"
 
@@ -11,6 +12,7 @@
 using testing::Test;
 using testing::Types;
 using std::string;
+using std::vector;
 
 using namespace pypp;
 
@@ -73,4 +75,13 @@ TEST(string, strip)
     ASSERT_EQ(strip(space + "abc" + space), stripped);
     ASSERT_EQ(strip(space), empty);
     ASSERT_EQ(strip(empty), empty);
+}
+
+
+/// Test the join() function.
+///
+TEST(string, join)
+{
+    static const string joined("a,b,c");
+    ASSERT_EQ(join({"a", "b", "c", }, ","), joined);
 }

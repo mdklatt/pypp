@@ -5,6 +5,7 @@
 #define PYPP_STRING_HPP
 
 #include <string>
+#include <vector>
 
 
 namespace pypp {
@@ -42,6 +43,11 @@ std::string rstrip(const std::string& str);
 /// @param str input string
 /// @return modified string
 std::string strip(const std::string& str);
+
+
+/// Join strings using a delimiter.
+///
+std::string join(const std::vector<std::string>& items, const std::string& delim="");
 
 }
 
