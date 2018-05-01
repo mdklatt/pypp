@@ -12,15 +12,36 @@ namespace pypp {
 /// Convert a string to lower case.
 ///
 /// @param str input string
-/// @return lower case string
+/// @return modified string
 std::string lower(std::string str);
 
 
 /// Convert a string to upper case.
 ///
 /// @param str input string
-/// @return uppder case string
+/// @return modified string
 std::string upper(std::string str);
+
+
+/// Remove leading whitespace.
+///
+/// @param str input string
+/// @return modified string
+std::string lstrip(const std::string& str);
+
+
+/// Remove trailing whitespace from a string.
+///
+/// @param str input string
+/// @return modified string
+std::string rstrip(const std::string& str);
+
+
+/// Remove whitespace from both ends of a string.
+///
+/// @param str input string
+/// @return modified string
+std::string strip(const std::string& str);
 
 }
 
