@@ -41,12 +41,11 @@ TEST(string, upper)
 TEST(string, lstrip)
 {
     static const string space("\r\t\n ");
-    static const string empty;
     static const string stripped("abc" + space);
     ASSERT_EQ(lstrip(stripped), stripped);
     ASSERT_EQ(lstrip(space + "abc" + space), stripped);
-    ASSERT_EQ(lstrip(space), empty);
-    ASSERT_EQ(lstrip(empty), empty);
+    ASSERT_EQ(lstrip(space), "");
+    ASSERT_EQ(lstrip(""), "");
 }
 
 
@@ -55,12 +54,11 @@ TEST(string, lstrip)
 TEST(string, rstrip)
 {
     static const string space("\r\t\n ");
-    static const string empty;
     static const string stripped(space + "abc");
     ASSERT_EQ(rstrip(stripped), stripped);
     ASSERT_EQ(rstrip(space + "abc" + space), stripped);
-    ASSERT_EQ(rstrip(space), empty);
-    ASSERT_EQ(rstrip(empty), empty);
+    ASSERT_EQ(rstrip(space), "");
+    ASSERT_EQ(rstrip(""), "");
 }
 
 
@@ -69,12 +67,11 @@ TEST(string, rstrip)
 TEST(string, strip)
 {
     static const string space("\r\t\n ");
-    static const string empty;
     static const string stripped("abc");
     ASSERT_EQ(strip(stripped), stripped);
     ASSERT_EQ(strip(space + "abc" + space), stripped);
-    ASSERT_EQ(strip(space), empty);
-    ASSERT_EQ(strip(empty), empty);
+    ASSERT_EQ(strip(space), "");
+    ASSERT_EQ(strip(""), "");
 }
 
 
@@ -94,8 +91,9 @@ TEST(string, split_space)
     static const vector<string> items({"abc", "xyz", "123"});
     static const string joined(" \rabc\t xyz \n123 \n");
     ASSERT_EQ(split(joined), items);
+    ASSERT_EQ(split(joined, "", 0), vector<string>({"abc\t xyz \n123 \n"}));
     ASSERT_EQ(split(joined, "", 1), vector<string>({"abc", "xyz \n123 \n"}));
-    //ASSERT_EQ(split(joined, "", 1), vector<string>({"", "abc", "00xyz00"}));
+    ASSERT_EQ(split(""), vector<string>());
 }
 
 
@@ -103,9 +101,12 @@ TEST(string, split_space)
 ///
 TEST(string, split_delim)
 {
-    static const vector<string> items({"", "abc", "", "xyz", ""});
+    static const string sep("00");
     static const string joined("00abc0000xyz00");
-    ASSERT_EQ(split(joined, "00"), items);
-    ASSERT_EQ(split(joined, "00", 0), vector<string>{joined});
-    ASSERT_EQ(split(joined, "00", 2), vector<string>({"", "abc", "00xyz00"}));
+    static const vector<string> items({"", "abc", "", "xyz", ""});
+    ASSERT_EQ(split(joined, sep), items);
+    ASSERT_EQ(split(joined, sep, 0), vector<string>{joined});
+    ASSERT_EQ(split(joined, sep, 2), vector<string>({"", "abc", "00xyz00"}));
+    ASSERT_EQ(split(sep, sep), vector<string>({"", ""}));
+    ASSERT_EQ(split("", sep), vector<string>({""}));
 }
