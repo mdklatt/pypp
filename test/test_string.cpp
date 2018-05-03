@@ -44,42 +44,78 @@ TEST(string, upper)
 }
 
 
-/// Test the lstrip() function.
+/// Test the lstrip() function for whitespace.
 ///
-TEST(string, lstrip)
+TEST(string, lstrip_space)
 {
-    static const string space("\r\t\n ");
-    static const string stripped("abc" + space);
+    static const string stripped("abc" + whitespace);
     ASSERT_EQ(lstrip(stripped), stripped);
-    ASSERT_EQ(lstrip(space + "abc" + space), stripped);
-    ASSERT_EQ(lstrip(space), "");
+    ASSERT_EQ(lstrip(whitespace + "abc" + whitespace), stripped);
+    ASSERT_EQ(lstrip(whitespace), "");
     ASSERT_EQ(lstrip(""), "");
 }
 
 
-/// Test the rstrip() function.
+/// Test the lstrip() function for a set of characters.
 ///
-TEST(string, rstrip)
+TEST(string, lstrip_chars)
 {
-    static const string space("\r\t\n ");
-    static const string stripped(space + "abc");
+    static const string chars("012");
+    static const string stripped("abc001122");
+    ASSERT_EQ(lstrip(stripped, chars), stripped);
+    ASSERT_EQ(lstrip("001122abc001122", chars), stripped);
+    ASSERT_EQ(lstrip("001122", chars), "");
+    ASSERT_EQ(lstrip("", chars), "");
+}
+
+
+/// Test the rstrip() function for whitespace.
+///
+TEST(string, rstrip_space)
+{
+    static const string stripped(whitespace + "abc");
     ASSERT_EQ(rstrip(stripped), stripped);
-    ASSERT_EQ(rstrip(space + "abc" + space), stripped);
-    ASSERT_EQ(rstrip(space), "");
+    ASSERT_EQ(rstrip(whitespace + "abc" + whitespace), stripped);
+    ASSERT_EQ(rstrip(whitespace), "");
     ASSERT_EQ(rstrip(""), "");
 }
 
 
-/// Test the strip() function.
+/// Test the rstrip() function for a set of characters.
 ///
-TEST(string, strip)
+TEST(string, rstrip_chars)
 {
-    static const string space("\r\t\n ");
+    static const string chars("012");
+    static const string stripped("001122abc");
+    ASSERT_EQ(rstrip(stripped, chars), stripped);
+    ASSERT_EQ(rstrip("001122abc001122", chars), stripped);
+    ASSERT_EQ(rstrip("001122", chars), "");
+    ASSERT_EQ(rstrip("", chars), "");
+}
+
+
+/// Test the strip() function for whitespace.
+///
+TEST(string, strip_space)
+{
     static const string stripped("abc");
     ASSERT_EQ(strip(stripped), stripped);
-    ASSERT_EQ(strip(space + "abc" + space), stripped);
-    ASSERT_EQ(strip(space), "");
+    ASSERT_EQ(strip(whitespace + "abc" + whitespace), stripped);
+    ASSERT_EQ(strip(whitespace), "");
     ASSERT_EQ(strip(""), "");
+}
+
+
+/// Test the strip() function for a set of characters.
+///
+TEST(string, strip_chars)
+{
+    static const string chars("012");
+    static const string stripped("abc");
+    ASSERT_EQ(strip(stripped, chars), stripped);
+    ASSERT_EQ(strip("001122abc001122", chars), stripped);
+    ASSERT_EQ(strip("001122", chars), "");
+    ASSERT_EQ(strip("", chars), "");
 }
 
 

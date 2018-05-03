@@ -19,6 +19,8 @@ extern const std::string whitespace;
 
 /// Convert a string to lower case.
 ///
+/// In the current implementation this is not locale-aware.
+///
 /// @param str input string
 /// @return modified string
 std::string lower(std::string str);
@@ -26,30 +28,37 @@ std::string lower(std::string str);
 
 /// Convert a string to upper case.
 ///
+/// In the current implementation this is not locale-aware.
+///
 /// @param str input string
 /// @return modified string
 std::string upper(std::string str);
 
 
-/// Remove leading whitespace from a string.
+/// Remove leading characters from a string.
 ///
 /// @param str input string
+/// @param chars set of characters to remove
 /// @return modified string
-std::string lstrip(const std::string& str);
+std::string lstrip(const std::string& str, const std::string& chars=whitespace);
 
 
-/// Remove trailing whitespace from a string.
+/// Remove trailing characters from a string.
 ///
 /// @param str input string
+/// @param chars set of characters to remove
 /// @return modified string
-std::string rstrip(const std::string& str);
+std::string rstrip(const std::string& str, const std::string& chars=whitespace);
 
 
-/// Remove whitespace from both ends of a string.
+/// Remove leading and trailing characters from of a string.
+///
+/// In the current implementation this is not locale-aware.
 ///
 /// @param str input string
+/// @param chars set of characters to remove
 /// @return modified string
-std::string strip(const std::string& str);
+std::string strip(const std::string& str, const std::string& chars=whitespace);
 
 
 /// Join strings using a separator.

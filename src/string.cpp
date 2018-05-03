@@ -67,7 +67,7 @@ vector<string> split_delim(const string& str, const string& sep, ssize_t maxspli
 }  // namespace
 
 
-const string pypp::whitespace(" \t\n\v\f\r");  // "C" locale
+const string pypp::whitespace{" \t\n\v\f\r"};  // "C" locale
 
 
 string pypp::lower(string str)
@@ -86,38 +86,23 @@ string pypp::upper(string str)
 }
 
 
-string pypp::lstrip(const string& str)
+string pypp::lstrip(const string& str, const string& chars)
 {
-    // TODO: Use std::isspace for locale awareness.
-    const auto end(str.cend());
-    auto iter(str.cbegin());
-    for (; iter != end; ++iter) {
-        if (not isspace(*iter)) {
-            // At first valid character.
-            break;
-        }
-    }
-    return string(iter, end);
+    const auto pos(str.find_first_not_of(chars));
+    return pos == string::npos ? "" : str.substr(pos);
 }
 
 
-string pypp::rstrip(const string& str)
+string pypp::rstrip(const string& str, const string& chars)
 {
-    // TODO: Use std::isspace for locale awareness.
-    auto iter(str.crbegin());
-    for (; iter != str.crend(); ++iter) {
-        if (not isspace(*iter)) {
-            // At last valid character.
-            break;
-        }
-    }
-    return string(str.cbegin(), iter.base());
+    auto pos(str.find_last_not_of(chars));
+    return pos == string::npos ? "" : str.substr(0, ++pos);
 }
 
 
-string pypp::strip(const string& str)
+string pypp::strip(const string& str, const string& chars)
 {
-    return rstrip(lstrip(str));
+    return rstrip(lstrip(str, chars), chars);
 }
 
 
