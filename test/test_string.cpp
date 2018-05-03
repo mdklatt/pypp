@@ -17,6 +17,14 @@ using std::vector;
 using namespace pypp;
 
 
+/// Test the whitespace constant.
+///
+TEST(string, whitespace)
+{
+    ASSERT_FALSE(whitespace.empty());  // make sure it's defined
+}
+
+
 /// Test the lower() function.
 ///
 TEST(string, lower)

@@ -10,6 +10,13 @@
 
 namespace pypp {
 
+/// List of whitespace characters.
+///
+/// In the current implementation this is not locale-aware.
+///
+extern const std::string whitespace;
+
+
 /// Convert a string to lower case.
 ///
 /// @param str input string

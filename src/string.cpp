@@ -67,6 +67,9 @@ vector<string> split_delim(const string& str, const string& sep, ssize_t maxspli
 }  // namespace
 
 
+const string pypp::whitespace(" \t\n\v\f\r");  // "C" locale
+
+
 string pypp::lower(string str)
 {
     // TODO: Use std::tolower for locale awareness.
