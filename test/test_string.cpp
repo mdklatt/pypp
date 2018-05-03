@@ -80,8 +80,8 @@ TEST(string, strip)
 TEST(string, join)
 {
     static const string sep(",");
-    ASSERT_EQ(join({"a", "b", "c", }, sep), "a,b,c");
-    ASSERT_EQ(join({"a", "b", ",c,"}, sep), "a,b,,c,");
+    ASSERT_EQ(join(sep, {"a", "b", "c",}), "a,b,c");
+    ASSERT_EQ(join(sep, {"a", "b", ",c,"}), "a,b,,c,");
 }
 
 

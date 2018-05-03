@@ -118,8 +118,13 @@ string pypp::strip(const string& str)
 }
 
 
-string pypp::join(const vector<string>& items, const string& sep)
+std::string pypp::join(const std::string& sep, const std::vector<std::string>& items)
 {
+    // If this was a clean-sheet design it would make more sense to put the
+    // 'sep' argument last, and possibly give it a default value of "". The
+    // goal here, however, is to resemble Python, where this function is used
+    // as a member function of the separator string.
+    //
     // To conform with the Python join behavior, there is no special handling
     // of items that contain the separator, e.g. joining "abc" and "d,ef," will
     // produce "abc,d,ef,". This means that that join() and split() are not

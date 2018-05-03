@@ -45,9 +45,9 @@ std::string rstrip(const std::string& str);
 std::string strip(const std::string& str);
 
 
-/// Join strings using a delimiter.
+/// Join strings using a separator.
 ///
-std::string join(const std::vector<std::string>& items, const std::string& sep="");
+std::string join(const std::string& sep, const std::vector<std::string>& items);
 
 
 /// Split a string.
