@@ -14,60 +14,7 @@ using std::transform;
 using std::vector;
 
 
-namespace {  // internal linkage
-
-/// Split string on whitespace.
-///
-vector<string> split_space(const string& str, ssize_t maxsplit)
-{
-    vector<string> items;
-    std::istringstream stream(str);
-    ssize_t count(0);
-    string item;
-    while (stream >> item) {
-        if (maxsplit >= 0 and count++ >= maxsplit) {
-            // Exceeded max splits, consume the rest of the string.
-            char c;
-            while (stream.get(c)) {
-                // TODO: This seems very inefficient.
-                item += c;
-            }
-        }
-        items.emplace_back(item);
-    }
-    return items;
-}
-
-
-/// Split string on a delimiter.
-///
-vector<string> split_delim(const string& str, const string& sep, ssize_t maxsplit)
-{
-    vector<string> items;
-    string::size_type beg(0);
-    ssize_t count(0);
-    while (beg <= str.length()) {
-        string::size_type pos(0);
-        if (maxsplit >= 0 and count++ >= maxsplit) {
-            // Exceeded max splits, consume the rest of the string.
-            pos = str.length();
-        }
-        else {
-            pos = str.find(sep, beg);
-            if (pos == string::npos) {
-                pos = str.length();
-            }
-        }
-        items.emplace_back(str.substr(beg, pos - beg));
-        beg = pos + sep.length();
-    }
-    return items;
-}
-
-}  // namespace
-
-
-const string pypp::whitespace{" \t\n\v\f\r"};  // "C" locale
+const string pypp::whitespace(" \t\n\v\f\r");  // "C" locale
 
 
 string pypp::lower(string str)
@@ -127,8 +74,46 @@ std::string pypp::join(const std::string& sep, const std::vector<std::string>& i
 }
 
 
-vector<string> pypp::split(const string& str, const string& sep, ssize_t maxsplit)
+vector<string> pypp::split(const string& str, ssize_t maxsplit)
 {
-    return sep.empty() ? split_space(str, maxsplit) : split_delim(str, sep, maxsplit);
+    vector<string> items;
+    std::istringstream stream(str);
+    ssize_t count(0);
+    string item;
+    while (stream >> item) {
+        if (maxsplit >= 0 and count++ >= maxsplit) {
+            // Exceeded max splits, consume the rest of the string.
+            char c;
+            while (stream.get(c)) {
+                // TODO: This seems very inefficient.
+                item += c;
+            }
+        }
+        items.emplace_back(item);
+    }
+    return items;
 }
 
+
+vector<string> pypp::split(const string& str, const string& sep, ssize_t maxsplit)
+{
+    vector<string> items;
+    string::size_type beg(0);
+    ssize_t count(0);
+    while (beg <= str.length()) {
+        string::size_type pos(0);
+        if (maxsplit >= 0 and count++ >= maxsplit) {
+            // Exceeded max splits, consume the rest of the string.
+            pos = str.length();
+        }
+        else {
+            pos = str.find(sep, beg);
+            if (pos == string::npos) {
+                pos = str.length();
+            }
+        }
+        items.emplace_back(str.substr(beg, pos - beg));
+        beg = pos + sep.length();
+    }
+    return items;
+}

@@ -136,8 +136,8 @@ TEST(string, split_space)
     static const vector<string> items({"abc", "xyz", "123"});
     static const string joined(" \rabc\t xyz \n123 \n");
     ASSERT_EQ(split(joined), items);
-    ASSERT_EQ(split(joined, "", 0), vector<string>({"abc\t xyz \n123 \n"}));
-    ASSERT_EQ(split(joined, "", 1), vector<string>({"abc", "xyz \n123 \n"}));
+    ASSERT_EQ(split(joined, 0), vector<string>({"abc\t xyz \n123 \n"}));
+    ASSERT_EQ(split(joined, 1), vector<string>({"abc", "xyz \n123 \n"}));
     ASSERT_EQ(split(""), vector<string>());
 }
 
