@@ -79,8 +79,9 @@ TEST(string, strip)
 ///
 TEST(string, join)
 {
-    static const string joined("a,b,c");
-    ASSERT_EQ(join({"a", "b", "c", }, ","), joined);
+    static const string sep(",");
+    ASSERT_EQ(join({"a", "b", "c", }, sep), "a,b,c");
+    ASSERT_EQ(join({"a", "b", ",c,"}, sep), "a,b,,c,");
 }
 
 
@@ -101,12 +102,12 @@ TEST(string, split_space)
 ///
 TEST(string, split_delim)
 {
-    static const string sep("00");
-    static const string joined("00abc0000xyz00");
+    static const string joined(", abc, , xyz, ");
     static const vector<string> items({"", "abc", "", "xyz", ""});
+    static const string sep(", ");  // test multi-char separators
     ASSERT_EQ(split(joined, sep), items);
     ASSERT_EQ(split(joined, sep, 0), vector<string>{joined});
-    ASSERT_EQ(split(joined, sep, 2), vector<string>({"", "abc", "00xyz00"}));
+    ASSERT_EQ(split(joined, sep, 2), vector<string>({"", "abc", ", xyz, "}));
     ASSERT_EQ(split(sep, sep), vector<string>({"", ""}));
     ASSERT_EQ(split("", sep), vector<string>({""}));
 }

@@ -120,6 +120,11 @@ string pypp::strip(const string& str)
 
 string pypp::join(const vector<string>& items, const string& sep)
 {
+    // To conform with the Python join behavior, there is no special handling
+    // of items that contain the separator, e.g. joining "abc" and "d,ef," will
+    // produce "abc,d,ef,". This means that that join() and split() are not
+    // strict inverses of each other unless the caller takes care to pick a
+    // separator that is distinct from any input.
     string joined(items.front());
     for (auto iter(next(items.cbegin())); iter != items.cend(); ++iter) {
         // Skip first element to avoid leading delimiter.
