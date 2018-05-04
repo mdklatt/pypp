@@ -155,3 +155,25 @@ TEST(string, split_sep)
     ASSERT_EQ(split(sep, sep), vector<string>({"", ""}));
     ASSERT_EQ(split("", sep), vector<string>({""}));
 }
+
+
+/// Test the startswith() function.
+///
+TEST(string, startswith)
+{
+    ASSERT_TRUE(startswith("abc", "ab"));
+    ASSERT_TRUE(startswith("abc", "abc"));
+    ASSERT_FALSE(startswith("abc", "xyz"));
+    ASSERT_FALSE(startswith("abc", "abcabc"));  // test prefix longer than str
+}
+
+
+/// Test the endswith() function.
+///
+TEST(string, endswith)
+{
+    ASSERT_TRUE(endswith("abc", "bc"));
+    ASSERT_TRUE(endswith("abc", "abc"));
+    ASSERT_FALSE(endswith("abc", "xyz"));
+    ASSERT_FALSE(endswith("abc", "abcabc"));  // test suffix longer than str
+}

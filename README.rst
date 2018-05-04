@@ -11,7 +11,12 @@ py++
 
 |travis.png|
 
-Python functions you wish C++ had.
+Python 3.6 functions you wish C++ had.
+
+The overarching design principle here is to emulate Python functionality as
+closely as possible, which occasionally results in some compromises to the
+ideal C++ approach to the problem. Also, user friendliness is prioritized over
+performance.
 
 
 ========

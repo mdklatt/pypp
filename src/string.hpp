@@ -95,6 +95,28 @@ std::vector<std::string> split(const std::string& str, ssize_t maxsplit=-1);
 /// @return split items
 std::vector<std::string> split(const std::string& str, const std::string& sep, ssize_t maxsplit=-1);
 
+
+/// Determine if a string starts with a prefix.
+///
+/// Unlike the Python version, this does not support optional beginning and
+/// ending positions for the comparision. Use `str.substr()` as needed instead.
+///
+/// @param str string to test
+/// @param prefix string to match
+/// @return
+bool startswith(const std::string& str, const std::string& prefix);
+
+
+/// Determine if a string ends with a suffix.
+///
+/// Unlike the Python version, this does not support optional beginning and
+/// ending positions for the comparision. Use `str.substr()` as needed instead.
+///
+/// @param str string to test
+/// @param suffix string to match
+/// @return
+bool endswith(const std::string& str, const std::string& suffix);
+
 }  // namespace
 
 #endif  // PYPP_STRING_HPP 

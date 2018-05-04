@@ -8,6 +8,7 @@
 #include "string.hpp"
 
 
+using std::max;
 using std::next;
 using std::string;
 using std::transform;
@@ -114,4 +115,26 @@ vector<string> pypp::split(const string& str, const string& sep, ssize_t maxspli
         beg = pos + sep.length();
     }
     return items;
+}
+
+
+bool pypp::startswith(const string& str, const string& prefix)
+{
+    // Making a deliberate decision to break with Python functionality, which
+    // supports optional beginning and ending positions for the comparison.
+    // This can be easily duplicated using `str.substr()`, which avoids
+    // burdening this function with what seems like an atypical use case.
+    return str.substr(0, prefix.length()) == prefix;
+}
+
+
+bool pypp::endswith(const string& str, const string& suffix)
+{
+    // Making a deliberate decision to break with Python functionality, which
+    // supports optional beginning and ending positions for the comparison.
+    // This can be easily duplicated using `str.substr()`, which avoids
+    // burdening this function with what seems like an atypical use case.
+    const auto strlen(str.length());
+    const auto suflen(suffix.length());
+    return suflen > strlen ? false : str.substr(strlen - suflen) == suffix;
 }
