@@ -15,6 +15,11 @@ using std::transform;
 using std::vector;
 
 
+// TODO: Move out of the root namespace.
+// The obvious choice for a module namespace is pypp::string, but that clashes
+// with std::string and forces the use of fully qualified names everywhere.
+
+
 const string pypp::whitespace(" \t\n\v\f\r");  // "C" locale
 
 

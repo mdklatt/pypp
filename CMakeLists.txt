@@ -7,12 +7,13 @@ cmake_minimum_required(VERSION 2.8.12)
 
 project(pypp)
 
-set(LIB_FILES
+set(PROJECT_SOURCE_FILES
+    ${CMAKE_SOURCE_DIR}/src/path.cpp
     ${CMAKE_SOURCE_DIR}/src/string.cpp
 )
 
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11 -Wall")
-add_library(${PROJECT_NAME} ${LIB_FILES})
+add_library(${PROJECT_NAME} ${PROJECT_SOURCE_FILES})
 
 function(install)
     # Disable install for test directory.
