@@ -97,16 +97,14 @@ vector<string> pypp::split(const string& str, ssize_t maxsplit)
 
 vector<string> pypp::split(const string& str, const string& sep, ssize_t maxsplit)
 {
+    const auto len(str.length());
     vector<string> items;
     string::size_type beg(0);
     ssize_t count(0);
-    while (beg <= str.length()) {
-        string::size_type pos(0);
-        if (maxsplit >= 0 and count++ >= maxsplit) {
-            // Exceeded max splits, consume the rest of the string.
-            pos = str.length();
-        }
-        else {
+    while (beg <= len) {
+        string::size_type pos(len);
+        if (maxsplit < 0 or count++ < maxsplit) {
+            // Continue splitting.
             pos = str.find(sep, beg);
             if (pos == string::npos) {
                 pos = str.length();

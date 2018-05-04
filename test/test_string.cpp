@@ -46,7 +46,7 @@ TEST(string, upper)
 
 /// Test the lstrip() function for whitespace.
 ///
-TEST(string, lstrip_space)
+TEST(string, lstrip)
 {
     static const string stripped("abc" + whitespace);
     ASSERT_EQ(lstrip(stripped), stripped);
@@ -71,7 +71,7 @@ TEST(string, lstrip_chars)
 
 /// Test the rstrip() function for whitespace.
 ///
-TEST(string, rstrip_space)
+TEST(string, rstrip)
 {
     static const string stripped(whitespace + "abc");
     ASSERT_EQ(rstrip(stripped), stripped);
@@ -96,7 +96,7 @@ TEST(string, rstrip_chars)
 
 /// Test the strip() function for whitespace.
 ///
-TEST(string, strip_space)
+TEST(string, strip)
 {
     static const string stripped("abc");
     ASSERT_EQ(strip(stripped), stripped);
@@ -129,9 +129,9 @@ TEST(string, join)
 }
 
 
-/// Test the split() function with whitespace.
+/// Test the split() function for whitespace.
 ///
-TEST(string, split_space)
+TEST(string, split)
 {
     static const vector<string> items({"abc", "xyz", "123"});
     static const string joined(" \rabc\t xyz \n123 \n");
@@ -142,9 +142,9 @@ TEST(string, split_space)
 }
 
 
-/// Test the split() function with a delimiter.
+/// Test the split() function for a separator.
 ///
-TEST(string, split_delim)
+TEST(string, split_sep)
 {
     static const string joined(", abc, , xyz, ");
     static const vector<string> items({"", "abc", "", "xyz", ""});
