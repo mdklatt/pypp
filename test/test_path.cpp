@@ -40,6 +40,7 @@ TEST(path, split)
     ASSERT_EQ(split("/abc/xyz"), make_pair(string("/abc"), string("xyz")));
     ASSERT_EQ(split("abc//xyz"), make_pair(string("abc"), string("xyz")));
     ASSERT_EQ(split("abc"), make_pair(string(""), string("abc")));
+    ASSERT_EQ(split("abc/"), make_pair(string("abc"), string("")));
     ASSERT_EQ(split(""), make_pair(string(""), string("")));
 }
 
@@ -52,6 +53,7 @@ TEST(path, dirname)
     ASSERT_EQ(dirname("/abc/xyz"), "/abc");
     ASSERT_EQ(dirname("abc//xyz"), "abc");
     ASSERT_EQ(dirname("abc"), "");
+    ASSERT_EQ(dirname("abc/"), "abc");
     ASSERT_EQ(dirname(""), "");
 }
 
@@ -64,12 +66,11 @@ TEST(path, basename)
     // spurious failures on Linux with both clang and gcc (i.e. Travis CI).
     // Without a cast, Google Test appears to test for pointer equality instead
     // of string equality. Tests pass without explicit casts on MacOS with
-    // clang. Note that casts are only needed in cases where there is no
-    // directory component. Running with valgrind doesn't reveal any obvious
-    // issues with the basename() function.
+    // clang.
     ASSERT_EQ(basename("//abc"), string("abc"));
     ASSERT_EQ(basename("/abc/xyz"), string("xyz"));
     ASSERT_EQ(basename("abc//xyz"), string("xyz"));
     ASSERT_EQ(basename("abc"), "abc");
+    ASSERT_EQ(basename("abc/"), string(""));
     ASSERT_EQ(basename(""), "");
 }
