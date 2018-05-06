@@ -22,10 +22,9 @@ using std::vector;
 ///
 TEST(path, join)
 {
-    // These test cases correspond with the observed Python behavior of
-    // os.path.join(), not its documented behavior.
     ASSERT_EQ(join({"/abc/"}), "/abc/");
     ASSERT_EQ(join({"/abc", "xyz"}), "/abc/xyz");
+    ASSERT_EQ(join({"/abc", "", "xyz"}), "/abc/xyz");
     ASSERT_EQ(join({"abc/", "xyz/"}), "abc/xyz/");
     ASSERT_EQ(join({"/abc/", "/xyz/"}), "/xyz/");
     ASSERT_EQ(join({"/abc//", "xyz", ""}), "/abc//xyz/");

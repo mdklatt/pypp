@@ -20,21 +20,9 @@ const string path::sep("/");  // *nix, but works for Windows too
 
 string path::join(const vector<string>& paths)
 {
-    // There is a discrepancy between the Python documentation and the actual
-    // behavior of os.path.join(). From the documentation:
-    //
-    //   The return value is the concatenation of path and any members of
-    //   *paths with exactly one directory separator (os.sep) following each
-    //   non-empty part except the last, meaning that the result will only end
-    //   in a separator if the last part is empty.
-    //
-    // Based on this, the result of `os.path.join("/abc//", "def/")` should be
-    // "/abc/def", but the actual result is "/abc//def/".
-    //
-    // Here, the observed behavior of os.path.join() is reproduced. If a path
-    // segment already has a trailing separator another one will not be added,
-    // but redundant separators in the input are ignored. In practice both the
-    // documented behavior and the actual behavior produce an equivalent path.
+    // The Python documentation for os.path.join() is ambiguous about the
+    // handling of path separators. Path separators are added as needed
+    // between segments, while existing separators are left unmodified.
     string joined;
     const auto last(prev(paths.cend()));
     for (auto iter(paths.cbegin()); iter != paths.cend(); ++iter) {
@@ -45,7 +33,7 @@ string path::join(const vector<string>& paths)
         else {
             joined += *iter;
         }
-        if (not endswith(*iter, sep) and iter != last) {
+        if (not endswith(joined, sep) and iter != last) {
             joined += sep;
         }
     }
