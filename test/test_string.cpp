@@ -3,6 +3,7 @@
 /// Link all test files with the `gtest_main` library to create a command-line 
 /// test runner.
 ///
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <gtest/gtest.h>
@@ -154,6 +155,7 @@ TEST(string, split_sep)
     ASSERT_EQ(split(joined, sep, 2), vector<string>({"", "abc", ", xyz, "}));
     ASSERT_EQ(split(sep, sep), vector<string>({"", ""}));
     ASSERT_EQ(split("", sep), vector<string>({""}));
+    ASSERT_THROW(split("", ""), std::invalid_argument);
 }
 
 

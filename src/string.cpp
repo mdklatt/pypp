@@ -5,9 +5,11 @@
 #include <iterator>
 #include <ios>
 #include <sstream>
+#include <stdexcept>
 #include "string.hpp"
 
 
+using std::invalid_argument;
 using std::max;
 using std::next;
 using std::string;
@@ -103,6 +105,9 @@ vector<string> pypp::split(const string& str, ssize_t maxsplit)
 
 vector<string> pypp::split(const string& str, const string& sep, ssize_t maxsplit)
 {
+    if (sep.empty()) {
+        throw invalid_argument("empty separator");
+    }
     const auto len(str.length());
     vector<string> items;
     string::size_type beg(0);
