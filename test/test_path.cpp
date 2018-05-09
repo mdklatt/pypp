@@ -1,8 +1,11 @@
 /// Test suite for the path module.
 ///
-/// Link all test files with the `gtest_main` library to create a command-line 
+/// Link all test files with the `gtest_main` library to create a command line
 /// test runner.
 ///
+#include <cassert>
+#include <cstdio>
+#include <memory>
 #include <string>
 #include <vector>
 #include <gtest/gtest.h>
@@ -15,6 +18,7 @@ using testing::Test;
 using std::make_pair;
 using std::pair;
 using std::string;
+using std::unique_ptr;
 using std::vector;
 
 
@@ -91,4 +95,19 @@ TEST(path, normpath)
     ASSERT_EQ(normpath("/abc"), "/abc");
     ASSERT_EQ(normpath("/abc/../../"), "/");
     ASSERT_EQ(normpath("/abc/.././xyz/"), "/xyz");
+}
+
+
+/// Test the abspath() function.
+TEST(path, abspath)
+{
+    unique_ptr<char> buffer(new char[FILENAME_MAX]);
+    assert(getcwd(buffer.get(), FILENAME_MAX));
+    const string cwd(buffer.get());
+    ASSERT_EQ(abspath(""), cwd);
+    ASSERT_EQ(abspath("."), cwd);
+    ASSERT_EQ(abspath("/"), "/");
+    ASSERT_EQ(abspath("/abc"), "/abc");
+    ASSERT_EQ(abspath("abc/xyz/"), cwd + "/abc/xyz");
+    ASSERT_EQ(abspath("abc/../"), cwd);
 }

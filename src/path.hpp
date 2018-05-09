@@ -37,7 +37,7 @@ std::string join(const std::vector<std::string>& parts);
 /// Calling join() on the resulting segments will return an equivalent (but not
 /// necessarily identical) path.
 ///
-/// @param path path
+/// @param path input path
 /// @return (root, name) pair
 std::pair<std::string, std::string> split(const std::string& path);
 
@@ -46,7 +46,7 @@ std::pair<std::string, std::string> split(const std::string& path);
 ///
 /// This is identical to the first value of the result returned by split().
 ///
-/// @param path path
+/// @param path input
 /// @return directory component
 std::string dirname(const std::string& path);
 
@@ -55,16 +55,26 @@ std::string dirname(const std::string& path);
 ///
 /// This is identical to the second value of the result returned by split().
 ///
-/// @param path complete path
+/// @param path input path
 /// @return name component
 std::string basename(const std::string& path);
 
 
 /// Normalize a path.
 ///
-/// @param path path
+/// @param path input path
 /// @return normalized path
 std::string normpath(const std::string& path);
+
+
+/// Return an absolute path.
+///
+/// The is this normalized version of the path joined with the current
+/// working directory.
+///
+/// @param path input path
+/// @return
+std::string abspath(const std::string& path);
 
 }}  // namespace
 

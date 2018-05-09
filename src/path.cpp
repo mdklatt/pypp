@@ -1,7 +1,17 @@
 /// Implemenation of the path module.
 ///
+#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#include "unistd.h"  // FIXME: not portable
+#else
+#error "path module requires *nix"
+#endif
+
+#include <cassert>
+#include <cstdio>  // FILENAME_MAX
 #include <iterator>
+#include <memory>
 #include <deque>
+#include <stdexcept>
 #include "path.hpp"
 #include "string.hpp"
 
@@ -11,7 +21,9 @@ using std::deque;
 using std::make_pair;
 using std::pair;
 using std::prev;
+using std::runtime_error;
 using std::string;
+using std::unique_ptr;
 using std::vector;
 
 using namespace pypp;
@@ -39,6 +51,7 @@ string path::join(const vector<string>& parts)
             joined += sep;
         }
     }
+    assert(joined.length() <= FILENAME_MAX);
     return joined;
 }
 
@@ -107,4 +120,17 @@ string path::normpath(const std::string& path)
         normed = current;
     }
     return normed;
+}
+
+
+string path::abspath(const std::string& path)
+{
+    if (startswith(path, sep)) {
+        return normpath(path);
+    }
+    unique_ptr<char> cwd(new char[FILENAME_MAX]);
+    if (not getcwd(cwd.get(), FILENAME_MAX)) {
+        throw runtime_error("could get current working directory");
+    }
+    return normpath(join({cwd.get(), path}));
 }

@@ -18,11 +18,9 @@
 #ifndef PYPP_VERSION_HPP
 #define PYPP_VERSION_HPP
 
-
 #define PYPP_MAJOR_VERSION "0"
 #define PYPP_MINOR_VERSION "1"
 #define PYPP_PATCH_VERSION "0"
-#define PYPP_DEVEL_VERSION "4"
-
+#define PYPP_DEVEL_VERSION "5"
 
 #endif  // PYPP_VERSION_HPP
