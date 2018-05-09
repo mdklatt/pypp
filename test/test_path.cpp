@@ -74,3 +74,21 @@ TEST(path, basename)
     ASSERT_EQ(basename("abc/"), string(""));
     ASSERT_EQ(basename(""), "");
 }
+
+
+/// Test the normpath() function.
+///
+TEST(path, normpath)
+{
+    ASSERT_EQ(normpath(""), ".");
+    ASSERT_EQ(normpath("./."), ".");
+    ASSERT_EQ(normpath("abc"), "abc");
+    ASSERT_EQ(normpath("abc/"), "abc");
+    ASSERT_EQ(normpath("abc/../"), ".");
+    ASSERT_EQ(normpath("abc/../../.."), "../..");
+    ASSERT_EQ(normpath("/"), "/");
+    ASSERT_EQ(normpath("/."), "/");
+    ASSERT_EQ(normpath("/abc"), "/abc");
+    ASSERT_EQ(normpath("/abc/../../"), "/");
+    ASSERT_EQ(normpath("/abc/.././xyz/"), "/xyz");
+}

@@ -26,9 +26,9 @@ extern const std::string sep;
 /// Use an empty string as the last to segment to ensure that the path ends in
 /// a trailing separator.
 ///
-/// @param paths path segments
+/// @param parts individual path parts
 /// @return complete path
-std::string join(const std::vector<std::string>& paths);
+std::string join(const std::vector<std::string>& parts);
 
 
 /// Split a path into directory and name components.
@@ -37,7 +37,7 @@ std::string join(const std::vector<std::string>& paths);
 /// Calling join() on the resulting segments will return an equivalent (but not
 /// necessarily identical) path.
 ///
-/// @param path complete path
+/// @param path path
 /// @return (root, name) pair
 std::pair<std::string, std::string> split(const std::string& path);
 
@@ -46,7 +46,7 @@ std::pair<std::string, std::string> split(const std::string& path);
 ///
 /// This is identical to the first value of the result returned by split().
 ///
-/// @param path complete path
+/// @param path path
 /// @return directory component
 std::string dirname(const std::string& path);
 
@@ -58,6 +58,13 @@ std::string dirname(const std::string& path);
 /// @param path complete path
 /// @return name component
 std::string basename(const std::string& path);
+
+
+/// Normalize a path.
+///
+/// @param path path
+/// @return normalized path
+std::string normpath(const std::string& path);
 
 }}  // namespace
 
