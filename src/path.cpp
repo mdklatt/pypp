@@ -1,4 +1,4 @@
-/// Implemenation of the path module.
+/// Implementation of the path module.
 ///
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 #include "unistd.h"  // FIXME: not portable
@@ -90,7 +90,6 @@ string path::normpath(const std::string& path)
 {
     static const string current(".");
     static const string parent("..");
-    const bool abs(startswith(path, sep));
     ssize_t level(0);
     deque<string> parts;
     for (const auto& item: pypp::split(path, sep)) {
@@ -103,7 +102,7 @@ string path::normpath(const std::string& path)
             if (level >= 0) {
                 parts.pop_back();
             }
-            else if (not abs) {
+            else if (not isabs(path)) {
                 parts.push_back(parent);
             }
         }
@@ -113,10 +112,10 @@ string path::normpath(const std::string& path)
         }
     }
     string normed(join({parts.cbegin(), parts.cend()}));
-    if (abs) {
+    if (isabs(path)) {
         normed.insert(0, sep);
     }
-    if (normed.empty()) {
+    else if (normed.empty()) {
         normed = current;
     }
     return normed;
@@ -125,7 +124,7 @@ string path::normpath(const std::string& path)
 
 string path::abspath(const std::string& path)
 {
-    if (startswith(path, sep)) {
+    if (isabs(path)) {
         return normpath(path);
     }
     unique_ptr<char> cwd(new char[FILENAME_MAX]);
@@ -133,4 +132,10 @@ string path::abspath(const std::string& path)
         throw runtime_error("could get current working directory");
     }
     return normpath(join({cwd.get(), path}));
+}
+
+
+bool path::isabs(const std::string& path)
+{
+    return startswith(path, sep);
 }

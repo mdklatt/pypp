@@ -76,6 +76,13 @@ std::string normpath(const std::string& path);
 /// @return
 std::string abspath(const std::string& path);
 
+
+/// Return true if this is an absolute path.
+///
+/// @param path input path
+/// @return true for an absolute path
+bool isabs(const std::string& path);
+
 }}  // namespace
 
 #endif  // PYPP_PATH_HPP

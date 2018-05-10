@@ -111,3 +111,14 @@ TEST(path, abspath)
     ASSERT_EQ(abspath("abc/xyz/"), cwd + "/abc/xyz");
     ASSERT_EQ(abspath("abc/../"), cwd);
 }
+
+
+/// Test the isabs() function.
+///
+TEST(path, isabs)
+{
+    ASSERT_FALSE(isabs(""));
+    ASSERT_FALSE(isabs("abc"));
+    ASSERT_TRUE(isabs("/"));
+    ASSERT_TRUE(isabs("/abc"));
+}
