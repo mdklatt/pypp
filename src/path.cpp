@@ -161,5 +161,19 @@ pair<string, string> path::splitext(const string& path)
 bool path::exists(const string& path)
 {
     struct stat info;
-    return (stat(path.c_str(), &info) == 0);
+    return stat(path.c_str(), &info) == 0;
+}
+
+
+bool path::isfile(const string& path)
+{
+    struct stat info;
+    return stat(path.c_str(), &info) == 0 and S_ISREG(info.st_mode);
+}
+
+
+bool path::isdir(const string& path)
+{
+    struct stat info;
+    return stat(path.c_str(), &info) == 0 and S_ISDIR(info.st_mode);
 }

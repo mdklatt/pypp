@@ -3,6 +3,12 @@
 /// Link all test files with the `gtest_main` library to create a command line
 /// test runner.
 ///
+#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#include "unistd.h"  // FIXME: not portable
+#else
+#error "path test suite requires *nix"
+#endif
+
 #include <cassert>
 #include <cstdio>
 #include <memory>
@@ -143,4 +149,24 @@ TEST(path, exists)
 {
     ASSERT_TRUE(exists(__FILE__));
     ASSERT_FALSE(exists(""));
+}
+
+
+/// Test the isfile() function.
+///
+TEST(path, isfile)
+{
+    ASSERT_TRUE(isfile(__FILE__));
+    ASSERT_FALSE(isfile(""));
+    ASSERT_FALSE(isfile("/"));
+}
+
+
+/// Test the isdir() function.
+///
+TEST(path, isdir)
+{
+    ASSERT_TRUE(isdir("/"));
+    ASSERT_FALSE(isdir(""));
+    ASSERT_FALSE(isdir(__FILE__));
 }

@@ -93,8 +93,29 @@ std::pair<std::string, std::string> splitext(const std::string& path);
 
 /// Determine if a path exists.
 ///
+/// If the path is a link its target is tested.
+///
+/// @param path input path
+/// @return true if path exists
 bool exists(const std::string& path);
 
+
+/// Determine if a path is an existing file.
+///
+/// If the path is a link its target is tested.
+///
+/// @param path input path
+/// @return true if path is an existing file
+bool isfile(const std::string& path);
+
+
+/// Determine if a path is an existing directory.
+///
+/// If the path is a link its target is tested.
+///
+/// @param path input path
+/// @return true if path is an existing directory
+bool isdir(const std::string& path);
 
 }}  // namespace
 
