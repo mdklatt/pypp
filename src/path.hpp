@@ -83,6 +83,11 @@ std::string abspath(const std::string& path);
 /// @return true for an absolute path
 bool isabs(const std::string& path);
 
+
+/// Determine the file extension of a path.
+///
+std::pair<std::string, std::string> splitext(const std::string& path);
+
 }}  // namespace
 
 #endif  // PYPP_PATH_HPP

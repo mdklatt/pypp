@@ -74,19 +74,19 @@ pair<string, string> path::split(const string& path)
 };
 
 
-string path::dirname(const std::string& path)
+string path::dirname(const string& path)
 {
     return split(path).first;
 }
 
 
-string path::basename(const std::string& path)
+string path::basename(const string& path)
 {
     return split(path).second;
 }
 
 
-string path::normpath(const std::string& path)
+string path::normpath(const string& path)
 {
     static const string current(".");
     static const string parent("..");
@@ -122,7 +122,7 @@ string path::normpath(const std::string& path)
 }
 
 
-string path::abspath(const std::string& path)
+string path::abspath(const string& path)
 {
     if (isabs(path)) {
         return normpath(path);
@@ -135,7 +135,23 @@ string path::abspath(const std::string& path)
 }
 
 
-bool path::isabs(const std::string& path)
+bool path::isabs(const string& path)
 {
     return startswith(path, sep);
 }
+
+
+pair<string, string> path::splitext(const string& path)
+{
+    const auto pos(path.rfind('.'));
+    string root;
+    string ext;
+    if (pos == 0 or pos == string::npos) {
+        root = path;
+    }
+    else {
+        root = path.substr(0, pos);
+        ext = path.substr(pos, string::npos);
+    }
+    return make_pair(root, ext);
+};

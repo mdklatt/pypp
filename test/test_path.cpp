@@ -122,3 +122,16 @@ TEST(path, isabs)
     ASSERT_TRUE(isabs("/"));
     ASSERT_TRUE(isabs("/abc"));
 }
+
+
+/// Test the splitext() function.
+///
+TEST(path, splitext)
+{
+    ASSERT_EQ(splitext(""), make_pair(string(""), string("")));
+    ASSERT_EQ(splitext("."), make_pair(string("."), string("")));
+    ASSERT_EQ(splitext(".abc"), make_pair(string(".abc"), string("")));
+    ASSERT_EQ(splitext("abc."), make_pair(string("abc"), string(".")));
+    ASSERT_EQ(splitext("abc.xyz"), make_pair(string("abc"), string(".xyz")));
+    ASSERT_EQ(splitext("a.b.c.xyz"), make_pair(string("a.b.c"), string(".xyz")));
+}
