@@ -77,16 +77,24 @@ std::string normpath(const std::string& path);
 std::string abspath(const std::string& path);
 
 
-/// Return true if this is an absolute path.
+/// Determine a path is absolute.
 ///
 /// @param path input path
 /// @return true for an absolute path
 bool isabs(const std::string& path);
 
 
-/// Determine the file extension of a path.
+/// Split a path into a root and an extension.
 ///
+/// @param path input path
+/// @return (root, extension) pair
 std::pair<std::string, std::string> splitext(const std::string& path);
+
+
+/// Determine if a path exists.
+///
+bool exists(const std::string& path);
+
 
 }}  // namespace
 

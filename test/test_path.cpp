@@ -135,3 +135,12 @@ TEST(path, splitext)
     ASSERT_EQ(splitext("abc.xyz"), make_pair(string("abc"), string(".xyz")));
     ASSERT_EQ(splitext("a.b.c.xyz"), make_pair(string("a.b.c"), string(".xyz")));
 }
+
+
+/// Test the exists() function.
+///
+TEST(path, exists)
+{
+    ASSERT_TRUE(exists(__FILE__));
+    ASSERT_FALSE(exists(""));
+}

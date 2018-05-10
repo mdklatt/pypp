@@ -2,6 +2,7 @@
 ///
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 #include "unistd.h"  // FIXME: not portable
+#include "sys/stat.h"  // FIXME: not portable
 #else
 #error "path module requires *nix"
 #endif
@@ -155,3 +156,10 @@ pair<string, string> path::splitext(const string& path)
     }
     return make_pair(root, ext);
 };
+
+
+bool path::exists(const string& path)
+{
+    struct stat info;
+    return (stat(path.c_str(), &info) == 0);
+}
