@@ -8,6 +8,7 @@ cmake_minimum_required(VERSION 2.8.12)
 project(pypp)
 
 set(PROJECT_SOURCE_FILES
+    ${CMAKE_SOURCE_DIR}/src/func.cpp
     ${CMAKE_SOURCE_DIR}/src/path.cpp
     ${CMAKE_SOURCE_DIR}/src/string.cpp
 )

@@ -7,6 +7,7 @@ project(test_pypp)
 add_subdirectory(lib/gtest)
 
 set(PROJECT_TEST_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_func.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_path.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_string.cpp
 )
