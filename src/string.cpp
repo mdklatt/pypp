@@ -61,7 +61,7 @@ string pypp::strip(const string& str, const string& chars)
 }
 
 
-std::string pypp::join(const std::string& sep, const std::vector<std::string>& items)
+string pypp::join(const string& sep, const vector<string>& items)
 {
     // If this was a clean-sheet design it would make more sense to put the
     // 'sep' argument last, and possibly give it a default value of "". The
