@@ -36,12 +36,22 @@ TEST(func, any)
 }
 
 
+/// Test the enumerate function.
+///
+TEST(func, enumerate)
+{
+    const vector<pair<size_t, char>> pairs{{1, 'a'}, {2, 'b'}};
+    const auto enumerated(enumerate<char>({'a', 'b'}, 1));
+    ASSERT_EQ(enumerated, pairs);
+}
+
+
 /// Test the zip() function.
 ///
 TEST(func, zip)
 {
-    const vector<pair<int, char>> zipped{{0, 'a'}, {1, 'b'}};
-    const auto result(zip<int, char>({0, 1}, {'a', 'b', 'c'}));
-    ASSERT_EQ(result, zipped);
+    const vector<pair<int, char>> pairs{{'a', 1}, {'b', 2}};
+    const auto zipped(zip<int, char>({'a', 'b'}, {1, 2, 3}));
+    ASSERT_EQ(zipped, pairs);
 
 }
