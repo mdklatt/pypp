@@ -9,6 +9,8 @@
 
 using namespace pypp::func;
 
+using std::vector;
+using std::pair;
 using testing::Test;
 
 
@@ -31,4 +33,15 @@ TEST(func, any)
     ASSERT_TRUE(any({true, false}));
     ASSERT_FALSE(any({false, false}));
     ASSERT_FALSE(any({}));
+}
+
+
+/// Test the zip() function.
+///
+TEST(func, zip)
+{
+    const vector<pair<int, char>> zipped{{0, 'a'}, {1, 'b'}};
+    const auto result(zip<int, char>({0, 1}, {'a', 'b', 'c'}));
+    ASSERT_EQ(result, zipped);
+
 }
