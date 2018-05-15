@@ -145,3 +145,33 @@ bool str::endswith(const string& str, const string& suffix)
     const auto suflen(suffix.length());
     return suflen > strlen ? false : str.substr(strlen - suflen) == suffix;
 }
+
+
+string str::replace(string str, const string& old, const string& sub, ssize_t maxcount)
+{
+    ssize_t count(0);
+    string::size_type pos(0);
+    while (maxcount == -1 or count < maxcount) {
+        // TODO: Split this into two loops to avoid repeated ifs?
+        if (not old.empty()) {
+            pos = str.find(old, pos);
+            if (pos == string::npos) {
+                break;
+            }
+            str.replace(pos, old.length(), sub);
+            pos += sub.length();
+        }
+        else {
+            // In Python, an empty search string causes replace() to act like
+            // sub.join(str) with leading and trailing delimiters. Not sure
+            // what the use case for that is, but it's reproduced here.
+            str.insert(pos, sub);
+            pos += sub.length() + 1;
+            if (pos > str.length()) {
+                break;
+            }
+        }
+        ++count;
+    }
+    return str;
+}

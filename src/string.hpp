@@ -1,4 +1,6 @@
-/// Interface for the string module.
+/// Common string utilities.
+///
+/// This combines functionality from the Python str type and the string module.
 ///
 /// @file
 #ifndef PYPP_STRING_HPP
@@ -103,7 +105,7 @@ std::vector<std::string> split(const std::string& str, const std::string& sep, s
 ///
 /// @param str string to test
 /// @param prefix string to match
-/// @return
+/// @return true if the string begins with the prefix
 bool startswith(const std::string& str, const std::string& prefix);
 
 
@@ -114,8 +116,18 @@ bool startswith(const std::string& str, const std::string& prefix);
 ///
 /// @param str string to test
 /// @param suffix string to match
-/// @return
+/// @return true if the string ends with the suffix
 bool endswith(const std::string& str, const std::string& suffix);
+
+
+/// Replace all occurrences of text in a string.
+///
+/// @param str string to modify
+/// @param old text to replace
+/// @param sub substitution text
+/// @param maxcount maximum number of substitutions
+/// @return modified string
+std::string replace(std::string str, const std::string& old, const std::string& sub, ssize_t maxcount=-1);
 
 }}  // namespace
 

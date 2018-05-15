@@ -179,3 +179,17 @@ TEST(string, endswith)
     ASSERT_FALSE(endswith("abc", "xyz"));
     ASSERT_FALSE(endswith("abc", "abcabc"));  // test suffix longer than str
 }
+
+
+/// Test the replace() function.
+///
+TEST(string, replace)
+{
+    ASSERT_EQ(replace("", "abcabc", "xyz"), "");
+    ASSERT_EQ(replace("abc", "", "xyz"), "xyzaxyzbxyzcxyz");
+    ASSERT_EQ(replace("abcabc", "abc", ""), "");
+    ASSERT_EQ(replace("abcabc", "abc", "xyz"), "xyzxyz");
+    ASSERT_EQ(replace("abc", "abc", "xyzxyz"), "xyzxyz");
+    ASSERT_EQ(replace("abcabc", "abc", "xyz", 0), "abcabc");
+    ASSERT_EQ(replace("abcabc", "abc", "xyz", 1), "xyzabc");
+}

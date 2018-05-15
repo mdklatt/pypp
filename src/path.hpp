@@ -1,6 +1,7 @@
 /// Common file path manipulations.
 ///
-/// Combines functionality from Python os.path and pathlib (TODO).
+/// This combines functionality from the Python os.path and pathlib (TODO)
+/// modules.
 ///
 /// @file
 #ifndef PYPP_PATH_HPP
