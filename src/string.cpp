@@ -16,16 +16,13 @@ using std::string;
 using std::transform;
 using std::vector;
 
-
-// TODO: Move out of the root namespace.
-// The obvious choice for a module namespace is pypp::string, but that clashes
-// with std::string and forces the use of fully qualified names everywhere.
+using namespace pypp;
 
 
-const string pypp::whitespace(" \t\n\v\f\r");  // "C" locale
+const string str::whitespace(" \t\n\v\f\r");  // "C" locale
 
 
-string pypp::lower(string str)
+string str::lower(string str)
 {
     // TODO: Use std::tolower for locale awareness.
     transform(str.begin(), str.end(), str.begin(), tolower);
@@ -33,7 +30,7 @@ string pypp::lower(string str)
 }
 
 
-string pypp::upper(string str)
+string str::upper(string str)
 {
     // TODO: Use std::toupper for locale awareness.
     transform(str.begin(), str.end(), str.begin(), toupper);
@@ -41,27 +38,27 @@ string pypp::upper(string str)
 }
 
 
-string pypp::lstrip(const string& str, const string& chars)
+string str::lstrip(const string& str, const string& chars)
 {
     const auto pos(str.find_first_not_of(chars));
     return pos == string::npos ? "" : str.substr(pos);
 }
 
 
-string pypp::rstrip(const string& str, const string& chars)
+string str::rstrip(const string& str, const string& chars)
 {
     auto pos(str.find_last_not_of(chars));
     return pos == string::npos ? "" : str.substr(0, ++pos);
 }
 
 
-string pypp::strip(const string& str, const string& chars)
+string str::strip(const string& str, const string& chars)
 {
     return rstrip(lstrip(str, chars), chars);
 }
 
 
-string pypp::join(const string& sep, const vector<string>& items)
+string str::join(const string& sep, const vector<string>& items)
 {
     // If this was a clean-sheet design it would make more sense to put the
     // 'sep' argument last, and possibly give it a default value of "". The
@@ -82,7 +79,7 @@ string pypp::join(const string& sep, const vector<string>& items)
 }
 
 
-vector<string> pypp::split(const string& str, ssize_t maxsplit)
+vector<string> str::split(const string& str, ssize_t maxsplit)
 {
     vector<string> items;
     std::istringstream stream(str);
@@ -103,7 +100,7 @@ vector<string> pypp::split(const string& str, ssize_t maxsplit)
 }
 
 
-vector<string> pypp::split(const string& str, const string& sep, ssize_t maxsplit)
+vector<string> str::split(const string& str, const string& sep, ssize_t maxsplit)
 {
     if (sep.empty()) {
         throw invalid_argument("empty separator");
@@ -128,7 +125,7 @@ vector<string> pypp::split(const string& str, const string& sep, ssize_t maxspli
 }
 
 
-bool pypp::startswith(const string& str, const string& prefix)
+bool str::startswith(const string& str, const string& prefix)
 {
     // Making a deliberate decision to break with Python functionality, which
     // supports optional beginning and ending positions for the comparison.
@@ -138,7 +135,7 @@ bool pypp::startswith(const string& str, const string& prefix)
 }
 
 
-bool pypp::endswith(const string& str, const string& suffix)
+bool str::endswith(const string& str, const string& suffix)
 {
     // Making a deliberate decision to break with Python functionality, which
     // supports optional beginning and ending positions for the comparison.

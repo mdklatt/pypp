@@ -8,7 +8,7 @@
 #include <vector>
 
 
-namespace pypp {
+namespace pypp { namespace str {
 
 /// List of whitespace characters.
 ///
@@ -117,6 +117,6 @@ bool startswith(const std::string& str, const std::string& prefix);
 /// @return
 bool endswith(const std::string& str, const std::string& suffix);
 
-}  // namespace
+}}  // namespace
 
 #endif  // PYPP_STRING_HPP 

@@ -16,8 +16,9 @@
 #include "path.hpp"
 #include "string.hpp"
 
-using pypp::endswith;
-using pypp::startswith;
+using pypp::str::endswith;
+using pypp::str::rstrip;
+using pypp::str::startswith;
 using std::deque;
 using std::make_pair;
 using std::pair;
@@ -93,7 +94,7 @@ string path::normpath(const string& path)
     static const string parent("..");
     ssize_t level(0);
     deque<string> parts;
-    for (const auto& item: pypp::split(path, sep)) {
+    for (const auto& item: str::split(path, sep)) {
         // Process each part of the path.
         if (item.empty() or item == current) {
             continue;

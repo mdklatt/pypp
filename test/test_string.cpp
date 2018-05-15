@@ -15,7 +15,7 @@ using testing::Types;
 using std::string;
 using std::vector;
 
-using namespace pypp;
+using namespace pypp::str;
 
 
 /// Test the whitespace constant.

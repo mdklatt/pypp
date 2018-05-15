@@ -49,7 +49,7 @@ Documentation (Sphinx)
     $ cd doc/sphinx
     $ make html
     
-Doxygen documentation can be integrated into Sphinx using the* `Breathe`_
+Doxygen documentation can be integrated into Sphinx using the `Breathe`_
 extension.
 
 
