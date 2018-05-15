@@ -15,16 +15,28 @@ namespace pypp { namespace func {
 
 /// Evaluate the truth of all items in a sequence.
 ///
+/// @tparam T sequence value type (must be bool convertible)
 /// @param items input items
 /// @return true if all items are true or sequence is empty
-bool all(const std::vector<bool>& items);
+template <typename T>
+bool all(const std::vector<T>& items)
+{
+    return std::all_of(items.begin(), items.end(),
+                       [](const T& x){ return static_cast<bool>(x); });
+}
 
 
 /// Evaluate the truth of any item in a sequence.
 ///
+/// @tparam T sequence value type (must be bool convertible)
 /// @param items input items
 /// @return true if any item is true and sequence is not empty
-bool any(const std::vector<bool>& items);
+template <typename T>
+bool any(const std::vector<bool>& items)
+{
+    return std::any_of(items.begin(), items.end(),
+                       [](const T& x){ return static_cast<bool>(x); });
+}
 
 
 /// Index each item in a sequence.

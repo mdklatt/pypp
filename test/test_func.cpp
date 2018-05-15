@@ -14,25 +14,51 @@ using std::pair;
 using testing::Test;
 
 
-/// Test the all() function.
+/// Test the all() function for bools.
 ///
-TEST(func, all)
+TEST(func, all_bool)
 {
-    ASSERT_TRUE(all({}));
-    ASSERT_TRUE(all({true, true}));
-    ASSERT_FALSE(all({true, false}));
-    ASSERT_FALSE(all({false, false}));
+    // TODO: Use type parametrization.
+    ASSERT_TRUE(all<bool>({}));
+    ASSERT_TRUE(all<bool>({true, true}));
+    ASSERT_FALSE(all<bool>({true, false}));
+    ASSERT_FALSE(all<bool>({false, false}));
 }
 
 
-/// Test the any() function.
+/// Test the all() function for ints.
 ///
-TEST(func, any)
+TEST(func, all_int)
 {
-    ASSERT_TRUE(any({true, true}));
-    ASSERT_TRUE(any({true, false}));
-    ASSERT_FALSE(any({false, false}));
-    ASSERT_FALSE(any({}));
+    // TODO: Use type parametrization.
+    ASSERT_TRUE(all<int>({}));
+    ASSERT_TRUE(all<int>({1, 1}));
+    ASSERT_FALSE(all<int>({1, 0}));
+    ASSERT_FALSE(all<int>({0, 0}));
+}
+
+
+/// Test the any() function for bools.
+///
+TEST(func, any_bool)
+{
+    // TODO: Use type parametrization.
+    ASSERT_TRUE(any<bool>({true, true}));
+    ASSERT_TRUE(any<bool>({true, false}));
+    ASSERT_FALSE(any<bool>({false, false}));
+    ASSERT_FALSE(any<bool>({}));
+}
+
+
+/// Test the any() function for ints.
+///
+TEST(func, any_int)
+{
+    // TODO: Use type parametrization.
+    ASSERT_TRUE(any<int>({1, 1}));
+    ASSERT_TRUE(any<int>({1, 0}));
+    ASSERT_FALSE(any<int>({0, 0}));
+    ASSERT_FALSE(any<int>({}));
 }
 
 
