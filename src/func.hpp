@@ -7,6 +7,7 @@
 #define PYPP_FUNC_HPP
 
 #include <algorithm>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -82,6 +83,68 @@ std::vector<std::pair<T1, T2>> zip(const std::vector<T1>& first, const std::vect
     return pairs;
 };
 
+
+/// Generate an incremental range.
+///
+/// For a zero-initialized start value of T, the range [start, stop) is
+/// generated using the preincrement operator. Unlike with the std::iota()
+/// algorithm, the size of the range does not need to be known beforehand.
+///
+/// @tparam T type that supports the required operations
+/// @param stop exclusive end point for the range
+/// @return range of values
+template <typename T>
+std::vector<T> range(const T& stop)
+{
+    // T is not required to implement differencing, so there is no way to
+    // predetermine the size of the vector here.
+    std::vector<T> range;
+    for (T value{}; value != stop; ++value) {
+        range.emplace_back(value);
+    }
+    return range;
+}
+
+
+/// Generate an arithmetic range of values using addition.
+///
+/// The range [start, stop) is generated using the addition operator with the
+/// given step. If the type T2 cannot be initialized to 1, an appropriate step
+/// value must be specified.
+///
+/// @tparam T1 type that supports the required operations
+/// @tparam T2 type that is defined for the operation T1 + T2
+/// @param start inclusive start point for the range
+/// @param stop exclusive end point for the range
+/// @return range of values
+template <typename T1, typename T2=T1>
+std::vector<T1> range(const T1& start, const T1& stop, const T2& step=1)
+{
+    // T is not required to implement differencing, so there is no way to
+    // predetermine the size of the vector here.
+    const T2 zero{};
+    if (step == zero) {
+        throw std::invalid_argument("step must be nonzero");
+    }
+    std::vector<T1> range;
+    if (start < stop) {
+        if (step < zero) {
+            return range;
+        }
+        for (T1 value(start); value < stop; value += step) {
+            range.emplace_back(value);
+        }
+    }
+    else {
+        if (step > zero) {
+            return range;
+        }
+        for (T1 value(start); value > stop; value += step) {
+            range.emplace_back(value);
+        }
+    }
+    return range;
+}
 
 }}  // namespace
 

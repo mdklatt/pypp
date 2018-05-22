@@ -12,6 +12,7 @@ using namespace pypp::func;
 using std::vector;
 using std::pair;
 using testing::Test;
+using testing::Types;
 
 
 /// Test the all() function for bools.
@@ -80,4 +81,54 @@ TEST(func, zip)
     const auto zipped(zip<int, char>({'a', 'b'}, {1, 2, 3}));
     ASSERT_EQ(zipped, pairs);
 
+}
+
+
+/// Test fixture for the incremental range() function.
+///
+/// This is used to group tests and provide common set-up and tear-down code.
+/// A new test fixture is created for each test to prevent any side effects
+/// between tests. Member variables and methods are injected into each test
+/// that uses this fixture.
+///
+template <typename T>
+class IncrementalRangeTest: public Test {};
+
+using IncrementalTypes = Types<char, int, long, size_t, ssize_t>;
+TYPED_TEST_CASE(IncrementalRangeTest, IncrementalTypes);
+
+
+/// Test the incremental range() function.
+///
+TYPED_TEST(IncrementalRangeTest, range)
+{
+    ASSERT_EQ(range(TypeParam{}), vector<TypeParam>({}));
+    ASSERT_EQ(range<TypeParam>(2), vector<TypeParam>({0, 1}));
+}
+
+
+/// Test fixture for the arithmetic range() function.
+///
+/// This is used to group tests and provide common set-up and tear-down code.
+/// A new test fixture is created for each test to prevent any side effects
+/// between tests. Member variables and methods are injected into each test
+/// that uses this fixture.
+///
+template <typename T>
+class ArithmeticRangeTest: public Test {};
+
+using ArithmeticTypes = Types<int, long, float, double>;  // no unsigned types
+TYPED_TEST_CASE(ArithmeticRangeTest, ArithmeticTypes);
+
+
+/// Test the numeric range() function.
+///
+TYPED_TEST(ArithmeticRangeTest, range)
+{
+    ASSERT_EQ(range<TypeParam>(1, -1), vector<TypeParam>({}));
+    ASSERT_EQ(range<TypeParam>(1, 3), vector<TypeParam>({1, 2}));
+    ASSERT_EQ(range<TypeParam>(1, 4, 2), vector<TypeParam>({1, 3}));
+    ASSERT_EQ(range<TypeParam>(4, 1, 2), vector<TypeParam>({}));
+    ASSERT_EQ(range<TypeParam>(4, 1, -2), vector<TypeParam>({4, 2}));
+    ASSERT_THROW(range<TypeParam>(1, 3, 0), std::invalid_argument);
 }

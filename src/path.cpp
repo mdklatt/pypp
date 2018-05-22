@@ -131,7 +131,7 @@ string path::abspath(const string& path)
     }
     unique_ptr<char> cwd(new char[FILENAME_MAX]);
     if (not getcwd(cwd.get(), FILENAME_MAX)) {
-        throw runtime_error("could get current working directory");
+        throw runtime_error("could not get current working directory");
     }
     return normpath(join({cwd.get(), path}));
 }
