@@ -70,15 +70,15 @@ std::string normpath(const std::string& path);
 
 /// Return an absolute path.
 ///
-/// The is this normalized version of the path joined with the current
-/// working directory.
+/// The is this normalized version of the path joined with the current working
+/// directory.
 ///
 /// @param path input path
 /// @return
 std::string abspath(const std::string& path);
 
 
-/// Determine a path is absolute.
+/// Determine if a path is absolute.
 ///
 /// @param path input path
 /// @return true for an absolute path

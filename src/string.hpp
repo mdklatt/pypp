@@ -65,6 +65,17 @@ std::string strip(const std::string& str, const std::string& chars=whitespace);
 
 /// Join strings using a separator.
 ///
+/// @param sep separator string
+/// @param items strings to join
+/// @return
+std::string join(const std::string& sep, const std::vector<std::string>& items);
+
+
+/// Join strings using a separator.
+///
+/// @param sep separator string
+/// @param items strings to join
+/// @return
 std::string join(const std::string& sep, const std::vector<std::string>& items);
 
 

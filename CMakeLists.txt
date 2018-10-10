@@ -4,7 +4,7 @@
 ##
 cmake_minimum_required(VERSION 3.0.2)
 
-project(pypp VERSION 0.1.0.17)  # tweak number is only for dev releases
+project(pypp VERSION 0.1.0.18)  # tweak number is only for dev releases
 
 set(PROJECT_SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/src/path.cpp
