@@ -10,11 +10,15 @@ set(PROJECT_SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/src/path.cpp
     ${CMAKE_SOURCE_DIR}/src/string.cpp
 )
-
 set(CMAKE_CXX_STANDARD 11)
 add_compile_options("-std=c++11" "-Wall")
 
 add_library(${PROJECT_NAME} ${PROJECT_SOURCE_FILES})
+target_include_directories(${PROJECT_NAME}
+PUBLIC
+    include/
+)
+
 
 function(install)
     # Disable install for test directory.

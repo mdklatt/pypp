@@ -6,7 +6,7 @@
 #include <ios>
 #include <sstream>
 #include <stdexcept>
-#include "string.hpp"
+#include "pypp/string.hpp"
 
 
 using std::invalid_argument;

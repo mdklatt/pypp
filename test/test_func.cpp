@@ -4,7 +4,7 @@
 /// test runner.
 ///
 #include <gtest/gtest.h>
-#include "func.hpp"
+#include "pypp/func.hpp"
 
 
 using namespace pypp::func;

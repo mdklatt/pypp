@@ -13,8 +13,8 @@
 #include <memory>
 #include <deque>
 #include <stdexcept>
-#include "path.hpp"
-#include "string.hpp"
+#include "pypp/path.hpp"
+#include "pypp/string.hpp"
 
 using pypp::str::endswith;
 using pypp::str::rstrip;
@@ -73,7 +73,7 @@ pair<string, string> path::split(const string& path)
     }
     const auto name(path.substr(pos));
     return make_pair(root, name);
-};
+}
 
 
 string path::dirname(const string& path)
@@ -156,7 +156,7 @@ pair<string, string> path::splitext(const string& path)
         ext = path.substr(pos, string::npos);
     }
     return make_pair(root, ext);
-};
+}
 
 
 bool path::exists(const string& path)
