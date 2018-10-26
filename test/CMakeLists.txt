@@ -2,17 +2,20 @@
 ##
 ## This will build a Google Test test runner for all contained tests.
 ##
-project(test_pypp)
+add_subdirectory(lib/gtest EXCLUDE_FROM_ALL)
 
-add_subdirectory(lib/gtest)
-
-set(PROJECT_TEST_FILES
+add_executable(test_pypp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_func.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_path.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test_string.cpp
 )
 
-include_directories(${CMAKE_SOURCE_DIR}/src)
+target_include_directories(test_pypp
+PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
 
-add_executable(${PROJECT_NAME} ${PROJECT_TEST_FILES})
-target_link_libraries(${PROJECT_NAME} pypp gtest gtest_main)
+target_link_libraries(test_pypp
+PRIVATE
+    ${PROJECT_NAME} gtest gtest_main
+)
