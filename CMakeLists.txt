@@ -4,7 +4,13 @@
 ##
 cmake_minimum_required(VERSION 3.8)
 
-project(pypp VERSION 0.1.0.19)  # tweak number is only for dev releases
+project(pypp
+    VERSION 0.1.0.20  # tweak number is only for dev releases
+    LANGUAGES CXX
+)
+
+
+# Define project targets.
 
 add_library(${PROJECT_NAME}
     src/path.cpp
@@ -13,7 +19,8 @@ add_library(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME}
 PUBLIC
-    # TODO: Why do build paths have to be absolute?
+    # Interface paths are relative to the installation path, not the current
+    # directory.
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 PRIVATE
@@ -32,19 +39,60 @@ PUBLIC
 )
 
 
-# Install library.
+# Generate package config files.
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+configure_package_config_file(
+    ${CMAKE_CURRENT_LIST_DIR}/cmake/${PROJECT_NAME}-config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
+    INSTALL_DESTINATION
+    ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+
+
+# Define installation rules.
 
 include(GNUInstallDirs)  # TODO: what about MacOS or Windows?
-install(TARGETS pypp
+install(TARGETS ${PROJECT_NAME}
     EXPORT pypp-targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
+
 install(DIRECTORY include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
+install(EXPORT ${PROJECT_NAME}-targets
+    FILE ${PROJECT_NAME}-targets.cmake
+    NAMESPACE pypp::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
 
-# Build tests
+install(
+FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
+DESTINATION
+    ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+
+
+# Allow external projects to use this package directly within their build tree.
+
+export(EXPORT ${PROJECT_NAME}-targets
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-targets.cmake
+    NAMESPACE pypp::
+)
+export(PACKAGE pypp)
+
+
+# Build tests.
 
 add_subdirectory(test)
