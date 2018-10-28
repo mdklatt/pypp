@@ -21,16 +21,12 @@ extern const std::string whitespace;
 
 /// Convert a character to lower case.
 ///
-/// In the current implementation this is not locale-aware.
-///
 /// @param c input char
 /// @return lower-case char
 char lower(char c);
 
 
 /// Convert a string to lower case.
-///
-/// In the current implementation this is not locale-aware.
 ///
 /// @param str input string
 /// @return lower-case string
@@ -39,16 +35,12 @@ std::string lower(std::string str);
 
 /// Convert a char to upper case.
 ///
-/// In the current implementation this is not locale-aware.
-///
 /// @param c input char
 /// @return upper-case char
 char upper(char c);
 
 
 /// Convert a string to upper case.
-///
-/// In the current implementation this is not locale-aware.
 ///
 /// @param str input string
 /// @return upper-case string

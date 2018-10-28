@@ -1,6 +1,6 @@
 /// Implementation of the string module.
 ///
-#include <cctype>
+#include <locale>
 #include <algorithm>
 #include <iterator>
 #include <ios>
@@ -10,9 +10,11 @@
 
 
 using std::invalid_argument;
+using std::locale;
 using std::max;
 using std::next;
 using std::string;
+using std::tolower;
 using std::transform;
 using std::vector;
 
@@ -24,28 +26,28 @@ const string str::whitespace(" \t\n\v\f\r");  // "C" locale
 
 char str::lower(char c)
 {
-    return static_cast<char>(tolower(c));
+    return tolower(c, locale());
 }
 
 
 string str::lower(string str)
 {
-    // TODO: Use std::tolower for locale awareness.
-    transform(str.begin(), str.end(), str.begin(), tolower);
+    static const auto lambda([](char c){ return lower(c); });
+    transform(str.begin(), str.end(), str.begin(), lambda);
     return str;
 }
 
 
 char str::upper(char c)
 {
-    return static_cast<char>(toupper(c));
+    return toupper(c, locale());
 }
 
 
 string str::upper(string str)
 {
-    // TODO: Use std::toupper for locale awareness.
-    transform(str.begin(), str.end(), str.begin(), toupper);
+    static const auto lambda([](char c){ return upper(c); });
+    transform(str.begin(), str.end(), str.begin(), lambda);
     return str;
 }
 
