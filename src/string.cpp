@@ -36,6 +36,12 @@ string str::lower(string str)
 }
 
 
+char str::upper(char c)
+{
+    return static_cast<char>(toupper(c));
+}
+
+
 string str::upper(string str)
 {
     // TODO: Use std::toupper for locale awareness.

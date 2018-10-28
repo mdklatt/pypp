@@ -23,8 +23,8 @@ extern const std::string whitespace;
 ///
 /// In the current implementation this is not locale-aware.
 ///
-/// @param str input string
-/// @return modified string
+/// @param c input char
+/// @return lower-case char
 char lower(char c);
 
 
@@ -33,8 +33,17 @@ char lower(char c);
 /// In the current implementation this is not locale-aware.
 ///
 /// @param str input string
-/// @return modified string
+/// @return lower-case string
 std::string lower(std::string str);
+
+
+/// Convert a char to upper case.
+///
+/// In the current implementation this is not locale-aware.
+///
+/// @param c input char
+/// @return upper-case char
+char upper(char c);
 
 
 /// Convert a string to upper case.
@@ -42,7 +51,7 @@ std::string lower(std::string str);
 /// In the current implementation this is not locale-aware.
 ///
 /// @param str input string
-/// @return modified string
+/// @return upper-case string
 std::string upper(std::string str);
 
 

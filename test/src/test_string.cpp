@@ -44,6 +44,15 @@ TEST(string, lower_str)
 }
 
 
+/// Test the upper() function for a char.
+///
+TEST(string, upper_char)
+{
+    ASSERT_EQ(upper('A'), 'A');
+    ASSERT_EQ(upper('a'), 'A');
+}
+
+
 /// Test the upper() function for a string.
 TEST(string, upper_str)
 {
