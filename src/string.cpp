@@ -22,6 +22,12 @@ using namespace pypp;
 const string str::whitespace(" \t\n\v\f\r");  // "C" locale
 
 
+char str::lower(char c)
+{
+    return static_cast<char>(tolower(c));
+}
+
+
 string str::lower(string str)
 {
     // TODO: Use std::tolower for locale awareness.

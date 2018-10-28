@@ -26,22 +26,29 @@ TEST(string, whitespace)
 }
 
 
-/// Test the lower() function.
+/// Test the lower() function for a char.
 ///
-TEST(string, lower)
+TEST(string, lower_char)
 {
-    static const string lcase("abc");
-    ASSERT_EQ(lower(lcase), lcase);
-    ASSERT_EQ(lower("ABC"), lcase);
+    ASSERT_EQ(lower('a'), 'a');
+    ASSERT_EQ(lower('A'), 'a');
 }
 
 
-/// Test the upper() function.
-TEST(string, upper)
+/// Test the lower() function for a string.
+///
+TEST(string, lower_str)
 {
-    static const string ucase("ABC");
-    ASSERT_EQ(upper(ucase), ucase);
-    ASSERT_EQ(upper("abc"), ucase);
+    ASSERT_EQ(lower("abc"), "abc");
+    ASSERT_EQ(lower("ABC"), "abc");
+}
+
+
+/// Test the upper() function for a string.
+TEST(string, upper_str)
+{
+    ASSERT_EQ(upper("ABC"), "ABC");
+    ASSERT_EQ(upper("abc"), "ABC");
 }
 
 

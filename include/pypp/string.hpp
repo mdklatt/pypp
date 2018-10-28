@@ -19,6 +19,15 @@ namespace pypp { namespace str {
 extern const std::string whitespace;
 
 
+/// Convert a character to lower case.
+///
+/// In the current implementation this is not locale-aware.
+///
+/// @param str input string
+/// @return modified string
+char lower(char c);
+
+
 /// Convert a string to lower case.
 ///
 /// In the current implementation this is not locale-aware.
