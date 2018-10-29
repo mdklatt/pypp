@@ -14,7 +14,6 @@ branches:
     - dev
 
 sudo: false
-dist: trusty  # beta; needed for C++11
 
 before_script:
   - mkdir build && cd build
