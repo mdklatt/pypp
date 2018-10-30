@@ -1,10 +1,6 @@
-# Ignore C++ build artifacts.
+# Ignore build artifacts.
 
 build/
-*.o
-*.so
-*.exe
-*.dll
 
 
 # Ignore Vagrant runtime files.

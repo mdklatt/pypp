@@ -1,4 +1,4 @@
-## CMake build file for the pypp library test suite.
+## CMake configuration file for the project test suite.
 ##
 ## This will build a Google Test test runner for all contained tests.
 ##

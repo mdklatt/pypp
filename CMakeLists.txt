@@ -1,11 +1,11 @@
-## CMake build file for the pypp library.
+## CMake configuration file for the pypp library.
 ##
 ## This will build the library and its test suite.
 ##
 cmake_minimum_required(VERSION 3.8)
 
 project(pypp
-    VERSION 0.1.0.23  # tweak number is only for dev releases
+    VERSION 0.1.0.24  # tweak number is only for dev releases
     LANGUAGES CXX
 )
 
@@ -95,4 +95,5 @@ export(PACKAGE pypp)
 
 # Build tests.
 
+add_subdirectory(doc)
 add_subdirectory(test)
