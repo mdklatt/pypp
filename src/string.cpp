@@ -93,6 +93,12 @@ string str::join(const string& sep, const vector<string>& items)
 }
 
 
+string str::join(char sep, const vector<string>& items)
+{
+    return join(string(1, sep), items);
+}
+
+
 vector<string> str::split(const string& str, ssize_t maxsplit)
 {
     vector<string> items;
