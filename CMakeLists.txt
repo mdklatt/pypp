@@ -1,11 +1,11 @@
 ## CMake configuration file for the pypp library.
 ##
-## This will build the library and its test suite.
+## The project defines the pypp::pypp target for use by external projects.
 ##
 cmake_minimum_required(VERSION 3.8)
 
 project(pypp
-    VERSION 0.1.0.24  # tweak number is only for dev releases
+    VERSION 0.1.0.25  # tweak number is only for dev releases
     LANGUAGES CXX
 )
 
@@ -17,7 +17,7 @@ add_library(${PROJECT_NAME}
     src/string.cpp
 )
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(pypp
 PUBLIC
     # Interface paths are relative to the installation path, not the current
     # directory.
@@ -27,13 +27,13 @@ PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_compile_options(${PROJECT_NAME}
+target_compile_options(pypp
 PRIVATE
     -Wall
     $<$<CXX_COMPILER_ID:GNU>:-pedantic>
 )
 
-target_compile_features(${PROJECT_NAME}
+target_compile_features(pypp
 PUBLIC
     cxx_auto_type
 )
@@ -43,14 +43,14 @@ PUBLIC
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/PyppConfigVersion.cmake
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
 configure_package_config_file(
-    ${CMAKE_CURRENT_LIST_DIR}/cmake/${PROJECT_NAME}-config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
+    ${CMAKE_CURRENT_LIST_DIR}/cmake/PyppConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/PyppConfig.cmake
 INSTALL_DESTINATION
     ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
@@ -59,8 +59,8 @@ INSTALL_DESTINATION
 # Define installation rules.
 
 include(GNUInstallDirs)  # TODO: what about MacOS or Windows?
-install(TARGETS ${PROJECT_NAME}
-    EXPORT pypp-targets
+install(TARGETS pypp
+    EXPORT pypp_targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
@@ -69,31 +69,33 @@ install(DIRECTORY include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-install(EXPORT ${PROJECT_NAME}-targets
-    FILE ${PROJECT_NAME}-targets.cmake
+install(EXPORT pypp_targets
+    FILE PyppTargets.cmake
     NAMESPACE pypp::
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
 install(
 FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/PyppConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/PyppConfigVersion.cmake
 DESTINATION
     ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
 
-# Allow external projects to use this package directly within their build tree.
+# Export targets. If an external project adds this project to its build tree
+# via `add_subdirectory()`, then `find_package(pypp)` will work without
+# requiring this project to be installed.
 
-export(EXPORT ${PROJECT_NAME}-targets
-    FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-targets.cmake
+export(EXPORT pypp_targets
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/PyppTargets.cmake
     NAMESPACE pypp::
 )
 export(PACKAGE pypp)
 
 
-# Build tests.
+# Add subdirectories to build.
 
 add_subdirectory(doc)
 add_subdirectory(test)
