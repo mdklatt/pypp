@@ -3,14 +3,16 @@
 /// Link all test files with the `gtest_main` library to create a command line
 /// test runner.
 ///
+#include <string>
 #include <gtest/gtest.h>
 #include "pypp/func.hpp"
 
 
 using namespace pypp::func;
 
-using std::vector;
 using std::pair;
+using std::string;
+using std::vector;
 using testing::Test;
 using testing::Types;
 
@@ -63,13 +65,23 @@ TEST(func, any_int)
 }
 
 
-/// Test the enumerate function.
+/// Test the enumerate() function.
 ///
 TEST(func, enumerate)
 {
     const vector<pair<size_t, char>> pairs{{1, 'a'}, {2, 'b'}};
     const auto enumerated(enumerate<char>({'a', 'b'}, 1));
     ASSERT_EQ(enumerated, pairs);
+}
+
+
+/// Test the in() function.
+///
+TEST(func, in)
+{
+    const string seq("abc");
+    ASSERT_TRUE(in('a', seq));
+    ASSERT_FALSE(in('x', seq));
 }
 
 

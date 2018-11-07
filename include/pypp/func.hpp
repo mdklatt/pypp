@@ -61,6 +61,16 @@ std::vector<std::pair<size_t, T>> enumerate(const std::vector<T>& items, ssize_t
 };
 
 
+/// Return true if a value is in a sequence.
+///
+template <typename C, typename T=typename C::value_type>
+bool in(const T& value, const C& seq)
+{
+    const auto end(std::end(seq));
+    return std::find(begin(seq), end, value) != end;
+}
+
+
 /// Pairwise aggregation of two sequences.
 ///
 /// The nth element in the first sequence is paired with the nth element in the

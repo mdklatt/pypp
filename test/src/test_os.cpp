@@ -19,10 +19,18 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+#include "pypp/func.hpp"
 #include "pypp/os.hpp"
 #include "pypp/path.hpp"
 
 
+using pypp::func::in;
+using pypp::path::abspath;
+using pypp::path::dirname;
+using pypp::path::isdir;
+using pypp::path::join;
+using pypp::path::normpath;
+using pypp::path::split;
 using std::begin;
 using std::end;
 using std::find;
@@ -34,7 +42,6 @@ using std::system;
 using std::vector;
 
 using namespace pypp::os;
-using namespace pypp::path;
 
 
 /// Create a temporary test directory.
@@ -75,7 +82,7 @@ public:
             abspath("."),
         };
         name = abspath(normpath(name));
-        if (find(begin(prohibited), end(prohibited), name) != end(prohibited)) {
+        if (in(name, prohibited)) {
             // Don't just assert() here because this check always needs to
             // happen.
             throw runtime_error("refusing to delete " + name);
