@@ -1,6 +1,6 @@
-/// Miscellaneous functions.
+/// Functional algorithms.
 ///
-/// Based on intrinsic Python functions.
+/// Based on intrinsic Python functions and operators.
 ///
 /// @file
 #ifndef PYPP_FUNC_HPP
@@ -17,53 +17,60 @@ namespace pypp { namespace func {
 /// Evaluate the truth of all items in a sequence.
 ///
 /// @tparam T sequence value type (must be bool convertible)
-/// @param items input items
+/// @param seq input sequence
 /// @return true if all items are true or sequence is empty
 template <typename T>
-bool all(const std::vector<T>& items)
+bool all(const std::vector<T>& seq)
 {
-    return std::all_of(items.begin(), items.end(),
-                       [](const T& x){ return static_cast<bool>(x); });
+    const auto boolean([](const T& x){ return static_cast<bool>(x); });
+    return std::all_of(std::begin(seq), std::end(seq), boolean);
 }
 
 
 /// Evaluate the truth of any item in a sequence.
 ///
 /// @tparam T sequence value type (must be bool convertible)
-/// @param items input items
+/// @param seq input sequence
 /// @return true if any item is true and sequence is not empty
 template <typename T>
-bool any(const std::vector<bool>& items)
+bool any(const std::vector<bool>& seq)
 {
-    return std::any_of(items.begin(), items.end(),
-                       [](const T& x){ return static_cast<bool>(x); });
+    const auto boolean([](const T& x){ return static_cast<bool>(x); });
+    return std::any_of(std::begin(seq), std::end(seq), boolean);
 }
 
 
 /// Index each item in a sequence.
 ///
-/// Each input item is paired with its position in the sequence.
+/// Each input item is paired with its index in the sequence.
 ///
 /// @tparam T sequence value type
-/// @param items input sequence
+/// @param seq input sequence
 /// @param start starting index
 /// @return (index, item) pairs
 template <typename T>
-std::vector<std::pair<size_t, T>> enumerate(const std::vector<T>& items, ssize_t start=0)
+std::vector<std::pair<size_t, T>> enumerate(const std::vector<T>& seq, ssize_t start=0)
 {
-    std::vector<std::pair<size_t, T>> pairs;
-    pairs.reserve(items.size());
+    std::vector<std::pair<size_t, T>> items;
+    items.reserve(seq.size());
     ssize_t pos(start);
-    for (const auto& item: items) {
-        pairs.emplace_back(std::make_pair(pos++, item));
+    for (const auto& item: seq) {
+        items.emplace_back(std::make_pair(pos++, item));
     }
-    return pairs;
+    return items;
 };
 
 
 /// Return true if a value is in a sequence.
 ///
-template <typename C, typename T=typename C::value_type>
+/// The value to search for must be comparable to the sequence value type.
+///
+/// @tparam T value type (must be comparable with sequence value type)
+/// @tparam C sequence container type
+/// @param value search value
+/// @param cont search sequence
+/// @return true if value is in sequence
+template <typename T, class C>
 bool in(const T& value, const C& seq)
 {
     const auto end(std::end(seq));
@@ -108,11 +115,11 @@ std::vector<T> range(const T& stop)
 {
     // T is not required to implement differencing, so there is no way to
     // predetermine the size of the vector here.
-    std::vector<T> range;
+    std::vector<T> values;
     for (T value{}; value != stop; ++value) {
-        range.emplace_back(value);
+        values.emplace_back(value);
     }
-    return range;
+    return values;
 }
 
 
@@ -136,24 +143,24 @@ std::vector<T1> range(const T1& start, const T1& stop, const T2& step=1)
     if (step == zero) {
         throw std::invalid_argument("step must be nonzero");
     }
-    std::vector<T1> range;
+    std::vector<T1> values;
     if (start < stop) {
         if (step < zero) {
-            return range;
+            return values;
         }
         for (T1 value(start); value < stop; value += step) {
-            range.emplace_back(value);
+            values.emplace_back(value);
         }
     }
     else {
         if (step > zero) {
-            return range;
+            return values;
         }
         for (T1 value(start); value > stop; value += step) {
-            range.emplace_back(value);
+            values.emplace_back(value);
         }
     }
-    return range;
+    return values;
 }
 
 }}  // namespace
