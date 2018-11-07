@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.8)
 
 project(pypp
-    VERSION 0.1.0.29  # tweak number is only for dev releases
+    VERSION 0.1.0.32  # tweak number is only for dev releases
     LANGUAGES CXX
 )
 
@@ -16,6 +16,7 @@ add_library(${PROJECT_NAME}
     src/os.cpp
     src/path.cpp
     src/string.cpp
+    src/tempfile.cpp
 )
 
 target_include_directories(pypp

@@ -9,6 +9,7 @@ add_executable(test_pypp
     src/test_os.cpp
     src/test_path.cpp
     src/test_string.cpp
+    src/test_tempfile.cpp
 )
 
 target_include_directories(test_pypp
@@ -18,5 +19,5 @@ PRIVATE
 
 target_link_libraries(test_pypp
 PRIVATE
-    ${PROJECT_NAME} gtest gtest_main
+    pypp gtest gtest_main
 )
