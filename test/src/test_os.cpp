@@ -4,8 +4,8 @@
 /// test runner.
 ///
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-#include "sys/stat.h"  // FIXME: not portable
-#include "unistd.h"  // FIXME: not portable
+#include "sys/stat.h"  // TODO: not portable
+#include "unistd.h"  // TODO: not portable
 #else
 #error "os module test suite requires *nix"
 #endif
@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <algorithm>
+#include <fstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -37,6 +38,8 @@ using std::find;
 using std::getenv;
 using std::remove;
 using std::runtime_error;
+using std::ofstream;
+using std::sort;
 using std::string;
 using std::system;
 using std::vector;
@@ -92,11 +95,26 @@ public:
 };
 
 
+/// Test the listdir() function.
+///
+TEST(os, listdir)
+{
+    const TemporaryDirectory tmpdir;
+    const auto fname(join({tmpdir.name, "file"}));
+    ofstream stream(fname);
+    const auto dname(join({tmpdir.name, "dir"}));
+    assert(mkdir(dname.c_str(), 0700) == 0);
+    auto names(listdir(tmpdir.name));
+    sort(begin(names), end(names));
+    ASSERT_EQ(vector<string>({"dir", "file"}), names);
+}
+
+
 /// Test the makedirs() function.
 ///
 TEST(os, makedirs)
 {
-    static const mode_t mode(0777);
+    static const mode_t mode(0700);
     TemporaryDirectory tmpdir;
     const auto path(join({tmpdir.name, "abc", "xyz"}));
     makedirs(path, mode);

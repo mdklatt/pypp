@@ -1,8 +1,9 @@
 /// Implementation of the os module.
 ///
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-#include "sys/stat.h"  // FIXME: not portable
-#include "unistd.h"  // FIXME: not portable
+#include "sys/stat.h"  // TODO: not portable
+#include "dirent.h"  // TODO: not portable
+#include "unistd.h"  // TODO: not portable
 #else
 #error "os module requires *nix"
 #endif
@@ -10,14 +11,37 @@
 #include <cerrno>
 #include <cstring>
 #include <stdexcept>
+#include "pypp/func.hpp"
 #include "pypp/os.hpp"
 #include "pypp/path.hpp"
+
 
 using std::runtime_error;
 using std::strerror;
 using std::string;
+using std::vector;
 
 using namespace pypp;
+
+
+vector<string> os::listdir(const string& path)
+{
+    static const vector<string> special({".", ".."});
+    vector<string> names;
+    auto dir(opendir(path.c_str()));
+    errno = 0;
+    dirent* entry;
+    while ((entry = readdir(dir))) {
+        if (not func::in(entry->d_name, special)) {
+            names.emplace_back(entry->d_name);
+        }
+    }
+    closedir(dir);
+    if (errno != 0) {
+        throw runtime_error(strerror(errno));
+    }
+    return names;
+}
 
 
 void os::makedirs(const string& path, mode_t mode, bool exist_ok)
