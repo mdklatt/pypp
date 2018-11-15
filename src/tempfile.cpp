@@ -64,12 +64,15 @@ std::string pypp::tempfile::gettempdir()
 }
 
 
-TemporaryDirectory::TemporaryDirectory(const string& suffix, const string& prefix, string dir)
+TemporaryDirectory::TemporaryDirectory(const string& prefix, string dir)
 {
+    // The Python counterpart supports an optional directory suffix, but this
+    // is not supported by all versions of mkdtemp(), so it is not implemented
+    // here.
     if (dir.empty()) {
         dir = gettempdir();
     }
-    auto tmpdir(join({dir, prefix + "XXXXXXXX" + suffix}));
+    string tmpdir(join({dir, prefix + "XXXXXXXX"}));
     if (not mkdtemp(&tmpdir[0])) {
         throw runtime_error(strerror(errno));
     }

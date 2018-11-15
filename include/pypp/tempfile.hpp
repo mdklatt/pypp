@@ -33,10 +33,12 @@ public:
 
     /// Construct the object.
     ///
-    /// @param suffix
-    /// @param prefix
+    /// Note that, unlike its Python counterpart, this does not have a
+    /// 'suffix' argument.
+    ///
+    /// @param prefix directory prefix
     /// @param dir optional temporary directory
-    TemporaryDirectory(const std::string& suffix="", const std::string& prefix="tmp", std::string dir="");
+    TemporaryDirectory(const std::string& prefix="tmp", std::string dir="");
 
     /// Delete the contents of this directory.
     ///

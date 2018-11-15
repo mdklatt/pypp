@@ -46,10 +46,9 @@ TEST(tempfile, gettempdir)
 TEST(TemporaryDirectoryTest, ctor)
 {
     // This also tests the 'name' attribute.
-    const TemporaryDirectory tmpdir("xyz", "abc");
+    const TemporaryDirectory tmpdir("abc");
     ASSERT_TRUE(isdir(tmpdir.name));
     ASSERT_TRUE(startswith(basename(tmpdir.name), "abc"));
-    ASSERT_TRUE(endswith(basename(tmpdir.name), "xyz"));
     ASSERT_EQ(gettempdir(), dirname(tmpdir.name));
 }
 
@@ -59,7 +58,7 @@ TEST(TemporaryDirectoryTest, ctor)
 TEST(TemporaryDirectoryTest, ctor_dir)
 {
     const TemporaryDirectory root;
-    const TemporaryDirectory tmpdir("", "tmp", root.name);
+    const TemporaryDirectory tmpdir("tmp", root.name);
     ASSERT_TRUE(isdir(tmpdir.name));
     ASSERT_EQ(root.name, dirname(tmpdir.name));
 }
