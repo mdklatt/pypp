@@ -38,7 +38,7 @@ public:
     ///
     /// @param prefix directory prefix
     /// @param dir optional temporary directory
-    TemporaryDirectory(const std::string& prefix="tmp", std::string dir="");
+    explicit TemporaryDirectory(const std::string& prefix="tmp", std::string dir="");
 
     /// Delete the contents of this directory.
     ///

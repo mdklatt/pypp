@@ -58,7 +58,7 @@ std::vector<std::pair<size_t, T>> enumerate(const std::vector<T>& seq, ssize_t s
         items.emplace_back(std::make_pair(pos++, item));
     }
     return items;
-};
+}
 
 
 /// Return true if a value is in a sequence.
@@ -98,7 +98,7 @@ std::vector<std::pair<T1, T2>> zip(const std::vector<T1>& first, const std::vect
         pairs.emplace_back(std::make_pair(first[pos], second[pos]));
     }
     return pairs;
-};
+}
 
 
 /// Generate an incremental range.
