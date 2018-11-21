@@ -12,12 +12,13 @@ project(pypp
 
 # Define project targets.
 
-add_library(${PROJECT_NAME}
+add_library(pypp
     src/os.cpp
     src/path.cpp
     src/string.cpp
     src/tempfile.cpp
 )
+add_library(pypp::pypp ALIAS pypp)
 
 target_include_directories(pypp
 PUBLIC
@@ -45,14 +46,14 @@ PUBLIC
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/PyppConfigVersion.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/pypp-config-version.cmake
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
 configure_package_config_file(
-    ${CMAKE_CURRENT_LIST_DIR}/cmake/PyppConfig.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/PyppConfig.cmake
+    ${CMAKE_CURRENT_LIST_DIR}/cmake/pypp-config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/pypp-config.cmake
 INSTALL_DESTINATION
     ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
@@ -79,8 +80,8 @@ install(EXPORT pypp_targets
 
 install(
 FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/PyppConfig.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/PyppConfigVersion.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/pypp-config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/pypp-config-version.cmake
 DESTINATION
     ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
@@ -91,7 +92,7 @@ DESTINATION
 # requiring this project to be installed.
 
 export(EXPORT pypp_targets
-    FILE ${CMAKE_CURRENT_BINARY_DIR}/PyppTargets.cmake
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/pypp-targets.cmake
     NAMESPACE pypp::
 )
 export(PACKAGE pypp)

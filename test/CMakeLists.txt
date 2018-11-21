@@ -19,5 +19,5 @@ PRIVATE
 
 target_link_libraries(test_pypp
 PRIVATE
-    pypp gtest gtest_main
+    pypp::pypp gtest gtest_main
 )
