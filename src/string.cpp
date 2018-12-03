@@ -1,5 +1,6 @@
 /// Implementation of the string module.
 ///
+#include <cmath>
 #include <locale>
 #include <algorithm>
 #include <iterator>
@@ -9,6 +10,8 @@
 #include "pypp/string.hpp"
 
 
+using std::ceil;
+using std::floor;
 using std::invalid_argument;
 using std::locale;
 using std::max;
@@ -194,4 +197,16 @@ string str::replace(string str, const string& old, const string& sub, ssize_t ma
         ++count;
     }
     return str;
+}
+
+
+string str::center(const string& str, size_t width, char fill)
+{
+    if (str.length() >= width) {
+        return str;
+    }
+    const auto padlen((width - str.length()) / 2.);  // TODO: possible overlow
+    const string lpad(static_cast<size_t>(floor(padlen)), fill);
+    const string rpad(static_cast<size_t>(ceil(padlen)), fill);
+    return lpad + str + rpad;
 }

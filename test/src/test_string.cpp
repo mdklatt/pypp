@@ -219,3 +219,14 @@ TEST(string, replace)
     ASSERT_EQ(replace("abcabc", "abc", "xyz", 0), "abcabc");
     ASSERT_EQ(replace("abcabc", "abc", "xyz", 1), "xyzabc");
 }
+
+
+/// Test the center() function.
+///
+TEST(string, center)
+{
+    ASSERT_EQ(center("abc", 2), "abc");
+    ASSERT_EQ(center("abc", 4), "abc ");
+    ASSERT_EQ(center("abc", 5), " abc ");
+    ASSERT_EQ(center("abc", 5, 'x'), "xabcx");
+}

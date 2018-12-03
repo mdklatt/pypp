@@ -143,12 +143,24 @@ bool endswith(const std::string& str, const std::string& suffix);
 
 /// Replace all occurrences of text in a string.
 ///
-/// @param str string to modify
+/// @param str input string
 /// @param old text to replace
 /// @param sub substitution text
 /// @param maxcount maximum number of substitutions
 /// @return modified string
 std::string replace(std::string str, const std::string& old, const std::string& sub, ssize_t maxcount=-1);
+
+
+/// Pad both sides of string to center it.
+///
+/// If the amount of padding is not even, the extra fill character will be on
+/// the right.
+///
+/// @param str input string
+/// @param width total output width
+/// @param fill fill character
+/// @return padded string
+std::string center(const std::string& str, size_t width, char fill=' ');
 
 }}  // namespace
 
