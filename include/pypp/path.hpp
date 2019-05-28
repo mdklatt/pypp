@@ -120,13 +120,13 @@ bool isdir(const std::string& path);
 
 /// System-independent representation of a file path.
 ///
-class PurePath
+class PurePosixPath  // TODO: single PosixPath class
 {
 public:
     /// Create a path object.
     ///
     /// @param path path as a string
-    PurePath(std::string path=".");
+    explicit PurePosixPath(std::string path=".");
 
     /// Represent the path as a std::string.
     ///
@@ -137,49 +137,49 @@ public:
     ///
     /// @param other other path to join with
     /// @return new joined path
-    PurePath joinpath(const PurePath& other) const;
+    PurePosixPath joinpath(const PurePosixPath& other) const;
 
     /// Join this path with another path.
     ///
     /// @param other path to join with
     /// @return new joned path
-    PurePath joinpath(const std::string& other) const;
+    PurePosixPath joinpath(const std::string& other) const;
 
     /// Join this path with another path
     ///
     /// @param other path to join with
     /// @return new joined path
-    PurePath operator/(const std::string& other) const;
+    PurePosixPath operator/(const std::string& other) const;
 
     /// Join this path with another path.
     ///
     /// @param other path to join with
     /// @return new joined path
-    PurePath operator/(const PurePath& other) const;
+    PurePosixPath operator/(const PurePosixPath& other) const;
 
     /// Join this path in place with another path.
     ///
     /// @param  path to join with
     /// @return modified path
-    PurePath& operator/=(const std::string& other);
+    PurePosixPath& operator/=(const std::string& other);
 
     /// Join this path in place with another path.
     ///
     /// @param other path to join with
     /// @return modified path
-    PurePath& operator/=(const PurePath& other);
+    PurePosixPath& operator/=(const PurePosixPath& other);
 
     /// Equality operator.
     ///
     /// @param other path to compare
     /// @return true if paths are equal
-    bool operator==(const PurePath& other) const;
+    bool operator==(const PurePosixPath& other) const;
 
     /// Inequality operator
     ///
     /// @param other path to compare
     /// @return true if paths are not equal
-    bool operator!=(const PurePath& other) const;
+    bool operator!=(const PurePosixPath& other) const;
 
     /// Determine if the path is absolute.
     ///
@@ -199,23 +199,23 @@ public:
     /// Get the path root (`` or `/`).
     ///
     /// @return root
-    const std::string root() const;
+    std::string root() const;
 
     /// Compute the direct parent path.
     ///
     /// @return parent path
-    PurePath parent() const;
+    PurePosixPath parent() const;
 
     /// Compute all ancestor paths, starting with the direct parent.
     ///
     /// @return ancestor paths
-    std::vector<PurePath> parents() const;
+    std::vector<PurePosixPath> parents() const;
 
     /// Compute a relative path.
     ///
     /// @param other parent path
     /// @return relative path
-    PurePath relative_to(const PurePath& other) const;
+    PurePosixPath relative_to(const PurePosixPath& other) const;
 
     /// Get the path name without its suffix.
     ///
@@ -235,12 +235,12 @@ public:
     /// Replace the path name.
     ///
     /// @return new path
-    PurePath with_name(const std::string& name) const;
+    PurePosixPath with_name(const std::string& name) const;
 
     /// Replace the path suffix.
     ///
     /// @return new path
-    PurePath with_suffix(const std::string& suffix) const;
+    PurePosixPath with_suffix(const std::string& suffix) const;
 
 private:
     std::vector<std::string> parts_;
@@ -252,13 +252,115 @@ private:
 };
 
 
-class PosixPath: public PurePath
+///
+///
+class PosixPath: private PurePosixPath
 {
+public:
+    using PurePosixPath::operator std::string;
+    using PurePosixPath::is_absolute;
+    using PurePosixPath::name;
+    using PurePosixPath::parts;
+    using PurePosixPath::root;
+    using PurePosixPath::stem;
+    using PurePosixPath::suffix;
+    using PurePosixPath::suffixes;
 
+    /// Create a path object.
+    ///
+    /// @param path path as a string
+    explicit PosixPath(const std::string& path=".");
+
+    /// Create a path object.
+    ///
+    /// @param path
+    explicit PosixPath(const PurePosixPath& path);
+
+    /// Join this path with another path.
+    ///
+    /// @param path other path to join with
+    /// @return new joined path
+    PosixPath joinpath(const PosixPath& path) const;
+
+    /// Join this path with another path.
+    ///
+    /// @param path path to join with
+    /// @return new joned path
+    PosixPath joinpath(const std::string& path) const;
+
+    /// Join this path with another path
+    ///
+    /// @param path path to join with
+    /// @return new joined path
+    PosixPath operator/(const std::string& path) const;
+
+    /// Join this path with another path.
+    ///
+    /// @param other path to join with
+    /// @return new joined path
+    PosixPath operator/(const PosixPath& other) const;
+
+    /// Join this path in place with another path.
+    ///
+    /// @param other path to join with
+    /// @return modified path
+    PosixPath& operator/=(const std::string& other);
+
+    /// Join this path in place with another path.
+    ///
+    /// @param other path to join with
+    /// @return modified path
+    PosixPath& operator/=(const PosixPath& other);
+
+    /// Equality operator.
+    ///
+    /// @param other path to compare
+    /// @return true if paths are equal
+    bool operator==(const PosixPath& other) const;
+
+    /// Inequality operator
+    ///
+    /// @param other path to compare
+    /// @return true if paths are not equal
+    bool operator!=(const PosixPath& other) const;
+
+    /// Compute the direct parent path.
+    ///
+    /// @return parent path
+    PosixPath parent() const;
+
+    /// Compute all ancestor paths, starting with the direct parent.
+    ///
+    /// @return ancestor paths
+    std::vector<PosixPath> parents() const;
+
+    /// Compute a relative path.
+    ///
+    /// @param other parent path
+    /// @return relative path
+    PosixPath relative_to(const PosixPath& other) const;
+
+    /// Replace the path name.
+    ///
+    /// @return new path
+    PosixPath with_name(const std::string& name) const;
+
+    /// Replace the path suffix.
+    ///
+    /// @return new path
+    PosixPath with_suffix(const std::string& suffix) const;
+
+    /// Convert to a PurePath object.
+    ///
+    PurePosixPath pure() const;
 };
+
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 using Path = PosixPath;
+using PurePath = PurePosixPath;
+#else
+#error "path module requires *nix"
 #endif
 
 }}  // namespace

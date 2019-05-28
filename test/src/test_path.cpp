@@ -4,7 +4,7 @@
 /// test runner.
 ///
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-#include "unistd.h"  // FIXME: not portable
+#include "unistd.h"
 #else
 #error "path test suite requires *nix"
 #endif
@@ -14,6 +14,7 @@
 #include <memory>
 #include <string>
 #include <stdexcept>
+#include <typeinfo>
 #include <vector>
 #include <gtest/gtest.h>
 #include "pypp/path.hpp"
@@ -108,6 +109,7 @@ TEST(path, normpath)
 
 
 /// Test the abspath() function.
+///
 TEST(path, abspath)
 {
     unique_ptr<char> buffer(new char[FILENAME_MAX]);
@@ -176,247 +178,264 @@ TEST(path, isdir)
 }
 
 
-/// Test the PurePath constructor.
+
+/// Test Fixture for PurePath unit tests.
 ///
-TEST(PurePathTest, ctor)
-{
-    // TODO: Just a basic smoke test for now.
-    const PurePath path;
-}
-
-
-/// Test the PurePath std::string operator.
+/// The fixture will be type-parametrized over all classes that implement the
+/// PurePath interface.
 ///
-TEST(PurePathTest, string_op)
-{
-    // TODO: Just a basic smoke test for now.
-    const PurePath path;
-    ASSERT_EQ(string(path), ".");
-}
-
-
-/// Test the PurePath::joinpath() method.
-///
-TEST(PurePathTest, joinpath)
-{
-    // TODO: Just a basic smoke test for now.
-//    const PurePath path("abc");
-    //ASSERT_EQ(string(path.joinpath(PurePath("/xyz"))), "/xyz");
-}
-
-
-/// Test the PurePath::joinpath() method.
-///
-TEST(PurePathTest, joinpath_string)
-{
-    // TODO: Just a basic smoke test for now.
-//    const PurePath path;
-    //ASSERT_EQ(typeid(path.joinpath("abc")), typeid(path));
-}
-
-
-/// Test the PurePath join operator.
-///
-TEST(PurePathTest, join_op)
-{
-    // TODO: Just a basic smoke test for now.
-    const PurePath path;
-    ASSERT_EQ(typeid(path / "abc"), typeid(path));
-}
-
-
-/// Test the PurePath join assignment operator.
-///
-TEST(PurePathTest, join_assign_op)
-{
-    PurePath path;
-    path /= "abc";
-    ASSERT_EQ(string(path), "abc");
-}
+template <typename T>
+class PurePathTest: public Test {};
+using PurePathTypes = Types<PurePath, Path>;
+TYPED_TEST_CASE(PurePathTest, PurePathTypes);
 
 
 /// Test the PurePath equality operator.
 ///
-TEST(PurePathTest, eq_op)
+TYPED_TEST(PurePathTest, eq_op)
 {
-    ASSERT_TRUE(PurePath() == PurePath());
-    ASSERT_TRUE(PurePath("abc") == PurePath("abc"));
-    ASSERT_TRUE(PurePath("abc") == PurePath("./abc"));
-    ASSERT_FALSE(PurePath("abc") == PurePath("/abc/"));
-    ASSERT_FALSE(PurePath("abc") == PurePath());
+    ASSERT_TRUE(TypeParam() == TypeParam());
+    ASSERT_TRUE(TypeParam("abc") == TypeParam("abc"));
+    ASSERT_TRUE(TypeParam("abc") == TypeParam("./abc"));
+    ASSERT_FALSE(TypeParam("abc") == TypeParam("/abc/"));
+    ASSERT_FALSE(TypeParam("abc") == TypeParam());
+    static const TypeParam path("abc");
+    ASSERT_TRUE(path == path);  // identity
 }
 
 
 /// Test the PurePath inequality operator.
 ///
-TEST(PurePathTest, ne_op)
+TYPED_TEST(PurePathTest, ne_op)
 {
-    ASSERT_TRUE(PurePath() == PurePath());
-    const PurePath path("abc");
-    ASSERT_TRUE(path == path);
-    ASSERT_TRUE(path == PurePath("abc"));
-    ASSERT_TRUE(path == PurePath("./abc"));
-    ASSERT_FALSE(path == PurePath("/abc/"));
-    ASSERT_FALSE(path == PurePath());
+    ASSERT_FALSE(TypeParam() != TypeParam());
+    ASSERT_FALSE(TypeParam("abc") != TypeParam("abc"));
+    ASSERT_FALSE(TypeParam("abc") != TypeParam("./abc"));
+    ASSERT_TRUE(TypeParam("abc") != TypeParam("/abc/"));
+    ASSERT_TRUE(TypeParam("abc") != TypeParam());
+    static const TypeParam path("abc");
+    ASSERT_FALSE(path != path);  // identity
+}
+ 
+
+/// Test the PurePath std::string operator.
+///
+TYPED_TEST(PurePathTest, string_op)
+{
+    ASSERT_EQ(".", string(TypeParam()));
+    ASSERT_EQ(".", string(TypeParam(".")));
+    ASSERT_EQ(".", string(TypeParam("./")));
+    ASSERT_EQ("/", string(TypeParam("/")));
+    ASSERT_EQ("abc", string(TypeParam("abc")));
+    ASSERT_EQ("abc", string(TypeParam("abc/")));
 }
 
 
 /// Test the PurePath::is_absolute() method.
 ///
-TEST(PurePathTest, is_absolute)
+TYPED_TEST(PurePathTest, is_absolute)
 {
-    ASSERT_FALSE(PurePath().is_absolute());
-    ASSERT_FALSE(PurePath("abc").is_absolute());
-    ASSERT_FALSE(PurePath("./abc").is_absolute());
-    ASSERT_TRUE(PurePath("/abc").is_absolute());
+    ASSERT_FALSE(TypeParam().is_absolute());
+    ASSERT_FALSE(TypeParam("abc").is_absolute());
+    ASSERT_FALSE(TypeParam("./abc").is_absolute());
+    ASSERT_TRUE(TypeParam("/abc").is_absolute());
 }
 
 
 /// Test the PurePath::name() method.
 ///
-TEST(PurePathTest, name)
+TYPED_TEST(PurePathTest, name)
 {
-    ASSERT_EQ(PurePath("").name(), "");
-    ASSERT_EQ(PurePath(".").name(), "");
-    ASSERT_EQ(PurePath("/").name(), "");
-    ASSERT_EQ(PurePath(".abc").name(), ".abc");
-    ASSERT_EQ(PurePath("./abc").name(), "abc");
-    ASSERT_EQ(PurePath("/abc").name(), "abc");
-    ASSERT_EQ(PurePath("/abc/").name(), "abc");
-    ASSERT_EQ(PurePath("abc/def").name(), "def");
+    ASSERT_EQ("", TypeParam("").name());
+    ASSERT_EQ("", TypeParam(".").name());
+    ASSERT_EQ("", TypeParam("/").name());
+    ASSERT_EQ(".abc", TypeParam(".abc").name());
+    ASSERT_EQ("abc", TypeParam("./abc").name());
+    ASSERT_EQ("abc", TypeParam("/abc").name());
+    ASSERT_EQ("abc", TypeParam("/abc/").name());
+    ASSERT_EQ("def", TypeParam("abc/def").name());
 }
 
 
 /// Test the PurePath::parts() method.
 ///
-TEST(PurePathTest, parts)
+TYPED_TEST(PurePathTest, parts)
 {
-    ASSERT_EQ(PurePath().parts(), vector<string>());
-    ASSERT_EQ(PurePath("").parts(), vector<string>());
-    ASSERT_EQ(PurePath(".").parts(), vector<string>());
-    ASSERT_EQ(PurePath("./..").parts(), vector<string>({".."}));
-    ASSERT_EQ(PurePath("/").parts(), vector<string>({"/"}));
-    ASSERT_EQ(PurePath("./abc").parts(), vector<string>({"abc"}));
-    ASSERT_EQ(PurePath("/abc").parts(), vector<string>({"/", "abc"}));
-    ASSERT_EQ(PurePath("abc/def").parts(), vector<string>({"abc", "def"}));
-    ASSERT_EQ(PurePath("abc//def").parts(), vector<string>({"abc", "def"}));
-    ASSERT_EQ(PurePath("../abc").parts(), vector<string>({"..", "abc"}));
-}
-
-
-/// Test the PurePath::parent() method.
-///
-TEST(PurePathTest, parent)
-{
-    ASSERT_EQ(PurePath().parent(), PurePath());
-    ASSERT_EQ(PurePath("abc").parent(), PurePath());
-    ASSERT_EQ(PurePath("/abc").parent(), PurePath("/"));
-    ASSERT_EQ(PurePath("abc/def").parent(), PurePath("abc"));
-    ASSERT_EQ(PurePath("/").parent(), PurePath("/"));
-}
-
-
-/// Test the PurePath::parents() method.
-///
-TEST(PurePathTest, parents)
-{
-    ASSERT_EQ(PurePath().parents(), vector<PurePath>());
-    ASSERT_EQ(PurePath("/").parents(), vector<PurePath>());
-    vector<PurePath> parents({PurePath("abc"), PurePath()});
-    ASSERT_EQ(PurePath("abc/def").parents(), parents);
-    parents = {PurePath("/abc"), PurePath("/")};
-    ASSERT_EQ(PurePath("/abc/def").parents(), parents);
-}
-
-
-/// Test the PurePath::relative_to() method.
-///
-TEST(PurePathTest, relative_to)
-{
-    ASSERT_THROW(PurePath("").relative_to(string("/")), std::invalid_argument);
-    ASSERT_THROW(PurePath("abc").relative_to(string("def")), std::invalid_argument);
-    ASSERT_THROW(PurePath("abc").relative_to(string("abc/def")), std::invalid_argument);
-    ASSERT_EQ(PurePath("abc").relative_to(string("")), PurePath("abc"));
-    ASSERT_EQ(PurePath("abc").relative_to(string("abc")), PurePath());
-    ASSERT_EQ(PurePath("abc/def").relative_to(string("abc")), PurePath("def"));
+    ASSERT_EQ(vector<string>(), TypeParam().parts());
+    ASSERT_EQ(vector<string>(), TypeParam("").parts());
+    ASSERT_EQ(vector<string>(), TypeParam(".").parts());
+    ASSERT_EQ(vector<string>({".."}), TypeParam("./..").parts());
+    ASSERT_EQ(vector<string>({"/"}), TypeParam("/").parts());
+    ASSERT_EQ(vector<string>({"abc"}), TypeParam("./abc").parts());
+    ASSERT_EQ(vector<string>({"/", "abc"}), TypeParam("/abc").parts());
+    ASSERT_EQ(vector<string>({"abc", "def"}), TypeParam("abc/def").parts());
+    ASSERT_EQ(vector<string>({"abc", "def"}), TypeParam("abc//def").parts());
+    ASSERT_EQ(vector<string>({"..", "abc"}), TypeParam("../abc").parts());
 }
 
 
 /// Test the PurePath::root() method.
 ///
-TEST(PurePathTest, root)
+TYPED_TEST(PurePathTest, root)
 {
-    ASSERT_EQ(PurePath().root(), "");
-    ASSERT_EQ(PurePath("abc/def").root(), "");
-    ASSERT_EQ(PurePath("/").root(), "/");
-    ASSERT_EQ(PurePath("/abc/def").root(), "/");
+    ASSERT_EQ("", TypeParam().root());
+    ASSERT_EQ("", TypeParam("abc/def").root());
+    ASSERT_EQ("/", TypeParam("/").root());
+    ASSERT_EQ("/", TypeParam("/abc/def").root());
 }
 
 
 /// Test the PurePath::stem() method.
 ///
-TEST(PurePathTest, stem)
+TYPED_TEST(PurePathTest, stem)
 {
-    ASSERT_EQ(PurePath().stem(), "");
-    ASSERT_EQ(PurePath(".").stem(), "");
-    ASSERT_EQ(PurePath("abc.").stem(), "abc.");
-    ASSERT_EQ(PurePath("/abc/def.").stem(), "def.");
-    ASSERT_EQ(PurePath("/abc/def.xyz").stem(), "def");
+    ASSERT_EQ("", TypeParam().stem());
+    ASSERT_EQ("", TypeParam(".").stem());
+    ASSERT_EQ("abc.", TypeParam("abc.").stem());
+    ASSERT_EQ("def.", TypeParam("/abc/def.").stem());
+    ASSERT_EQ("def", TypeParam("/abc/def.xyz").stem());
 }
 
 
 /// Test the PurePath::suffix() method.
 ///
-TEST(PurePathTest, suffix)
+TYPED_TEST(PurePathTest, suffix)
 {
-    ASSERT_EQ(PurePath().suffix(), "");
-    ASSERT_EQ(PurePath("abc.").suffix(), "");
-    ASSERT_EQ(PurePath(".abc").suffix(), "");
-    ASSERT_EQ(PurePath("abc.xyz").suffix(), ".xyz");
-    ASSERT_EQ(PurePath("abc.def.xyz").suffix(), ".xyz");
+    ASSERT_EQ("", TypeParam().suffix());
+    ASSERT_EQ("", TypeParam("abc.").suffix());
+    ASSERT_EQ("", TypeParam(".abc").suffix());
+    ASSERT_EQ(".xyz", TypeParam("abc.xyz").suffix());
+    ASSERT_EQ(".xyz", TypeParam("abc.def.xyz").suffix());
 }
 
 
 /// Test the PurePath::suffixes() method.
 ///
-TEST(PurePathTest, suffixes)
+TYPED_TEST(PurePathTest, suffixes)
 {
-    ASSERT_EQ(PurePath().suffixes(), vector<string>());
-    ASSERT_EQ(PurePath("abc.").suffixes(), vector<string>());
-    ASSERT_EQ(PurePath(".abc").suffixes(), vector<string>());
-    ASSERT_EQ(PurePath("abc.xyz").suffixes(), vector<string>({".xyz"}));
-    ASSERT_EQ(PurePath("abc..xyz").suffixes(), vector<string>({".", ".xyz"}));
-    ASSERT_EQ(PurePath("abc.def.xyz").suffixes(), vector<string>({".def", ".xyz"}));
+    ASSERT_EQ(vector<string>(), TypeParam().suffixes());
+    ASSERT_EQ(vector<string>(), TypeParam("abc.").suffixes());
+    ASSERT_EQ(vector<string>(), TypeParam(".abc").suffixes());
+    ASSERT_EQ(vector<string>({".xyz"}), TypeParam("abc.xyz").suffixes());
+    ASSERT_EQ(vector<string>({".", ".xyz"}), TypeParam("abc..xyz").suffixes());
+    ASSERT_EQ(vector<string>({".def", ".xyz"}), TypeParam("abc.def.xyz").suffixes());
 }
+
+
+/// Test the PurePath::joinpath() method.
+///
+TYPED_TEST(PurePathTest, joinpath)
+{
+    ASSERT_EQ(TypeParam(), TypeParam().joinpath(TypeParam()));
+    ASSERT_EQ(TypeParam("/"), TypeParam().joinpath(TypeParam("/")));
+    ASSERT_EQ(TypeParam("abc"), TypeParam().joinpath(TypeParam("abc")));
+    ASSERT_EQ(TypeParam("abc/def"), TypeParam("abc").joinpath(TypeParam("def/")));
+    //ASSERT_EQ(TypeParam("/def"), TypeParam("abc").joinpath(TypeParam("/def")));  // FIXME
+}
+
+
+/// Test the PurePath join operator.
+///
+TYPED_TEST(PurePathTest, join_op)
+{
+    ASSERT_EQ(TypeParam(), TypeParam() / TypeParam());
+    ASSERT_EQ(TypeParam("/"), TypeParam() / TypeParam("/"));
+    ASSERT_EQ(TypeParam("abc"), TypeParam() / TypeParam("abc"));
+    ASSERT_EQ(TypeParam("abc/def"), TypeParam("abc") / TypeParam("def/"));
+    //ASSERT_EQ(TypeParam("/def"), TypeParam("abc") / TypeParam("/def"));  // FIXME
+}
+
+
+/// Test the PurePath join assignment operator.
+///
+TYPED_TEST(PurePathTest, join_assign_op)
+{
+    TypeParam path("abc");
+    path /= "def";
+    ASSERT_EQ(TypeParam("abc/def"), path);
+}
+
+
+/// Test the PurePath::parent() method.
+///
+TYPED_TEST(PurePathTest, parent)
+{
+    ASSERT_EQ(TypeParam(), TypeParam().parent());
+    ASSERT_EQ(TypeParam(), TypeParam("abc").parent());
+    ASSERT_EQ(TypeParam("/"), TypeParam("/abc").parent());
+    ASSERT_EQ(TypeParam("abc"), TypeParam("abc/def").parent());
+    ASSERT_EQ(TypeParam("/"), TypeParam("/").parent());
+}
+
+
+/// Test the PurePath::parents() method.
+///
+TYPED_TEST(PurePathTest, parents)
+{
+    ASSERT_EQ(vector<TypeParam>(), TypeParam().parents());
+    ASSERT_EQ(vector<TypeParam>(), TypeParam("/").parents());
+    ASSERT_EQ(vector<TypeParam>({TypeParam("abc"), TypeParam()}), TypeParam("abc/def").parents());
+    ASSERT_EQ(vector<TypeParam>({TypeParam("/abc"), TypeParam("/")}), TypeParam("/abc/def").parents());
+}
+
+
+/// Test the PurePath::relative_to() method.
+///
+TYPED_TEST(PurePathTest, relative_to)
+{
+    ASSERT_THROW(TypeParam("").relative_to(TypeParam("/")), std::invalid_argument);
+    ASSERT_THROW(TypeParam("abc").relative_to(TypeParam("def")), std::invalid_argument);
+    ASSERT_THROW(TypeParam("abc").relative_to(TypeParam("abc/def")), std::invalid_argument);
+    ASSERT_EQ(TypeParam("abc"), TypeParam("abc").relative_to(TypeParam("")));
+    ASSERT_EQ(TypeParam(), TypeParam("abc").relative_to(TypeParam("abc")));
+    ASSERT_EQ(TypeParam("def"), TypeParam("abc/def").relative_to(TypeParam("abc")));
+}
+
 
 
 /// Test the PurePath::with_name() method.
 ///
-TEST(PurePathTest, with_name)
+TYPED_TEST(PurePathTest, with_name)
 {
-    ASSERT_THROW(PurePath("").with_name("abc"), std::invalid_argument);
-    ASSERT_THROW(PurePath(".").with_name("abc"), std::invalid_argument);
-    ASSERT_THROW(PurePath("/").with_name("abc"), std::invalid_argument);
-    ASSERT_THROW(PurePath("abc").with_name(""), std::invalid_argument);
-    ASSERT_THROW(PurePath("abc").with_name("."), std::invalid_argument);
-    ASSERT_THROW(PurePath("abc").with_name("def/"), std::invalid_argument);
-    ASSERT_EQ(PurePath("abc").with_name("xyz"), PurePath("xyz"));
-    ASSERT_EQ(PurePath("/abc").with_name("xyz"), PurePath("/xyz"));
-    ASSERT_EQ(PurePath("abc/def").with_name("xyz"), PurePath("abc/xyz"));
+    ASSERT_THROW(TypeParam("").with_name("abc"), std::invalid_argument);
+    ASSERT_THROW(TypeParam(".").with_name("abc"), std::invalid_argument);
+    ASSERT_THROW(TypeParam("/").with_name("abc"), std::invalid_argument);
+    ASSERT_THROW(TypeParam("abc").with_name(""), std::invalid_argument);
+    ASSERT_THROW(TypeParam("abc").with_name("."), std::invalid_argument);
+    ASSERT_THROW(TypeParam("abc").with_name("def/"), std::invalid_argument);
+    ASSERT_EQ(TypeParam("xyz"), TypeParam("abc").with_name("xyz"));
+    ASSERT_EQ(TypeParam("/xyz"), TypeParam("/abc").with_name("xyz"));
+    ASSERT_EQ(TypeParam("abc/xyz"), TypeParam("abc/def").with_name("xyz"));
 }
 
 
 /// Test the PurePath::with_suffx() method.
 ///
-TEST(PurePathTest, with_suffix)
+TYPED_TEST(PurePathTest, with_suffix)
 {
-    ASSERT_THROW(PurePath("").with_suffix(".xyz"), std::invalid_argument);
-    ASSERT_THROW(PurePath(".").with_suffix(".xyz"), std::invalid_argument);
-    ASSERT_THROW(PurePath("/").with_suffix(".xyz"), std::invalid_argument);
-    ASSERT_THROW(PurePath("abc").with_suffix("."), std::invalid_argument);
-    ASSERT_THROW(PurePath("abc").with_suffix("./"), std::invalid_argument);
-    ASSERT_EQ(PurePath("abc").with_suffix(""), PurePath("abc"));
-    ASSERT_EQ(PurePath("abc").with_suffix(".xyz"), PurePath("abc.xyz"));
-    ASSERT_EQ(PurePath("abc.").with_suffix(".xyz"), PurePath("abc..xyz"));
-    ASSERT_EQ(PurePath("abc.def").with_suffix(".xyz"), PurePath("abc.xyz"));
+    ASSERT_THROW(TypeParam("").with_suffix(".xyz"), std::invalid_argument);
+    ASSERT_THROW(TypeParam(".").with_suffix(".xyz"), std::invalid_argument);
+    ASSERT_THROW(TypeParam("/").with_suffix(".xyz"), std::invalid_argument);
+    ASSERT_THROW(TypeParam("abc").with_suffix("."), std::invalid_argument);
+    ASSERT_THROW(TypeParam("abc").with_suffix("./"), std::invalid_argument);
+    ASSERT_EQ(TypeParam("abc"), TypeParam("abc").with_suffix(""));
+    ASSERT_EQ(TypeParam("abc.xyz"), TypeParam("abc").with_suffix(".xyz"));
+    ASSERT_EQ(TypeParam("abc..xyz"), TypeParam("abc.").with_suffix(".xyz"));
+    ASSERT_EQ(TypeParam("abc.xyz"), TypeParam("abc.def").with_suffix(".xyz"));
+}
+
+
+/// Test fixture for Path unit tests.
+///
+/// This is used to test the system-dependent behavior that is not part of
+/// the PurePath interface.
+///
+class PathTest: public Test {};
+
+
+/// Test the Path::pure() method.
+///
+TEST_F(PathTest, pure)
+{
+    ASSERT_EQ(PurePath("abc"), Path("abc").pure());
 }
