@@ -1,7 +1,6 @@
 /// Common file path manipulations.
 ///
-/// This combines functionality from the Python os.path and pathlib (TODO)
-/// modules.
+/// This combines functionality from the Python os.path and pathlib modules.
 ///
 /// @file
 #ifndef PYPP_PATH_HPP
@@ -117,6 +116,150 @@ bool isfile(const std::string& path);
 /// @param path input path
 /// @return true if path is an existing directory
 bool isdir(const std::string& path);
+
+
+/// System-independent representation of a file path.
+///
+class PurePath
+{
+public:
+    /// Create a path object.
+    ///
+    /// @param path path as a string
+    PurePath(std::string path=".");
+
+    /// Represent the path as a std::string.
+    ///
+    /// @return string representation
+    explicit operator std::string() const;
+
+    /// Join this path with another path.
+    ///
+    /// @param other other path to join with
+    /// @return new joined path
+    PurePath joinpath(const PurePath& other) const;
+
+    /// Join this path with another path.
+    ///
+    /// @param other path to join with
+    /// @return new joned path
+    PurePath joinpath(const std::string& other) const;
+
+    /// Join this path with another path
+    ///
+    /// @param other path to join with
+    /// @return new joined path
+    PurePath operator/(const std::string& other) const;
+
+    /// Join this path with another path.
+    ///
+    /// @param other path to join with
+    /// @return new joined path
+    PurePath operator/(const PurePath& other) const;
+
+    /// Join this path in place with another path.
+    ///
+    /// @param  path to join with
+    /// @return modified path
+    PurePath& operator/=(const std::string& other);
+
+    /// Join this path in place with another path.
+    ///
+    /// @param other path to join with
+    /// @return modified path
+    PurePath& operator/=(const PurePath& other);
+
+    /// Equality operator.
+    ///
+    /// @param other path to compare
+    /// @return true if paths are equal
+    bool operator==(const PurePath& other) const;
+
+    /// Inequality operator
+    ///
+    /// @param other path to compare
+    /// @return true if paths are not equal
+    bool operator!=(const PurePath& other) const;
+
+    /// Determine if the path is absolute.
+    ///
+    /// @return true if this is an absolute path
+    bool is_absolute() const;
+
+    /// Get the final path component.
+    ///
+    /// @return name
+    std::string name() const;
+
+    /// Split the path into its component parts.
+    ///
+    /// @return path parts
+    const std::vector<std::string>& parts() const;
+
+    /// Get the path root (`` or `/`).
+    ///
+    /// @return root
+    const std::string root() const;
+
+    /// Compute the direct parent path.
+    ///
+    /// @return parent path
+    PurePath parent() const;
+
+    /// Compute all ancestor paths, starting with the direct parent.
+    ///
+    /// @return ancestor paths
+    std::vector<PurePath> parents() const;
+
+    /// Compute a relative path.
+    ///
+    /// @param other parent path
+    /// @return relative path
+    PurePath relative_to(const PurePath& other) const;
+
+    /// Get the path name without its suffix.
+    ///
+    /// @return stem
+    std::string stem() const;
+
+    /// Get the final file extension for the path name.
+    ///
+    /// @return suffix
+    std::string suffix() const;
+
+    /// Get all file extensions for the path name.
+    ///
+    /// @return
+    std::vector<std::string> suffixes() const;
+
+    /// Replace the path name.
+    ///
+    /// @return new path
+    PurePath with_name(const std::string& name) const;
+
+    /// Replace the path suffix.
+    ///
+    /// @return new path
+    PurePath with_suffix(const std::string& suffix) const;
+
+private:
+    std::vector<std::string> parts_;
+
+    /// Determine if path is a relative (`.`) or absolute (`/`) root.
+    ///
+    /// @return true if path is a root
+    bool is_root() const;
+};
+
+
+class PosixPath: public PurePath
+{
+
+};
+
+#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+using Path = PosixPath;
+#endif
 
 }}  // namespace
 
