@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <cstdio>
+#include <fstream>
 #include <memory>
 #include <string>
 #include <stdexcept>
@@ -23,8 +24,11 @@
 using namespace pypp::path;
 
 using std::invalid_argument;
+using std::fstream;
+using std::ios;
 using std::make_pair;
 using std::pair;
+using std::runtime_error;
 using std::string;
 using std::unique_ptr;
 using std::vector;
@@ -384,9 +388,9 @@ TYPED_TEST(PurePathTest, parents)
 ///
 TYPED_TEST(PurePathTest, relative_to)
 {
-    ASSERT_THROW(TypeParam("").relative_to(TypeParam("/")), std::invalid_argument);
-    ASSERT_THROW(TypeParam("abc").relative_to(TypeParam("def")), std::invalid_argument);
-    ASSERT_THROW(TypeParam("abc").relative_to(TypeParam("abc/def")), std::invalid_argument);
+    ASSERT_THROW(TypeParam("").relative_to(TypeParam("/")), invalid_argument);
+    ASSERT_THROW(TypeParam("abc").relative_to(TypeParam("def")), invalid_argument);
+    ASSERT_THROW(TypeParam("abc").relative_to(TypeParam("abc/def")), invalid_argument);
     ASSERT_EQ(TypeParam("abc"), TypeParam("abc").relative_to(TypeParam("")));
     ASSERT_EQ(TypeParam(), TypeParam("abc").relative_to(TypeParam("abc")));
     ASSERT_EQ(TypeParam("def"), TypeParam("abc/def").relative_to(TypeParam("abc")));
@@ -398,12 +402,12 @@ TYPED_TEST(PurePathTest, relative_to)
 ///
 TYPED_TEST(PurePathTest, with_name)
 {
-    ASSERT_THROW(TypeParam("").with_name("abc"), std::invalid_argument);
-    ASSERT_THROW(TypeParam(".").with_name("abc"), std::invalid_argument);
-    ASSERT_THROW(TypeParam("/").with_name("abc"), std::invalid_argument);
-    ASSERT_THROW(TypeParam("abc").with_name(""), std::invalid_argument);
-    ASSERT_THROW(TypeParam("abc").with_name("."), std::invalid_argument);
-    ASSERT_THROW(TypeParam("abc").with_name("def/"), std::invalid_argument);
+    ASSERT_THROW(TypeParam("").with_name("abc"), invalid_argument);
+    ASSERT_THROW(TypeParam(".").with_name("abc"), invalid_argument);
+    ASSERT_THROW(TypeParam("/").with_name("abc"), invalid_argument);
+    ASSERT_THROW(TypeParam("abc").with_name(""), invalid_argument);
+    ASSERT_THROW(TypeParam("abc").with_name("."), invalid_argument);
+    ASSERT_THROW(TypeParam("abc").with_name("def/"), invalid_argument);
     ASSERT_EQ(TypeParam("xyz"), TypeParam("abc").with_name("xyz"));
     ASSERT_EQ(TypeParam("/xyz"), TypeParam("/abc").with_name("xyz"));
     ASSERT_EQ(TypeParam("abc/xyz"), TypeParam("abc/def").with_name("xyz"));
@@ -414,11 +418,11 @@ TYPED_TEST(PurePathTest, with_name)
 ///
 TYPED_TEST(PurePathTest, with_suffix)
 {
-    ASSERT_THROW(TypeParam("").with_suffix(".xyz"), std::invalid_argument);
-    ASSERT_THROW(TypeParam(".").with_suffix(".xyz"), std::invalid_argument);
-    ASSERT_THROW(TypeParam("/").with_suffix(".xyz"), std::invalid_argument);
-    ASSERT_THROW(TypeParam("abc").with_suffix("."), std::invalid_argument);
-    ASSERT_THROW(TypeParam("abc").with_suffix("./"), std::invalid_argument);
+    ASSERT_THROW(TypeParam("").with_suffix(".xyz"), invalid_argument);
+    ASSERT_THROW(TypeParam(".").with_suffix(".xyz"), invalid_argument);
+    ASSERT_THROW(TypeParam("/").with_suffix(".xyz"), invalid_argument);
+    ASSERT_THROW(TypeParam("abc").with_suffix("."), invalid_argument);
+    ASSERT_THROW(TypeParam("abc").with_suffix("./"), invalid_argument);
     ASSERT_EQ(TypeParam("abc"), TypeParam("abc").with_suffix(""));
     ASSERT_EQ(TypeParam("abc.xyz"), TypeParam("abc").with_suffix(".xyz"));
     ASSERT_EQ(TypeParam("abc..xyz"), TypeParam("abc.").with_suffix(".xyz"));
@@ -434,9 +438,59 @@ TYPED_TEST(PurePathTest, with_suffix)
 class PathTest: public Test {};
 
 
+/// Test the Path::cwd() method.
+///
+TEST_F(PathTest, cwd)
+{
+    ASSERT_EQ(abspath("."), string(Path::cwd()));
+}
+
+
 /// Test the Path::pure() method.
 ///
 TEST_F(PathTest, pure)
 {
     ASSERT_EQ(PurePath("abc"), Path("abc").pure());
+}
+
+
+/// Test the Path::exists() method.
+///
+TEST_F(PathTest, exists)
+{
+    ASSERT_TRUE(Path().exists());
+    ASSERT_TRUE(Path(__FILE__).exists());
+    ASSERT_FALSE(Path(__FILE__).joinpath(Path("xxx")).exists());
+}
+
+
+/// Test the Path::is_dir() method.
+///
+TEST_F(PathTest, is_dir)
+{
+    ASSERT_TRUE(Path().is_dir());
+    ASSERT_FALSE(Path(__FILE__).is_dir());
+    ASSERT_FALSE(Path(__FILE__).joinpath(Path("xxx")).exists());
+}
+
+
+/// Test the Path::is_file() method.
+///
+TEST_F(PathTest, is_file)
+{
+    ASSERT_FALSE(Path().is_file());
+    ASSERT_TRUE(Path(__FILE__).is_file());
+    ASSERT_FALSE(Path(__FILE__).joinpath(Path("xxx")).is_file());
+}
+
+
+/// Test the Path::open() method.
+///
+TEST_F(PathTest, open)
+{
+    // The only reliable way to check the validity of the returned stream is to
+    // attempt an I/O operation on it.
+    // TODO: Test all modes.
+    ASSERT_NE(EOF, Path(__FILE__).open("rt").peek());
+    ASSERT_EQ(EOF, Path(__FILE__).open("xt").peek());  // error, file exists
 }

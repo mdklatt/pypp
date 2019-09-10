@@ -6,6 +6,7 @@
 #ifndef PYPP_PATH_HPP
 #define PYPP_PATH_HPP
 
+#include <fstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -266,6 +267,11 @@ public:
     using PurePosixPath::suffix;
     using PurePosixPath::suffixes;
 
+    /// Get the current working directory.
+    ///
+    /// @return path of the current working directory
+    static PosixPath cwd();
+
     /// Create a path object.
     ///
     /// @param path path as a string
@@ -353,6 +359,30 @@ public:
     /// Convert to a PurePath object.
     ///
     PurePosixPath pure() const;
+
+    /// Test for the existence of the path.
+    ///
+    /// @return true if this is an existing file or directory.
+    bool exists() const;
+
+    /// Test if the path is a valid directory.
+    ///
+    /// @return true if this is valid directory.
+    bool is_dir() const;
+
+    /// Test if the path is a valid file.
+    ///
+    /// @return true if this is valid file.
+    bool is_file() const;
+
+    /// Open a file stream for this path.
+    ///
+    /// Unlike Python, an exception will not be thrown if the file cannot be
+    /// opened.
+    ///
+    /// @param mode file mode (follows Python conventions)
+    /// @return open file stream
+    std::fstream open(const std::string& mode="rt") const;
 };
 
 

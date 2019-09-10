@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <deque>
 #include <iterator>
+#include <map>
 #include <memory>
 #include <regex>
 #include <stdexcept>
@@ -25,8 +26,11 @@ using std::back_inserter;
 using std::copy;
 using std::deque;
 using std::find;
+using std::fstream;
+using std::ios_base;
 using std::invalid_argument;
 using std::make_pair;
+using std::map;
 using std::mismatch;
 using std::pair;
 using std::prev;
@@ -150,11 +154,11 @@ string path::abspath(const string& path)
     if (isabs(path)) {
         return normpath(path);
     }
-    unique_ptr<char> cwd(new char[FILENAME_MAX]);
-    if (not getcwd(cwd.get(), FILENAME_MAX)) {
+    unique_ptr<char> buffer(new char[FILENAME_MAX]);
+    if (not getcwd(buffer.get(), FILENAME_MAX)) {
         throw runtime_error("could not get current working directory");
     }
-    return normpath(join({cwd.get(), path}));
+    return normpath(join({buffer.get(), path}));
 }
 
 
@@ -504,10 +508,75 @@ PosixPath PosixPath::with_suffix(const std::string& name) const
 
 // Implement the PosixPath-specific API.
 
+PosixPath PosixPath::cwd()
+{
+    unique_ptr<char> buffer(new char[FILENAME_MAX]);
+    if (not getcwd(buffer.get(), FILENAME_MAX)) {
+        throw runtime_error("could not get current working directory");
+    }
+    return PosixPath(string(buffer.get()));
+}
+
+
 PurePosixPath PosixPath::pure() const
 {
     // This is not part of the Python API, but is useful here because the
     // private inheritance relationship between PosixPath and PurePosixPath
     // otherwise prevents interoperability.
     return PurePosixPath(*this);
+}
+
+
+bool PosixPath::exists() const
+{
+    return path::exists(string(*this));
+}
+
+
+bool PosixPath::is_dir() const
+{
+    return path::isdir(string(*this));
+}
+
+
+bool PosixPath::is_file() const
+{
+    return path::isfile(string(*this));
+}
+
+
+fstream PosixPath::open(const string& mode) const
+{
+    // The Python implementation throws an exception if the file cannot be
+    // opened. The only reliable way to test the validity of an open C++
+    // stream, however, is to attempt a read or write operation on it; calling
+    // is_open() and good() on the stream is *not* sufficient. The caller is
+    // responsible for doing I/O on the returned stream in a fail-safe way.
+    static const map<char, ios_base::openmode> modes({
+        {'r', fstream::in},
+        {'w', fstream::out|fstream::trunc},
+        {'x', fstream::out|fstream::trunc},
+        {'a', fstream::out|fstream::app},
+    });
+    const string path(*this);
+    const auto it(modes.find(mode[0]));
+    if (it == modes.end()) {
+        // This not a stream error so throw an exception.
+        throw invalid_argument("invalid file mode: '" + mode + "'");
+    }
+    if (it->first == 'x' and exists()) {
+        // As of C++11, there's no way to do this via iostream flags. For
+        // consistency with the other modes, treat this like an iostream error
+        // and return an invalid stream instead of throwing an exception.
+        return fstream();
+    }
+    auto flags(it->second);
+    if (mode.size() >= 2 and mode[1] == '+') {
+        // Make the stream readable and writable, or vice versa.
+        flags |= fstream::in | fstream::out;
+    }
+    if (endswith(mode, "b")) {
+        flags |= fstream::binary;
+    }
+    return fstream(path, flags);
 }
