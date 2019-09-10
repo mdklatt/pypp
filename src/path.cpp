@@ -229,7 +229,12 @@ PurePosixPath PurePosixPath::joinpath(const std::string& other) const
 
 PurePosixPath::operator std::string() const
 {
-    return parts_.empty() ? "." : str::join(sep, parts_);
+    auto result(parts_.empty() ? "." : str::join(sep, parts_));
+    if (is_absolute() and parts_.size() > 1) {
+        // Fix the double slash at the beginning.
+        result.erase(result.begin());
+    }
+    return result;
 }
 
 

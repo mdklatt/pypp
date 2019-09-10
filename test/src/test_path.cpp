@@ -226,6 +226,7 @@ TYPED_TEST(PurePathTest, string_op)
     ASSERT_EQ(".", string(TypeParam(".")));
     ASSERT_EQ(".", string(TypeParam("./")));
     ASSERT_EQ("/", string(TypeParam("/")));
+    ASSERT_EQ("/abc", string(TypeParam("/abc")));
     ASSERT_EQ("abc", string(TypeParam("abc")));
     ASSERT_EQ("abc", string(TypeParam("abc/")));
 }
