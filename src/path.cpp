@@ -8,7 +8,7 @@
 #endif
 
 #include <cassert>
-#include <cstdio>  // FILENAME_MAX
+#include <cstdio>
 #include <algorithm>
 #include <deque>
 #include <iterator>
@@ -36,6 +36,7 @@ using std::pair;
 using std::prev;
 using std::regex;
 using std::regex_match;
+using std::remove;
 using std::runtime_error;
 using std::string;
 using std::tie;
@@ -591,4 +592,14 @@ fstream PosixPath::open(const string& mode) const
         flags |= fstream::binary;
     }
     return fstream(path, flags);
+}
+
+
+void PosixPath::unlink() const
+{
+    const string path(*this);
+    if (remove(path.c_str()) != 0) {
+        throw runtime_error(string(strerror(errno)) + ": " + path);
+    }
+    return;
 }

@@ -383,6 +383,10 @@ public:
     /// @param mode file mode (follows Python conventions)
     /// @return open file stream
     std::fstream open(const std::string& mode="rt") const;
+
+    /// Remove this file.
+    ///
+    void unlink() const;
 };
 
 

@@ -19,10 +19,12 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include "pypp/path.hpp"
+#include "pypp/tempfile.hpp"
 
 
 using namespace pypp::path;
 
+using pypp::tempfile::TemporaryDirectory;
 using std::invalid_argument;
 using std::fstream;
 using std::ios;
@@ -432,12 +434,18 @@ TYPED_TEST(PurePathTest, with_suffix)
 }
 
 
-/// Test fixture for Path unit tests.
+/// Test fixture for Path methods that are not part of the PurePath interface.
 ///
-/// This is used to test the system-dependent behavior that is not part of
-/// the PurePath interface.
+/// This is used to group tests and provide common set-up and tear-down code.
+/// A new test fixture is created for each test to prevent any side effects
+/// between tests. Member variables and methods are injected into each test
+/// that uses this fixture.
 ///
-class PathTest: public Test {};
+class PathTest: public Test
+{
+protected:
+    const TemporaryDirectory tmpdir;
+};
 
 
 /// Test the Path::cwd() method.
@@ -495,4 +503,16 @@ TEST_F(PathTest, open)
     // TODO: Test all modes.
     ASSERT_NE(EOF, Path(__FILE__).open("rt").peek());
     ASSERT_EQ(EOF, Path(__FILE__).open("xt").peek());  // error, file exists
+}
+
+
+/// Test the Path::unlink() method.
+///
+TEST_F(PathTest, unlink)
+{
+    const auto path(Path(tmpdir.name) / "unlink");
+    path.open("wt");
+    assert(path.is_file());
+    path.unlink();
+    ASSERT_FALSE(path.is_file());
 }
