@@ -468,9 +468,12 @@ TEST_F(PathTest, pure)
 ///
 TEST_F(PathTest, exists)
 {
-    ASSERT_TRUE(Path().exists());
-    ASSERT_TRUE(Path(__FILE__).exists());
-    ASSERT_FALSE(Path(__FILE__).joinpath(Path("xxx")).exists());
+    Path path(tmpdir.name);
+    ASSERT_TRUE(path.exists());  // directory
+    path /= "exists_test";
+    ASSERT_FALSE(path.exists());
+    path.open("wt");
+    ASSERT_TRUE(path.exists());  // file
 }
 
 
@@ -478,9 +481,12 @@ TEST_F(PathTest, exists)
 ///
 TEST_F(PathTest, is_dir)
 {
-    ASSERT_TRUE(Path().is_dir());
-    ASSERT_FALSE(Path(__FILE__).is_dir());
-    ASSERT_FALSE(Path(__FILE__).joinpath(Path("xxx")).exists());
+    Path path(tmpdir.name);
+    ASSERT_TRUE(path.is_dir());
+    path /= "is_dir_test";
+    ASSERT_FALSE(path.is_dir());  // does not exist
+    path.open("wt");
+    ASSERT_FALSE(path.is_dir());  // not a directory
 }
 
 
@@ -488,9 +494,12 @@ TEST_F(PathTest, is_dir)
 ///
 TEST_F(PathTest, is_file)
 {
-    ASSERT_FALSE(Path().is_file());
-    ASSERT_TRUE(Path(__FILE__).is_file());
-    ASSERT_FALSE(Path(__FILE__).joinpath(Path("xxx")).is_file());
+    Path path(tmpdir.name);
+    ASSERT_FALSE(path.is_file());  // not a file
+    path /= "is_file_test";
+    ASSERT_FALSE(path.is_file());  // does not exist
+    path.open("wt");  // create empty file
+    ASSERT_TRUE(path.is_file());
 }
 
 
@@ -500,9 +509,12 @@ TEST_F(PathTest, open)
 {
     // The only reliable way to check the validity of the returned stream is to
     // attempt an I/O operation on it.
-    // TODO: Test all modes.
-    ASSERT_NE(EOF, Path(__FILE__).open("rt").peek());
-    ASSERT_EQ(EOF, Path(__FILE__).open("xt").peek());  // error, file exists
+    const auto path(Path(tmpdir.name) / "open_test");
+    ASSERT_TRUE(path.open("xt").put('a'));
+    ASSERT_TRUE(path.open("at").put('b'));  // TODO: make sure this appends
+    ASSERT_TRUE(path.open("wt").put('c'));
+    ASSERT_EQ('c', path.open("rt").get());
+    ASSERT_EQ(EOF, path.open("xt").get());  // error because file exists
 }
 
 
@@ -510,9 +522,8 @@ TEST_F(PathTest, open)
 ///
 TEST_F(PathTest, unlink)
 {
-    const auto path(Path(tmpdir.name) / "unlink");
+    const auto path(Path(tmpdir.name) / "unlink_test");
     path.open("wt");
-    assert(path.is_file());
     path.unlink();
     ASSERT_FALSE(path.is_file());
 }
