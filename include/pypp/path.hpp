@@ -384,9 +384,27 @@ public:
     /// @return open file stream
     std::fstream open(const std::string& mode="rt") const;
 
-    /// Remove this file.
+    /// Create a directory at this path.
+    ///
+    /// @param mode permissions for new leaf directory
+    /// @param parents create missing parents as needed
+    /// @param exist_ok no error if directory already exists
+    void mkdir(mode_t mode=0777, bool parents=false, bool exist_ok=false) const;
+
+    /// Remove the file with this path.
+    ///
+    /// Trying to unlink a nonexistent file is an error. Use `rmdir()` to
+    /// remove a directory.
     ///
     void unlink() const;
+
+    /// Remove the directory with this path.
+    ///
+    /// Trying to remove a nonexistent or non-empty directory is an error. Use
+    /// `unlink` to remove a file.
+    ///
+    void rmdir() const;
+
 };
 
 

@@ -16,9 +16,11 @@
 #include <memory>
 #include <regex>
 #include <stdexcept>
+#include "pypp/os.hpp"
 #include "pypp/path.hpp"
 #include "pypp/string.hpp"
 
+using pypp::os::makedirs;
 using pypp::str::endswith;
 using pypp::str::rstrip;
 using pypp::str::startswith;
@@ -595,10 +597,30 @@ fstream PosixPath::open(const string& mode) const
 }
 
 
+void PosixPath::mkdir(mode_t mode, bool parents, bool exist_ok) const
+{
+    if (not parents and not parent().is_dir()) {
+        throw runtime_error("no such directory: " + string(parent()));
+    }
+    makedirs(string(*this), mode, exist_ok);
+    return;
+}
+
+
 void PosixPath::unlink() const
 {
     const string path(*this);
     if (remove(path.c_str()) != 0) {
+        throw runtime_error(string(strerror(errno)) + ": " + path);
+    }
+    return;
+}
+
+
+void PosixPath::rmdir() const
+{
+    const string path(*this);
+    if (::rmdir(path.c_str()) != 0) {
         throw runtime_error(string(strerror(errno)) + ": " + path);
     }
     return;

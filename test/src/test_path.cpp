@@ -373,6 +373,7 @@ TYPED_TEST(PurePathTest, parent)
     ASSERT_EQ(TypeParam(), TypeParam("abc").parent());
     ASSERT_EQ(TypeParam("/"), TypeParam("/abc").parent());
     ASSERT_EQ(TypeParam("abc"), TypeParam("abc/def").parent());
+    ASSERT_EQ(TypeParam("abc/def"), TypeParam("abc/def/xyz").parent());
     ASSERT_EQ(TypeParam("/"), TypeParam("/").parent());
 }
 
@@ -518,6 +519,19 @@ TEST_F(PathTest, open)
 }
 
 
+/// Test the Path::mkdir() method.
+///
+TEST_F(PathTest, mkdir)
+{
+    const auto path(Path(tmpdir.name) / "mkdir_test" / "subdir");
+    ASSERT_THROW(path.mkdir(), runtime_error);  // parent doesn't exist
+    path.mkdir(0777, true);
+    ASSERT_TRUE(path.is_dir());
+    ASSERT_THROW(path.mkdir(), runtime_error);  // already exists
+    ASSERT_NO_THROW(path.mkdir(0777, false, true));  // exist_ok
+}
+
+
 /// Test the Path::unlink() method.
 ///
 TEST_F(PathTest, unlink)
@@ -526,4 +540,20 @@ TEST_F(PathTest, unlink)
     path.open("wt");
     path.unlink();
     ASSERT_FALSE(path.is_file());
+}
+
+
+/// Test the Path::rmdir() method.
+///
+TEST_F(PathTest, rmdir)
+{
+    const auto path(Path(tmpdir.name) / "rmdir_test");
+    const auto file(path / "file");
+    ASSERT_THROW(path.rmdir(), runtime_error);  // doesn't exist
+    path.mkdir();
+    file.open("wt");
+    ASSERT_THROW(path.rmdir(), runtime_error);  // not empty
+    file.unlink();
+    ASSERT_NO_THROW(path.rmdir());
+    ASSERT_FALSE(path.is_dir());
 }
