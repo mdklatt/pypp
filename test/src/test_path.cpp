@@ -335,6 +335,7 @@ TYPED_TEST(PurePathTest, joinpath)
     ASSERT_EQ(TypeParam("/"), TypeParam().joinpath(TypeParam("/")));
     ASSERT_EQ(TypeParam("abc"), TypeParam().joinpath(TypeParam("abc")));
     ASSERT_EQ(TypeParam("abc/def"), TypeParam("abc").joinpath(TypeParam("def/")));
+    ASSERT_EQ(TypeParam("abc/def"), TypeParam("abc").joinpath("def/"));
     //ASSERT_EQ(TypeParam("/def"), TypeParam("abc").joinpath(TypeParam("/def")));  // FIXME
 }
 
@@ -347,6 +348,7 @@ TYPED_TEST(PurePathTest, join_op)
     ASSERT_EQ(TypeParam("/"), TypeParam() / TypeParam("/"));
     ASSERT_EQ(TypeParam("abc"), TypeParam() / TypeParam("abc"));
     ASSERT_EQ(TypeParam("abc/def"), TypeParam("abc") / TypeParam("def/"));
+    ASSERT_EQ(TypeParam("abc/def"), TypeParam("abc") / "def");
     //ASSERT_EQ(TypeParam("/def"), TypeParam("abc") / TypeParam("/def"));  // FIXME
 }
 

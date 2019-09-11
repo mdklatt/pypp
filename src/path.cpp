@@ -453,7 +453,19 @@ PosixPath PosixPath::joinpath(const PosixPath& path) const
 }
 
 
+PosixPath PosixPath::joinpath(const string& path) const
+{
+    return PosixPath(PurePosixPath::joinpath(path));
+}
+
+
 PosixPath PosixPath::operator/(const PosixPath& path) const
+{
+    return PosixPath(PurePosixPath::operator/(path));
+}
+
+
+PosixPath PosixPath::operator/(const string& path) const
 {
     return PosixPath(PurePosixPath::operator/(path));
 }
