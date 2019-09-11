@@ -33,7 +33,7 @@ bool all(const std::vector<T>& seq)
 /// @param seq input sequence
 /// @return true if any item is true and sequence is not empty
 template <typename T>
-bool any(const std::vector<bool>& seq)
+bool any(const std::vector<T>& seq)
 {
     const auto boolean([](const T& x){ return static_cast<bool>(x); });
     return std::any_of(std::begin(seq), std::end(seq), boolean);
