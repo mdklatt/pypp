@@ -105,8 +105,8 @@ bool exists(const std::string& path);
 ///
 /// If the path is a link its target is tested.
 ///
-/// @param path input path
-/// @return true if path is an existing file
+/// @param path: input path
+/// @return true for an existing file
 bool isfile(const std::string& path);
 
 
@@ -114,9 +114,16 @@ bool isfile(const std::string& path);
 ///
 /// If the path is a link its target is tested.
 ///
-/// @param path input path
-/// @return true if path is an existing directory
+/// @param path: input path
+/// @return true for an existing directory
 bool isdir(const std::string& path);
+
+
+/// Determine if the path is an existing symbolic link.
+///
+/// @param path: input path
+/// @return true for an existing symbolic link
+bool islink(const std::string& path);
 
 
 /// System-independent representation of a file path.
@@ -367,13 +374,18 @@ public:
 
     /// Test if the path is a valid directory.
     ///
-    /// @return true if this is valid directory.
+    /// @return true for a directory
     bool is_dir() const;
 
     /// Test if the path is a valid file.
     ///
-    /// @return true if this is valid file.
+    /// @return true for a file
     bool is_file() const;
+
+    /// Test if the path is a valid symbolic link.
+    ///
+    /// @return true for a symbolic link
+    bool is_symlink() const;
 
     /// Open a file stream for this path.
     ///
@@ -390,6 +402,16 @@ public:
     /// @param parents create missing parents as needed
     /// @param exist_ok no error if directory already exists
     void mkdir(mode_t mode=0777, bool parents=false, bool exist_ok=false) const;
+
+    /// Create a symbolic link at this path.
+    ///
+    /// @param target: path to link to
+    void symlink_to(const PosixPath& target) const;
+
+    /// Create a symbolic link at this path.
+    ///
+    /// @param target: path to link to
+    void symlink_to(const std::string& target) const;
 
     /// Remove the file with this path.
     ///

@@ -210,6 +210,13 @@ bool path::isdir(const string& path)
 }
 
 
+bool path::islink(const string& path)
+{
+    struct stat info{};
+    return lstat(path.c_str(), &info) == 0 and S_ISLNK(info.st_mode);
+}
+
+
 PurePosixPath::PurePosixPath(string path)
 {
     if (isabs(path)) {
@@ -562,6 +569,12 @@ bool PosixPath::is_file() const
 }
 
 
+bool PosixPath::is_symlink() const
+{
+    return path::islink(string(*this));
+}
+
+
 fstream PosixPath::open(const string& mode) const
 {
     // The Python implementation throws an exception if the file cannot be
@@ -605,6 +618,23 @@ void PosixPath::mkdir(mode_t mode, bool parents, bool exist_ok) const
         throw runtime_error("no such directory: " + string(parent()));
     }
     makedirs(string(*this), mode, exist_ok);
+    return;
+}
+
+
+void PosixPath::symlink_to(const PosixPath& target) const
+{
+    symlink_to(string(target));
+    return;
+}
+
+
+void PosixPath::symlink_to(const string& target) const
+{
+    const string path(*this);
+    if (symlink(target.c_str(), path.c_str()) != 0) {
+        throw runtime_error(string(strerror(errno)) + ": " + path);
+    }
     return;
 }
 

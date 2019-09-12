@@ -185,6 +185,19 @@ TEST(path, isdir)
 }
 
 
+/// Test the islink() function.
+///
+TEST(path, islink)
+{
+    const TemporaryDirectory tmpdir;
+    const auto link(join({tmpdir.name, "test_islink"}));
+    symlink(__FILE__, link.c_str());
+    ASSERT_TRUE(islink(link));
+    ASSERT_FALSE(islink("/"));  // directory
+    ASSERT_FALSE(islink(__FILE__));  // file
+    ASSERT_FALSE(islink(""));  // doesn't exist
+}
+
 
 /// Test Fixture for PurePath unit tests.
 ///
@@ -505,6 +518,17 @@ TEST_F(PathTest, is_file)
 }
 
 
+/// Test the Path::is_symlink_test() method.
+///
+TEST_F(PathTest, is_symlink)
+{
+    Path path(Path(tmpdir.name) / "is_symlink_test");
+    ASSERT_FALSE(path.is_symlink());  // does not exist
+    symlink(__FILE__, string(path).c_str());
+    ASSERT_TRUE(path.is_symlink());
+}
+
+
 /// Test the Path::open() method.
 ///
 TEST_F(PathTest, open)
@@ -533,6 +557,17 @@ TEST_F(PathTest, mkdir)
 }
 
 
+/// Test the Path::symlink_to() method.
+///
+TEST_F(PathTest, symlink_to)
+{
+    const auto path(Path(tmpdir.name) / "symlink_to_test");
+    path.symlink_to(Path(__FILE__));
+    ASSERT_TRUE(path.is_symlink());
+    ASSERT_THROW(path.symlink_to(string(__FILE__)), runtime_error);  // already exists
+}
+
+
 /// Test the Path::unlink() method.
 ///
 TEST_F(PathTest, unlink)
@@ -540,7 +575,8 @@ TEST_F(PathTest, unlink)
     const auto path(Path(tmpdir.name) / "unlink_test");
     path.open("wt");
     path.unlink();
-    ASSERT_FALSE(path.is_file());
+    ASSERT_FALSE(path.exists());
+    ASSERT_THROW(path.unlink(), runtime_error);  // doesn't exist
 }
 
 
@@ -555,8 +591,9 @@ TEST_F(PathTest, rmdir)
     file.open("wt");
     ASSERT_THROW(path.rmdir(), runtime_error);  // not empty
     file.unlink();
-    ASSERT_NO_THROW(path.rmdir());
-    ASSERT_FALSE(path.is_dir());
+    path.rmdir();
+    ASSERT_FALSE(path.exists());
+    ASSERT_THROW(path.rmdir(), runtime_error);  // doesn't exist
 }
 
 
