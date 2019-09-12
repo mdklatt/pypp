@@ -147,10 +147,7 @@ public:
     /// @return new joined path
     PurePosixPath joinpath(const PurePosixPath& other) const;
 
-    /// Join this path with another path.
-    ///
-    /// @param other path to join with
-    /// @return new joned path
+    /// @overload
     PurePosixPath joinpath(const std::string& other) const;
 
     /// Join this path with another path
@@ -159,10 +156,7 @@ public:
     /// @return new joined path
     PurePosixPath operator/(const std::string& other) const;
 
-    /// Join this path with another path.
-    ///
-    /// @param other path to join with
-    /// @return new joined path
+    /// @overload
     PurePosixPath operator/(const PurePosixPath& other) const;
 
     /// Join this path in place with another path.
@@ -171,10 +165,7 @@ public:
     /// @return modified path
     PurePosixPath& operator/=(const std::string& other);
 
-    /// Join this path in place with another path.
-    ///
-    /// @param other path to join with
-    /// @return modified path
+    /// @overload
     PurePosixPath& operator/=(const PurePosixPath& other);
 
     /// Equality operator.
@@ -284,7 +275,7 @@ public:
     /// @param path path as a string
     explicit PosixPath(const std::string& path=".");
 
-    /// Create a path object.
+    /// Copy constructor.
     ///
     /// @param path
     explicit PosixPath(const PurePosixPath& path);
@@ -295,10 +286,7 @@ public:
     /// @return new joined path
     PosixPath joinpath(const PosixPath& path) const;
 
-    /// Join this path with another path.
-    ///
-    /// @param path path to join with
-    /// @return new joned path
+    /// @overload
     PosixPath joinpath(const std::string& path) const;
 
     /// Join this path with another path
@@ -307,10 +295,7 @@ public:
     /// @return new joined path
     PosixPath operator/(const std::string& path) const;
 
-    /// Join this path with another path.
-    ///
-    /// @param other path to join with
-    /// @return new joined path
+    /// @return overload
     PosixPath operator/(const PosixPath& other) const;
 
     /// Join this path in place with another path.
@@ -319,10 +304,7 @@ public:
     /// @return modified path
     PosixPath& operator/=(const std::string& other);
 
-    /// Join this path in place with another path.
-    ///
-    /// @param other path to join with
-    /// @return modified path
+    /// @overload
     PosixPath& operator/=(const PosixPath& other);
 
     /// Equality operator.
@@ -408,9 +390,7 @@ public:
     /// @param target: path to link to
     void symlink_to(const PosixPath& target) const;
 
-    /// Create a symbolic link at this path.
-    ///
-    /// @param target: path to link to
+    /// @overload
     void symlink_to(const std::string& target) const;
 
     /// Remove the file with this path.
