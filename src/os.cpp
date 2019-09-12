@@ -28,8 +28,11 @@ vector<string> os::listdir(const string& path)
 {
     static const vector<string> special({".", ".."});
     vector<string> names;
+    errno = 0;  // POSIX requires this to be thread-safe
     auto dir(opendir(path.c_str()));
-    errno = 0;
+    if (errno != 0) {
+        throw runtime_error(string(strerror(errno)) + ": " + path);
+    }
     dirent* entry;
     while ((entry = readdir(dir))) {
         if (not func::in(entry->d_name, special)) {

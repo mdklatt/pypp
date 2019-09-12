@@ -49,6 +49,7 @@ TEST(os, listdir)
     auto names(listdir(tmpdir.name));
     sort(begin(names), end(names));
     ASSERT_EQ(vector<string>({"dir", "file"}), names);
+    ASSERT_THROW(listdir(fname), runtime_error);
 }
 
 
