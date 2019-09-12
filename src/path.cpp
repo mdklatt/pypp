@@ -3,6 +3,7 @@
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 #include "unistd.h"
 #include "sys/stat.h"
+#include "dirent.h"  // TODO: not portable
 #else
 #error "path module requires *nix"
 #endif
@@ -17,10 +18,12 @@
 #include <regex>
 #include <stdexcept>
 #include <sstream>
+#include "pypp/func.hpp"
 #include "pypp/os.hpp"
 #include "pypp/path.hpp"
 #include "pypp/string.hpp"
 
+using pypp::func::in;
 using pypp::os::makedirs;
 using pypp::str::endswith;
 using pypp::str::rstrip;
@@ -703,4 +706,33 @@ void PosixPath::write_file(const string& mode, const string& data) const
         throw runtime_error("could not write data to " + string(*this));
     }
     return;
+}
+
+
+vector<PosixPath> PosixPath::iterdir() const
+{
+    // Implementing this in terms of os::listdir() would require the conversion
+    // of a vector<string> to a vector<PosixPath>. This would either double the
+    // memory usage or require additional complexity to reduce the size of the
+    // original list as the new list is populated. Instead, this is a copy of
+    // the os::listdir() implementation with some type-specific tweaks.
+    static const vector<string> special({".", ".."});
+    const string path(*this);
+    errno = 0;  // POSIX requires this to be thread-safe
+    auto dir(opendir(path.c_str()));
+    if (errno != 0) {
+        throw runtime_error(string(strerror(errno)) + ": " + path);
+    }
+    vector<PosixPath> entries;
+    dirent* entry;
+    while ((entry = readdir(dir))) {
+        if (not in(entry->d_name, special)) {
+            entries.emplace_back(*this / PosixPath(entry->d_name));
+        }
+    }
+    closedir(dir);
+    if (errno != 0) {
+        throw runtime_error(strerror(errno));
+    }
+    return entries;
 }

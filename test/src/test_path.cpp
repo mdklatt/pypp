@@ -18,12 +18,15 @@
 #include <typeinfo>
 #include <vector>
 #include <gtest/gtest.h>
+#include "pypp/func.hpp"
 #include "pypp/path.hpp"
 #include "pypp/tempfile.hpp"
 
 
 using namespace pypp::path;
 
+using pypp::func::all;
+using pypp::func::in;
 using pypp::tempfile::TemporaryDirectory;
 using std::invalid_argument;
 using std::fstream;
@@ -642,4 +645,20 @@ TEST_F(PathTest, write_text)
     string line;
     getline(path.open("rt"), line);
     ASSERT_EQ(data, line);
+}
+
+
+/// Test the Path::iterdir() method.
+///
+TEST_F(PathTest, iterdir)
+{
+    const TemporaryDirectory tmpdir;
+    const Path root(tmpdir.name);
+    const auto file(root / "file");
+    file.open("wt");
+    const auto dir(root / "dir");
+    dir.mkdir();
+    const vector<PosixPath> entries({dir, file});  // TODO: don't assume specific ordering
+    ASSERT_EQ(entries, root.iterdir());
+    ASSERT_THROW(file.iterdir(), runtime_error);  // not a directory
 }

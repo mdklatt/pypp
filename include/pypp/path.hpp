@@ -435,6 +435,13 @@ public:
     /// @param data: file contents
     void write_text(const std::string& data) const;
 
+    /// List all items in the directory with this path.
+    ///
+    /// Unlike Python, this returns a complete sequence, not a generator.
+    ///
+    /// @return
+    std::vector<PosixPath> iterdir() const;
+
 private:
     /// Read file contents.
     ///

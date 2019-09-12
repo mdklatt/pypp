@@ -95,7 +95,7 @@ TemporaryDirectory::~TemporaryDirectory()
 
 void TemporaryDirectory::cleanup(const string& path, bool delpath)
 {
-    // TODO: Use scandir() instead of listdir() if it becomes available.
+    // TODO: Refactor using Path objects.
     for (const auto& name: listdir(path)) {
         const string item(join({path, name}));
         if (isdir(item)) {
