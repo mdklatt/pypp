@@ -11,31 +11,36 @@
 
 #include <cassert>
 #include <cstdio>
+#include <algorithm>
 #include <fstream>
+#include <iterator>
 #include <memory>
+#include <set>
 #include <string>
 #include <stdexcept>
 #include <typeinfo>
 #include <vector>
 #include <gtest/gtest.h>
-#include "pypp/func.hpp"
 #include "pypp/path.hpp"
 #include "pypp/tempfile.hpp"
 
 
 using namespace pypp::path;
 
-using pypp::func::all;
-using pypp::func::in;
 using pypp::tempfile::TemporaryDirectory;
 using std::invalid_argument;
+using std::begin;
+using std::end;
 using std::fstream;
 using std::getline;
+using std::inserter;
 using std::ios;
 using std::make_pair;
 using std::pair;
 using std::runtime_error;
+using std::set;
 using std::string;
+using std::transform;
 using std::unique_ptr;
 using std::vector;
 using testing::Test;
@@ -658,7 +663,10 @@ TEST_F(PathTest, iterdir)
     file.open("wt");
     const auto dir(root / "dir");
     dir.mkdir();
-    const vector<PosixPath> entries({dir, file});  // TODO: don't assume specific ordering
-    ASSERT_EQ(entries, root.iterdir());
+    const auto paths(root.iterdir());
+    set<string> items;  // guaranteed ordering
+    const auto str = [](const Path& path) { return string(path); };
+    transform(begin(paths), end(paths), inserter(items, items.begin()), str);
+    ASSERT_EQ(set<string>({string(dir), string(file)}), items);
     ASSERT_THROW(file.iterdir(), runtime_error);  // not a directory
 }

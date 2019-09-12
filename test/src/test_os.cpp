@@ -9,9 +9,8 @@
 #error "os module test suite requires *nix"
 #endif
 
-#include <cassert>
-#include <algorithm>
 #include <fstream>
+#include <set>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -29,9 +28,9 @@ using pypp::tempfile::TemporaryDirectory;
 using std::begin;
 using std::end;
 using std::runtime_error;
-using std::ofstream;
-using std::sort;
+using std::fstream;
 using std::string;
+using std::set;
 using std::vector;
 
 using namespace pypp::os;
@@ -43,12 +42,12 @@ TEST(os, listdir)
 {
     const TemporaryDirectory tmpdir;
     const auto fname(join({tmpdir.name, "file"}));
-    ofstream stream(fname);
+    fstream stream(fname, fstream::out);
     const auto dname(join({tmpdir.name, "dir"}));
-    assert(mkdir(dname.c_str(), 0700) == 0);
-    auto names(listdir(tmpdir.name));
-    sort(begin(names), end(names));
-    ASSERT_EQ(vector<string>({"dir", "file"}), names);
+    mkdir(dname.c_str(), 0700);
+    const auto paths(listdir(tmpdir.name));
+    set<string> items(begin(paths), end(paths));  // guaranteed ordering
+    ASSERT_EQ(set<string>({"dir", "file"}), items);
     ASSERT_THROW(listdir(fname), runtime_error);
 }
 
