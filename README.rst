@@ -18,6 +18,8 @@ closely as possible, which occasionally results in some compromises to the
 ideal C++ approach to the problem. Also, user friendliness is prioritized over
 performance.
 
+Unlike Python, C++ does not have built-in support for Unicode, and none is
+implied here beyond the ASCII subset.
 
 ========
 Building

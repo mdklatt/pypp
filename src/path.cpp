@@ -16,6 +16,7 @@
 #include <memory>
 #include <regex>
 #include <stdexcept>
+#include <sstream>
 #include "pypp/os.hpp"
 #include "pypp/path.hpp"
 #include "pypp/string.hpp"
@@ -34,6 +35,7 @@ using std::invalid_argument;
 using std::make_pair;
 using std::map;
 using std::mismatch;
+using std::ostringstream;
 using std::pair;
 using std::prev;
 using std::regex;
@@ -622,6 +624,53 @@ void PosixPath::rmdir() const
     const string path(*this);
     if (::rmdir(path.c_str()) != 0) {
         throw runtime_error(string(strerror(errno)) + ": " + path);
+    }
+    return;
+}
+
+
+string PosixPath::read_bytes() const
+{
+    return read_file("rb");
+}
+
+
+string PosixPath::read_text() const
+{
+    return read_file("rt");
+}
+
+
+void PosixPath::write_bytes(const string& data) const
+{
+    write_file("wb", data);
+    return;
+}
+
+
+void PosixPath::write_text(const string& data) const
+{
+    write_file("wt", data);
+    return;
+}
+
+
+string PosixPath::read_file(const string& mode) const
+{
+    auto stream(open(mode));
+    ostringstream buffer;
+    if (not (buffer << stream.rdbuf())) {
+        throw runtime_error("could not read data from " + string(*this));
+    }
+    return buffer.str();  // is this a move (good) or copy (bad)?
+}
+
+
+void PosixPath::write_file(const string& mode, const string& data) const
+{
+    auto stream(open(mode));
+    if (not stream.write(data.c_str(), data.size())) {
+        throw runtime_error("could not write data to " + string(*this));
     }
     return;
 }

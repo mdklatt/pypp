@@ -27,6 +27,7 @@ using namespace pypp::path;
 using pypp::tempfile::TemporaryDirectory;
 using std::invalid_argument;
 using std::fstream;
+using std::getline;
 using std::ios;
 using std::make_pair;
 using std::pair;
@@ -556,4 +557,52 @@ TEST_F(PathTest, rmdir)
     file.unlink();
     ASSERT_NO_THROW(path.rmdir());
     ASSERT_FALSE(path.is_dir());
+}
+
+
+/// Test the Path::read_bytes() method.
+///
+TEST_F(PathTest, read_bytes)
+{
+    static const string data("Some test data");  // TODO: test non-ASCII bytes
+    const auto path(Path(tmpdir.name) / "read_bytes_test");
+    path.open("wb").write(data.c_str(), data.size());
+    ASSERT_EQ(data, path.read_bytes());
+}
+
+
+/// Test the Path::read_text() method.
+///
+TEST_F(PathTest, read_text)
+{
+    static const string data("Some test data");
+    const auto path(Path(tmpdir.name) / "read_text_test");
+    path.open("wt").write(data.c_str(), data.size());
+    ASSERT_EQ(data, path.read_text());
+}
+
+
+/// Test the Path::write_bytes() method.
+///
+TEST_F(PathTest, write_bytes)
+{
+    static const string data("Some test data");  // TODO: test non-ASCII bytes
+    const auto path(Path(tmpdir.name) / "write_bytes_test");
+    path.write_bytes(data);
+    string line;
+    getline(path.open("rb"), line);
+    ASSERT_EQ(data, line);
+}
+
+
+/// Test the Path::write_text() method.
+///
+TEST_F(PathTest, write_text)
+{
+    static const string data("Some test data");
+    const auto path(Path(tmpdir.name) / "write_text_test");
+    path.write_text(data);
+    string line;
+    getline(path.open("rt"), line);
+    ASSERT_EQ(data, line);
 }

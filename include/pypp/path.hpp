@@ -377,8 +377,8 @@ public:
 
     /// Open a file stream for this path.
     ///
-    /// Unlike Python, an exception will not be thrown if the file cannot be
-    /// opened.
+    /// Unlike the Python version, an exception will not be thrown if the file
+    /// cannot be opened.
     ///
     /// @param mode file mode (follows Python conventions)
     /// @return open file stream
@@ -405,6 +405,46 @@ public:
     ///
     void rmdir() const;
 
+    /// Read binary data from a file with this path.
+    ///
+    /// @return binary data
+    std::string read_bytes() const;
+
+    /// Read text data from a file with this path.
+    ///
+    /// Unlike the Python version, this does not support the `encoding` or
+    /// `errors` parameters.
+    ///
+    /// @return file contents
+    std::string read_text() const;
+
+    /// Write binary data to a file with this path.
+    ///
+    /// If the file already exists it will be overwritten.
+    ///
+    /// @param data: file contents
+    void write_bytes(const std::string& data) const;
+
+    /// Write text data to a file with this path.
+    ///
+    /// If the file already exists it will be overwritten. Unlike the Python
+    /// version, this does not support the `enocoding` or `errors` parameters.
+    ///
+    /// @param data: file contents
+    void write_text(const std::string& data) const;
+
+private:
+    /// Read file contents.
+    ///
+    /// @param mode file mode
+    /// @return file contents
+    std::string read_file(const std::string& mode) const;
+
+    /// Write file contents.
+    ///
+    /// @param mode file mode
+    /// @param data file contents
+    void write_file(const std::string& mode, const std::string& data) const;
 };
 
 
