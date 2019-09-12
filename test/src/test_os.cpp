@@ -10,8 +10,6 @@
 #endif
 
 #include <cassert>
-#include <cstdlib>
-#include <cstdio>
 #include <algorithm>
 #include <fstream>
 #include <stdexcept>
@@ -19,18 +17,13 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include "pypp/func.hpp"
 #include "pypp/os.hpp"
 #include "pypp/path.hpp"
 #include "pypp/tempfile.hpp"
 
 
-using pypp::func::in;
-using pypp::path::abspath;
-using pypp::path::dirname;
 using pypp::path::isdir;
 using pypp::path::join;
-using pypp::path::normpath;
 using pypp::path::split;
 using pypp::tempfile::TemporaryDirectory;
 using std::begin;
