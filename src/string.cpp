@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <iterator>
 #include <ios>
-#include <sstream>
 #include <stdexcept>
 #include "pypp/string.hpp"
 
@@ -105,19 +104,19 @@ string str::join(char sep, const vector<string>& items)
 vector<string> str::split(const string& str, ssize_t maxsplit)
 {
     vector<string> items;
-    std::istringstream stream(str);
-    ssize_t count(0);
-    string item;
-    while (stream >> item) {
-        if (maxsplit >= 0 and count++ >= maxsplit) {
-            // Exceeded max splits, consume the rest of the string.
-            char c;
-            while (stream.get(c)) {
-                // TODO: This seems very inefficient.
-                item += c;
+    string::size_type beg(str.find_first_not_of(whitespace));
+    const auto split_all(maxsplit < 0);
+    while (beg <= str.length()) {
+        string::size_type end(str.length());
+        if (split_all or items.size() < maxsplit) {
+            // Continue splitting.
+            end = str.find_first_of(whitespace, beg);
+            if (end == string::npos) {
+                end = str.length();
             }
         }
-        items.emplace_back(item);
+        items.emplace_back(str.substr(beg, end - beg));
+        beg = str.find_first_not_of(whitespace, end);
     }
     return items;
 }
@@ -128,21 +127,20 @@ vector<string> str::split(const string& str, const string& sep, ssize_t maxsplit
     if (sep.empty()) {
         throw invalid_argument("empty separator");
     }
-    const auto len(str.length());
     vector<string> items;
     string::size_type beg(0);
-    ssize_t count(0);
-    while (beg <= len) {
-        string::size_type pos(len);
-        if (maxsplit < 0 or count++ < maxsplit) {
+    const auto split_all(maxsplit < 0);
+    while (beg <= str.length()) {
+        string::size_type end(str.length());
+        if (split_all or items.size() < maxsplit) {
             // Continue splitting.
-            pos = str.find(sep, beg);
-            if (pos == string::npos) {
-                pos = str.length();
+            end = str.find(sep, beg);
+            if (end == string::npos) {
+                end = str.length();
             }
         }
-        items.emplace_back(str.substr(beg, pos - beg));
-        beg = pos + sep.length();
+        items.emplace_back(str.substr(beg, end - beg));
+        beg = end + sep.length();
     }
     return items;
 }
@@ -205,7 +203,7 @@ string str::center(const string& str, size_t width, char fill)
     if (str.length() >= width) {
         return str;
     }
-    const auto padlen((width - str.length()) / 2.);  // TODO: possible overlow
+    const auto padlen(static_cast<double>(width - str.length()) / 2.);  // TODO: possible overflow
     const string lpad(static_cast<size_t>(floor(padlen)), fill);
     const string rpad(static_cast<size_t>(ceil(padlen)), fill);
     return lpad + str + rpad;

@@ -160,11 +160,11 @@ TEST(string, join_char)
 ///
 TEST(string, split)
 {
+    static const string str(" \rabc\t xyz \n123 \n");
     static const vector<string> items({"abc", "xyz", "123"});
-    static const string joined(" \rabc\t xyz \n123 \n");
-    ASSERT_EQ(split(joined), items);
-    ASSERT_EQ(split(joined, 0), vector<string>({"abc\t xyz \n123 \n"}));
-    ASSERT_EQ(split(joined, 1), vector<string>({"abc", "xyz \n123 \n"}));
+    ASSERT_EQ(split(str), items);
+    ASSERT_EQ(split(str, 0), vector<string>({"abc\t xyz \n123 \n"}));
+    ASSERT_EQ(split(str, 1), vector<string>({"abc", "xyz \n123 \n"}));
     ASSERT_EQ(split(""), vector<string>());
 }
 
@@ -173,12 +173,12 @@ TEST(string, split)
 ///
 TEST(string, split_sep)
 {
-    static const string joined(", abc, , xyz, ");
     static const vector<string> items({"", "abc", "", "xyz", ""});
+    static const string str(", abc, , xyz, ");
     static const string sep(", ");  // test multi-char separators
-    ASSERT_EQ(split(joined, sep), items);
-    ASSERT_EQ(split(joined, sep, 0), vector<string>{joined});
-    ASSERT_EQ(split(joined, sep, 2), vector<string>({"", "abc", ", xyz, "}));
+    ASSERT_EQ(split(str, sep), items);
+    ASSERT_EQ(split(str, sep, 0), vector<string>{str});
+    ASSERT_EQ(split(str, sep, 2), vector<string>({"", "abc", ", xyz, "}));
     ASSERT_EQ(split(sep, sep), vector<string>({"", ""}));
     ASSERT_EQ(split("", sep), vector<string>({""}));
     ASSERT_THROW(split("", ""), std::invalid_argument);
