@@ -87,10 +87,8 @@ std::string join(char sep, const std::vector<std::string>& items);
 
 /// Split a string on whitespace.
 ///
-/// Leading and trailing whitespace is ignored.
-///
 /// If `maxsplit` is non-negative, a maximum of that many splits will be
-/// performed. The last item will contain the remainder of the string
+/// performed, and the last item will contain the remainder of the string
 /// regardless of any whitespace it contains.
 ///
 /// @param str string to split
@@ -105,7 +103,7 @@ std::vector<std::string> split(const std::string& str, ssize_t maxsplit=-1);
 /// strings as items as appropriate.
 ///
 /// If `maxsplit` is non-negative, a maximum of that many splits will be
-/// performed. The last item will contain the remainder of the string
+/// performed, and the last item will contain the remainder of the string
 /// regardless of any separators it contains.
 ///
 /// @param str string to split
@@ -113,6 +111,36 @@ std::vector<std::string> split(const std::string& str, ssize_t maxsplit=-1);
 /// @param maxsplit maximum number of splits to perform
 /// @return split items
 std::vector<std::string> split(const std::string& str, const std::string& sep, ssize_t maxsplit=-1);
+
+
+/// Split a string on whitespace starting from the right.
+///
+/// If `maxsplit` is non-negative, a maximum of that many splits will be
+/// performed, and the first item will contain the remainder of the string
+/// regardless of any whitespace it contains.
+///
+/// Leading and trailing whitespace is ignored.
+///
+/// @param str string to split
+/// @param maxsplit maximum number of splits to perform
+/// @return split items
+std::vector<std::string> rsplit(const std::string& str, ssize_t maxsplit=-1);
+
+
+/// Split a string on a separator starting from the right.
+///
+/// All occurrences of the separator are significant, and will generate empty
+/// strings as items as appropriate.
+///
+/// If `maxsplit` is non-negative, a maximum of that many splits will be
+/// performed, and the first item will contain the remainder of the string
+/// regardless of any separators it contains.
+///
+/// @param str string to split
+/// @param sep separator to split on
+/// @param maxsplit maximum number of splits to perform
+/// @return split items
+std::vector<std::string> rsplit(const std::string& str, const std::string& sep, ssize_t maxsplit=-1);
 
 
 /// Determine if a string starts with a prefix.

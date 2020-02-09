@@ -12,6 +12,7 @@
 
 using testing::Test;
 using testing::Types;
+using std::invalid_argument;
 using std::string;
 using std::vector;
 
@@ -173,15 +174,44 @@ TEST(string, split)
 ///
 TEST(string, split_sep)
 {
-    static const vector<string> items({"", "abc", "", "xyz", ""});
     static const string str(", abc, , xyz, ");
+    static const vector<string> items({"", "abc", "", "xyz", ""});
     static const string sep(", ");  // test multi-char separators
     ASSERT_EQ(split(str, sep), items);
     ASSERT_EQ(split(str, sep, 0), vector<string>{str});
     ASSERT_EQ(split(str, sep, 2), vector<string>({"", "abc", ", xyz, "}));
     ASSERT_EQ(split(sep, sep), vector<string>({"", ""}));
     ASSERT_EQ(split("", sep), vector<string>({""}));
-    ASSERT_THROW(split("", ""), std::invalid_argument);
+    ASSERT_THROW(split(str, ""), invalid_argument);
+}
+
+
+/// Test the rsplit() function for whitespace.
+///
+TEST(string, rsplit)
+{
+    static const string str(" \rabc\t xyz \n123 \n");
+    static const vector<string> items({"abc", "xyz", "123"});
+    ASSERT_EQ(items, rsplit(str));
+    ASSERT_EQ(vector<string>({" \rabc\t xyz \n123"}), rsplit(str, 0));
+    ASSERT_EQ(vector<string>({" \rabc\t xyz", "123"}), rsplit(str, 1));
+    ASSERT_EQ(vector<string>(), rsplit(""));
+}
+
+
+/// Test the rsplit function for a separator.
+///
+TEST(string, rsplit_sep)
+{
+    static const string str(", abc, , xyz, ");
+    static const vector<string> items({"", "abc", "", "xyz", ""});
+    static const string sep(", ");  // test multi-char separators
+    ASSERT_EQ(items, rsplit(str, sep));
+    ASSERT_EQ(vector<string>{str}, rsplit(str, sep, 0));
+    ASSERT_EQ(vector<string>({", abc, ", "xyz", ""}), rsplit(str, sep, 2));
+    ASSERT_EQ(vector<string>({"", ""}), rsplit(sep, sep));
+    ASSERT_EQ(vector<string>({""}), rsplit("", sep));
+    ASSERT_THROW(rsplit(str, ""), invalid_argument);
 }
 
 

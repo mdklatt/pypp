@@ -6,10 +6,13 @@
 #include <iterator>
 #include <ios>
 #include <stdexcept>
+#include "pypp/func.hpp"
 #include "pypp/string.hpp"
 
 
 using std::ceil;
+using std::distance;
+using std::find;
 using std::floor;
 using std::invalid_argument;
 using std::locale;
@@ -63,8 +66,8 @@ string str::lstrip(const string& str, const string& chars)
 
 string str::rstrip(const string& str, const string& chars)
 {
-    auto pos(str.find_last_not_of(chars));
-    return pos == string::npos ? "" : str.substr(0, ++pos);
+    const auto pos(str.find_last_not_of(chars));
+    return pos == string::npos ? "" : str.substr(0, pos + 1);
 }
 
 
@@ -104,15 +107,15 @@ string str::join(char sep, const vector<string>& items)
 vector<string> str::split(const string& str, ssize_t maxsplit)
 {
     vector<string> items;
-    string::size_type beg(str.find_first_not_of(whitespace));
+    auto beg(str.find_first_not_of(whitespace));
     const auto split_all(maxsplit < 0);
-    while (beg <= str.length()) {
-        string::size_type end(str.length());
+    while (beg <= str.size()) {
+        auto end(str.size());
         if (split_all or items.size() < maxsplit) {
             // Continue splitting.
             end = str.find_first_of(whitespace, beg);
             if (end == string::npos) {
-                end = str.length();
+                end = str.size();
             }
         }
         items.emplace_back(str.substr(beg, end - beg));
@@ -131,7 +134,7 @@ vector<string> str::split(const string& str, const string& sep, ssize_t maxsplit
     string::size_type beg(0);
     const auto split_all(maxsplit < 0);
     while (beg <= str.length()) {
-        string::size_type end(str.length());
+        string::size_type end(str.size());
         if (split_all or items.size() < maxsplit) {
             // Continue splitting.
             end = str.find(sep, beg);
@@ -141,6 +144,60 @@ vector<string> str::split(const string& str, const string& sep, ssize_t maxsplit
         }
         items.emplace_back(str.substr(beg, end - beg));
         beg = end + sep.length();
+    }
+    return items;
+}
+
+
+vector<string> str::rsplit(const string& str, ssize_t maxsplit)
+{
+    const auto rstrip_len = [str](string::size_type end=string::npos) {
+        // Calculate the length of the string that would be returned by
+        // rstrip(str.substr(len)).
+        const auto pos(end != string::npos ? end - 1 : string::npos);
+        const auto last(str.find_last_not_of(whitespace, pos));
+        return last == string::npos ? 0 : last + 1;
+    };
+    vector<string> items;
+    auto end(rstrip_len());
+    while (end > 0) {
+        // Split the string from right to left such that each new item becomes
+        // the first item in the sequence.
+        const auto split(maxsplit < 0 or items.size() < maxsplit);
+        if (not split) {
+            // Consume the remainder of the string as the first item.
+            items.insert(items.begin(), str.substr(0, end));
+            break;
+        }
+        const auto pos(str.find_last_of(whitespace, end - 1));
+        const auto beg(pos != string::npos ? pos + 1 : 0);
+        items.insert(items.begin(), str.substr(beg, end - beg));
+        end = rstrip_len(beg);
+    }
+    return items;
+}
+
+
+vector<string> str::rsplit(const string& str, const string& sep, ssize_t maxsplit)
+{
+    if (sep.empty()) {
+        throw invalid_argument("empty separator");
+    }
+    vector<string> items;
+    auto end(str.size());
+    while (true) {
+        // Split the string from right to left such that each new item becomes
+        // the first item in the sequence.
+        const auto split(maxsplit < 0 or items.size() < maxsplit);
+        const auto pos(str.rfind(sep, end - sep.size()));
+        if (not split or end == 0 or pos == string::npos) {
+            // Consume the remainder of the string as the first item.
+            items.insert(items.begin(), str.substr(0, end));
+            break;
+        }
+        const auto beg(pos + sep.size());
+        items.insert(items.begin(), str.substr(beg, end - beg));
+        end = pos;
     }
     return items;
 }
