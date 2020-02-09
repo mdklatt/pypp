@@ -18,6 +18,7 @@
 #include <regex>
 #include <stdexcept>
 #include <sstream>
+#include <utility>
 #include "pypp/func.hpp"
 #include "pypp/os.hpp"
 #include "pypp/path.hpp"
@@ -38,6 +39,7 @@ using std::invalid_argument;
 using std::make_pair;
 using std::map;
 using std::mismatch;
+using std::move;
 using std::ostringstream;
 using std::pair;
 using std::prev;
@@ -55,13 +57,13 @@ using path::PurePosixPath;
 using path::PosixPath;
 
 
-// In the Python implementation, a Path is derived from a PurePath, and
+// In the Python implementation a Path inherits from a PurePath, and
 // metaprogramming is used to ensure that methods return an object of the
 // correct type. All of the C++ solutions for this will have a negative impact
-// on usability. Instead, the strategy here is to use private inheritance to
-// ensure that a Path acts just like a PurePath. This means that a Path is not
-// recognizable as a PurePath, but the use case for interoperability seems
-// limited, and can be handled by adding explicit conversion methods.
+// on usability. Instead, the strategy here is to use composition. This means
+// that a Path is not recognizable as a PurePath, but the use case for
+// interoperability seems limited, and can be handled using explicit conversion
+// methods.
 
 
 const string path::sep("/");  // *nix, but works for Windows too
@@ -437,79 +439,126 @@ bool PurePosixPath::is_root() const
 }
 
 
-// Implement the PurePath portion of the Path API. Type-specific methods that
-// cannot be pulled down from the base base via `using` are implemented here in
-// terms of their PurePath implementation.
+// Implement the PurePath portion of the Path API.
 
 PosixPath::PosixPath(const std::string& path):
-    PurePosixPath(path)
+    base_(path)
 {}
 
-PosixPath::PosixPath(const pypp::path::PurePosixPath& path):
-    PurePosixPath(path)
+
+PosixPath::PosixPath(PurePosixPath path):
+    base_(move(path))
 {}
+
+
+PosixPath::operator string() const
+{
+    return string(base_);
+}
+
+
+bool PosixPath::is_absolute() const
+{
+    return base_.is_absolute();
+}
+
+
+std::string PosixPath::name() const
+{
+    return base_.name();
+}
+
+
+const vector<string>& PosixPath::parts() const
+{
+    return base_.parts();
+}
+
+
+string PosixPath::root() const
+{
+    return base_.root();
+}
+
+
+string PosixPath::stem() const
+{
+    return base_.stem();
+}
+
+
+string PosixPath::suffix() const
+{
+    return base_.suffix();
+}
+
+
+vector<string> PosixPath::suffixes() const
+{
+    return base_.suffixes();
+}
 
 
 bool PosixPath::operator==(const PosixPath& other) const
 {
-    return PurePosixPath::operator==(other);
+    return base_ == other.base_;
 }
 
 
 bool PosixPath::operator!=(const PosixPath& other) const
 {
-    return PurePosixPath::operator!=(other);
+    return base_ != other.base_;
 }
 
 
 PosixPath PosixPath::joinpath(const PosixPath& path) const
 {
-    return PosixPath(PurePosixPath::joinpath(path));
+    return PosixPath(base_.joinpath(path.base_));
 }
 
 
 PosixPath PosixPath::joinpath(const string& path) const
 {
-    return PosixPath(PurePosixPath::joinpath(path));
+    return PosixPath(base_.joinpath(path));
 }
 
 
 PosixPath PosixPath::operator/(const PosixPath& path) const
 {
-    return PosixPath(PurePosixPath::operator/(path));
+    return PosixPath(base_ / path.base_);
 }
 
 
 PosixPath PosixPath::operator/(const string& path) const
 {
-    return PosixPath(PurePosixPath::operator/(path));
+    return PosixPath(base_ / path);
 }
 
 
 PosixPath& PosixPath::operator/=(const PosixPath& other)
 {
-    PurePosixPath::operator/=(other);
+    base_ /= other.base_;
     return *this;
 }
 
 
 PosixPath& PosixPath::operator/=(const std::string& other)
 {
-    PurePosixPath::operator/=(other);
+    base_ /= other;
     return *this;
 }
 
 
 PosixPath PosixPath::parent() const
 {
-    return PosixPath(PurePosixPath::parent());
+    return PosixPath(base_.parent());
 }
 
 
 vector<PosixPath> PosixPath::parents() const
 {
     vector<PosixPath> result;
-    for (const auto& path: PurePosixPath::parents()) {
+    for (const auto& path: base_.parents()) {
         // Convert each item to the correct type.
         result.emplace_back(PosixPath(path));
     }
@@ -518,18 +567,18 @@ vector<PosixPath> PosixPath::parents() const
 
 PosixPath PosixPath::relative_to(const PosixPath& other) const
 {
-    return PosixPath(PurePosixPath::relative_to(other));
+    return PosixPath(base_.relative_to(other.base_));
 }
 
 
 PosixPath PosixPath::with_name(const std::string& name) const
 {
-    return PosixPath(PurePosixPath::with_name(name));
+    return PosixPath(base_.with_name(name));
 }
 
 PosixPath PosixPath::with_suffix(const std::string& name) const
 {
-    return PosixPath(PurePosixPath::with_suffix(name));
+    return PosixPath(base_.with_suffix(name));
 }
 
 
@@ -550,7 +599,7 @@ PurePosixPath PosixPath::pure() const
     // This is not part of the Python API, but is useful here because the
     // private inheritance relationship between PosixPath and PurePosixPath
     // otherwise prevents interoperability.
-    return PurePosixPath(*this);
+    return base_;
 }
 
 

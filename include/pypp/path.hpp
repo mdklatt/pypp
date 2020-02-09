@@ -253,17 +253,48 @@ private:
 
 ///
 ///
-class PosixPath: private PurePosixPath
+class PosixPath
 {
 public:
-    using PurePosixPath::operator std::string;
-    using PurePosixPath::is_absolute;
-    using PurePosixPath::name;
-    using PurePosixPath::parts;
-    using PurePosixPath::root;
-    using PurePosixPath::stem;
-    using PurePosixPath::suffix;
-    using PurePosixPath::suffixes;
+    /// Represent the path as a std::string.
+    ///
+    /// @return string representation
+    explicit operator std::string() const;
+
+    /// Determine if the path is absolute.
+    ///
+    /// @return true if this is an absolute path
+    bool is_absolute() const;
+
+    /// Get the final path component.
+    ///
+    /// @return name
+    std::string name() const;
+
+    /// Split the path into its component parts.
+    ///
+    /// @return path parts
+    const std::vector<std::string>& parts() const;
+
+    /// Get the path root (`` or `/`).
+    ///
+    /// @return root
+    std::string root() const;
+
+    /// Get the path name without its suffix.
+    ///
+    /// @return stem
+    std::string stem() const;
+
+    /// Get the final file extension for the path name.
+    ///
+    /// @return suffix
+    std::string suffix() const;
+
+    /// Get all file extensions for the path name.
+    ///
+    /// @return
+    std::vector<std::string> suffixes() const;
 
     /// Get the current working directory.
     ///
@@ -278,7 +309,7 @@ public:
     /// Copy constructor.
     ///
     /// @param path
-    explicit PosixPath(const PurePosixPath& path);
+    explicit PosixPath(PurePosixPath  path);
 
     /// Join this path with another path.
     ///
@@ -289,7 +320,7 @@ public:
     /// @overload
     PosixPath joinpath(const std::string& path) const;
 
-    /// Join this path with another path
+    /// Join this path with another path,
     ///
     /// @param path path to join with
     /// @return new joined path
@@ -443,6 +474,8 @@ public:
     std::vector<PosixPath> iterdir() const;
 
 private:
+    PurePosixPath base_;
+
     /// Read file contents.
     ///
     /// @param mode file mode
