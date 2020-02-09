@@ -47,9 +47,9 @@ TEST(TemporaryDirectoryTest, ctor)
 {
     // This also tests the 'name' attribute.
     const TemporaryDirectory tmpdir("abc");
-    ASSERT_TRUE(isdir(tmpdir.name));
-    ASSERT_TRUE(startswith(basename(tmpdir.name), "abc"));
-    ASSERT_EQ(gettempdir(), dirname(tmpdir.name));
+    ASSERT_TRUE(isdir(tmpdir.name()));
+    ASSERT_TRUE(startswith(basename(tmpdir.name()), "abc"));
+    ASSERT_EQ(gettempdir(), dirname(tmpdir.name()));
 }
 
 
@@ -58,9 +58,9 @@ TEST(TemporaryDirectoryTest, ctor)
 TEST(TemporaryDirectoryTest, ctor_dir)
 {
     const TemporaryDirectory root;
-    const TemporaryDirectory tmpdir("tmp", root.name);
-    ASSERT_TRUE(isdir(tmpdir.name));
-    ASSERT_EQ(root.name, dirname(tmpdir.name));
+    const TemporaryDirectory tmpdir("tmp", root.name());
+    ASSERT_TRUE(isdir(tmpdir.name()));
+    ASSERT_EQ(root.name(), dirname(tmpdir.name()));
 }
 
 
@@ -69,13 +69,13 @@ TEST(TemporaryDirectoryTest, ctor_dir)
 TEST(TemporaryDirectoryTest, cleanup)
 {
     const TemporaryDirectory tmpdir;
-    const auto dname(join({tmpdir.name, "dir"}));
+    const auto dname(join({tmpdir.name(), "dir"}));
     assert(mkdir(dname.c_str(), 0700) == 0);
     const auto fname(join({dname, "file"}));
     ofstream stream(fname);
     stream.close();
     tmpdir.cleanup();
-    ASSERT_TRUE(isdir(tmpdir.name));
+    ASSERT_TRUE(isdir(tmpdir.name()));
     ASSERT_FALSE(isdir(dname));
 }
 
@@ -85,7 +85,7 @@ TEST(TemporaryDirectoryTest, cleanup)
 TEST(TemporaryDirectoryTest, dtor)
 {
     const auto tmpdir(new TemporaryDirectory());
-    const auto name(tmpdir->name);
+    const auto name(tmpdir->name());
     delete tmpdir;
     ASSERT_FALSE(isdir(name));
 }

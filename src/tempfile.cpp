@@ -24,6 +24,7 @@ using pypp::os::listdir;
 using pypp::path::abspath;
 using pypp::path::isdir;
 using pypp::path::join;
+using pypp::path::Path;
 using std::getenv;
 using std::remove;
 using std::runtime_error;
@@ -76,38 +77,41 @@ TemporaryDirectory::TemporaryDirectory(const string& prefix, string dir)
     if (not mkdtemp(&tmpdir[0])) {
         throw runtime_error(strerror(errno));
     }
-    const_cast<string&>(name) = tmpdir;
+    path = Path(tmpdir);
+}
+
+
+std::string TemporaryDirectory::name() const
+{
+    return string(path);
 }
 
 
 void TemporaryDirectory::cleanup() const
 {
-    cleanup(name);
+    rmtree(path);
     return;
 }
 
 
 TemporaryDirectory::~TemporaryDirectory()
 {
-    cleanup(name, true);
+    rmtree(path, true);
 }
 
 
-void TemporaryDirectory::cleanup(const string& path, bool delpath)
+void TemporaryDirectory::rmtree(const Path& root, bool delroot)
 {
-    // TODO: Refactor using Path objects.
-    for (const auto& name: listdir(path)) {
-        const string item(join({path, name}));
-        if (isdir(item)) {
-            cleanup(item, true);
-            continue;
+    for (const auto& item: root.iterdir()) {
+        if (not item.is_dir()) {
+            item.unlink();
         }
-        if (remove(item.c_str()) != 0) {
-            throw runtime_error(item + ": " + strerror(errno));
+        else {
+            rmtree(item, true);
         }
     }
-    if (delpath and rmdir(path.c_str()) != 0) {
-        throw runtime_error(path + ": " + strerror(errno));
+    if (delroot) {
+        root.rmdir();
     }
     return;
 }

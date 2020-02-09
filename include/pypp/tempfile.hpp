@@ -5,6 +5,7 @@
 #define PYPP_TEMPFILE_HPP
 
 #include <string>
+#include "pypp/path.hpp"
 
 
 namespace pypp { namespace tempfile {
@@ -29,12 +30,13 @@ class TemporaryDirectory
 public:
     /// Directory name.
     ///
-    const std::string name;
+    /// @return: path
+    std::string name() const;
 
     /// Construct the object.
     ///
-    /// Note that, unlike its Python counterpart, this does not have a
-    /// 'suffix' argument.
+    /// Note that, unlike its Python counterpart, this does not have a 'suffix'
+    /// argument.
     ///
     /// @param prefix directory prefix
     /// @param dir optional temporary directory
@@ -49,11 +51,15 @@ public:
     ~TemporaryDirectory();
 
 private:
-    /// Delete the contents of a directory.
+    /// Recursively remove a directory tree.
     ///
-    /// @param path directory path
-    /// @param delpath delete directory itself
-    static void cleanup(const std::string& path, bool delpath=false);
+    /// @param root: root directory
+    /// @param delpath: delete root directory itself
+    static void rmtree(const path::Path& root, bool delroot=false);
+
+    /// @property
+    path::Path path;
+
 };
 
 }}

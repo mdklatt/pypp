@@ -41,11 +41,11 @@ using namespace pypp::os;
 TEST(os, listdir)
 {
     const TemporaryDirectory tmpdir;
-    const auto fname(join({tmpdir.name, "file"}));
+    const auto fname(join({tmpdir.name(), "file"}));
     fstream stream(fname, fstream::out);
-    const auto dname(join({tmpdir.name, "dir"}));
+    const auto dname(join({tmpdir.name(), "dir"}));
     mkdir(dname.c_str(), 0700);
-    const auto paths(listdir(tmpdir.name));
+    const auto paths(listdir(tmpdir.name()));
     set<string> items(begin(paths), end(paths));  // guaranteed ordering
     ASSERT_EQ(set<string>({"dir", "file"}), items);
     ASSERT_THROW(listdir(fname), runtime_error);
@@ -58,7 +58,7 @@ TEST(os, makedirs)
 {
     static const mode_t mode(0700);
     TemporaryDirectory tmpdir;
-    const auto path(join({tmpdir.name, "abc", "xyz"}));
+    const auto path(join({tmpdir.name(), "abc", "xyz"}));
     makedirs(path, mode);
     ASSERT_TRUE(isdir(path));
     makedirs(path, mode, true);   // exist_ok, no op
@@ -73,14 +73,14 @@ TEST(os, removedirs)
 {
     static const vector<string> subdirs({"abc", "xyz"});
     TemporaryDirectory tmpdir;
-    auto path(tmpdir.name);
+    auto path(tmpdir.name());
     for (const auto& dir: subdirs) {
         // Create subdirectories to remove.
         path = join({path, dir});
         assert(mkdir(path.c_str(), 0700) == 0);
     }
     removedirs(path);  // will also remove tmpdir itself
-    const auto pair(split(tmpdir.name));
+    const auto pair(split(tmpdir.name()));
     ASSERT_TRUE(isdir(pair.first));
     ASSERT_FALSE(isdir(pair.second));
     removedirs(path);  // no op

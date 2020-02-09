@@ -198,7 +198,7 @@ TEST(path, isdir)
 TEST(path, islink)
 {
     const TemporaryDirectory tmpdir;
-    const auto link(join({tmpdir.name, "test_islink"}));
+    const auto link(join({tmpdir.name(), "test_islink"}));
     symlink(__FILE__, link.c_str());
     ASSERT_TRUE(islink(link));
     ASSERT_FALSE(islink("/"));  // directory
@@ -491,7 +491,7 @@ TEST_F(PathTest, pure)
 ///
 TEST_F(PathTest, exists)
 {
-    Path path(tmpdir.name);
+    Path path(tmpdir.name());
     ASSERT_TRUE(path.exists());  // directory
     path /= "exists_test";
     ASSERT_FALSE(path.exists());
@@ -504,7 +504,7 @@ TEST_F(PathTest, exists)
 ///
 TEST_F(PathTest, is_dir)
 {
-    Path path(tmpdir.name);
+    Path path(tmpdir.name());
     ASSERT_TRUE(path.is_dir());
     path /= "is_dir_test";
     ASSERT_FALSE(path.is_dir());  // does not exist
@@ -517,7 +517,7 @@ TEST_F(PathTest, is_dir)
 ///
 TEST_F(PathTest, is_file)
 {
-    Path path(tmpdir.name);
+    Path path(tmpdir.name());
     ASSERT_FALSE(path.is_file());  // not a file
     path /= "is_file_test";
     ASSERT_FALSE(path.is_file());  // does not exist
@@ -530,7 +530,7 @@ TEST_F(PathTest, is_file)
 ///
 TEST_F(PathTest, is_symlink)
 {
-    Path path(Path(tmpdir.name) / "is_symlink_test");
+    Path path(Path(tmpdir.name()) / "is_symlink_test");
     ASSERT_FALSE(path.is_symlink());  // does not exist
     symlink(__FILE__, string(path).c_str());
     ASSERT_TRUE(path.is_symlink());
@@ -543,7 +543,7 @@ TEST_F(PathTest, open)
 {
     // The only reliable way to check the validity of the returned stream is to
     // attempt an I/O operation on it.
-    const auto path(Path(tmpdir.name) / "open_test");
+    const auto path(Path(tmpdir.name()) / "open_test");
     ASSERT_TRUE(path.open("xt").put('a'));
     ASSERT_TRUE(path.open("at").put('b'));  // TODO: make sure this appends
     ASSERT_TRUE(path.open("wt").put('c'));
@@ -556,7 +556,7 @@ TEST_F(PathTest, open)
 ///
 TEST_F(PathTest, mkdir)
 {
-    const auto path(Path(tmpdir.name) / "mkdir_test" / "subdir");
+    const auto path(Path(tmpdir.name()) / "mkdir_test" / "subdir");
     ASSERT_THROW(path.mkdir(), runtime_error);  // parent doesn't exist
     path.mkdir(0777, true);
     ASSERT_TRUE(path.is_dir());
@@ -569,7 +569,7 @@ TEST_F(PathTest, mkdir)
 ///
 TEST_F(PathTest, symlink_to)
 {
-    const auto path(Path(tmpdir.name) / "symlink_to_test");
+    const auto path(Path(tmpdir.name()) / "symlink_to_test");
     path.symlink_to(Path(__FILE__));
     ASSERT_TRUE(path.is_symlink());
     ASSERT_THROW(path.symlink_to(string(__FILE__)), runtime_error);  // already exists
@@ -580,7 +580,7 @@ TEST_F(PathTest, symlink_to)
 ///
 TEST_F(PathTest, unlink)
 {
-    const auto path(Path(tmpdir.name) / "unlink_test");
+    const auto path(Path(tmpdir.name()) / "unlink_test");
     path.open("wt");
     path.unlink();
     ASSERT_FALSE(path.exists());
@@ -592,7 +592,7 @@ TEST_F(PathTest, unlink)
 ///
 TEST_F(PathTest, rmdir)
 {
-    const auto path(Path(tmpdir.name) / "rmdir_test");
+    const auto path(Path(tmpdir.name()) / "rmdir_test");
     const auto file(path / "file");
     ASSERT_THROW(path.rmdir(), runtime_error);  // doesn't exist
     path.mkdir();
@@ -610,7 +610,7 @@ TEST_F(PathTest, rmdir)
 TEST_F(PathTest, read_bytes)
 {
     static const string data("Some test data");  // TODO: test non-ASCII bytes
-    const auto path(Path(tmpdir.name) / "read_bytes_test");
+    const auto path(Path(tmpdir.name()) / "read_bytes_test");
     path.open("wb").write(data.c_str(), data.size());
     ASSERT_EQ(data, path.read_bytes());
 }
@@ -621,7 +621,7 @@ TEST_F(PathTest, read_bytes)
 TEST_F(PathTest, read_text)
 {
     static const string data("Some test data");
-    const auto path(Path(tmpdir.name) / "read_text_test");
+    const auto path(Path(tmpdir.name()) / "read_text_test");
     path.open("wt").write(data.c_str(), data.size());
     ASSERT_EQ(data, path.read_text());
 }
@@ -632,7 +632,7 @@ TEST_F(PathTest, read_text)
 TEST_F(PathTest, write_bytes)
 {
     static const string data("Some test data");  // TODO: test non-ASCII bytes
-    const auto path(Path(tmpdir.name) / "write_bytes_test");
+    const auto path(Path(tmpdir.name()) / "write_bytes_test");
     path.write_bytes(data);
     string line;
     getline(path.open("rb"), line);
@@ -645,7 +645,7 @@ TEST_F(PathTest, write_bytes)
 TEST_F(PathTest, write_text)
 {
     static const string data("Some test data");
-    const auto path(Path(tmpdir.name) / "write_text_test");
+    const auto path(Path(tmpdir.name()) / "write_text_test");
     path.write_text(data);
     string line;
     getline(path.open("rt"), line);
@@ -658,7 +658,7 @@ TEST_F(PathTest, write_text)
 TEST_F(PathTest, iterdir)
 {
     const TemporaryDirectory tmpdir;
-    const Path root(tmpdir.name);
+    const Path root(tmpdir.name());
     const auto file(root / "file");
     file.open("wt");
     const auto dir(root / "dir");
