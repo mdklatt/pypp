@@ -555,7 +555,11 @@ TEST_F(PathTest, open)
     // attempt an I/O operation on it.
     const auto path(Path(tmpdir.name()) / "open_test");
     ASSERT_TRUE(path.open("xt").put('a'));
-    ASSERT_TRUE(path.open("at").put('b'));  // TODO: make sure this appends
+    ASSERT_EQ('a', path.open("rt").get());
+    ASSERT_TRUE(path.open("at").put('b'));
+    auto file(path.open("rt"));
+    ASSERT_EQ('a', file.get());
+    ASSERT_EQ('b', file.get());
     ASSERT_TRUE(path.open("wt").put('c'));
     ASSERT_EQ('c', path.open("rt").get());
     ASSERT_EQ(EOF, path.open("xt").get());  // error because file exists
