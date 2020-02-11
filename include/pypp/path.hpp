@@ -126,9 +126,9 @@ bool isdir(const std::string& path);
 bool islink(const std::string& path);
 
 
-/// System-independent representation of a file path.
+/// System-independent representation of a POSIX file path.
 ///
-class PurePosixPath  // TODO: single PosixPath class
+class PurePosixPath
 {
 public:
     /// Create a path object.
@@ -171,14 +171,24 @@ public:
     /// Equality operator.
     ///
     /// @param other path to compare
-    /// @return true if paths are equal
+    /// @return true if path is equal to other
     bool operator==(const PurePosixPath& other) const;
 
-    /// Inequality operator
+    /// Inequality operator.
     ///
     /// @param other path to compare
-    /// @return true if paths are not equal
+    /// @return true if path is not equal to other
     bool operator!=(const PurePosixPath& other) const;
+
+    /// Less-than operator.
+    ///
+    /// This a lexical comparison and does not imply anything about directory
+    /// hierarchies. This is mainly intended to allow the use of PurePosixPath
+    /// objects in contexts that require a sort order.
+    ///
+    /// @param other path to compare
+    /// @return true if path is less than other
+    bool operator<(const PurePosixPath& other) const;
 
     /// Determine if the path is absolute.
     ///
@@ -341,14 +351,24 @@ public:
     /// Equality operator.
     ///
     /// @param other path to compare
-    /// @return true if paths are equal
+    /// @return true if path is equal to other
     bool operator==(const PosixPath& other) const;
 
-    /// Inequality operator
+    /// Inequality operator.
     ///
     /// @param other path to compare
-    /// @return true if paths are not equal
+    /// @return true if path is not equal to other
     bool operator!=(const PosixPath& other) const;
+
+    /// Less-than operator.
+    ///
+    /// This a lexical comparison and does not imply anything about directory
+    /// hierarchies. This is mainly intended to allow the use of PosixPath
+    /// objects in contexts that require a sort order.
+    ///
+    /// @param other path to compare
+    /// @return true if path is less than other
+    bool operator<(const PosixPath& other) const;
 
     /// Compute the direct parent path.
     ///
@@ -486,7 +506,7 @@ private:
     ///
     /// @param mode file mode
     /// @param data file contents
-    void write_file(const std::string& mode, const std::string& data) const;
+    void write_file(const std::string& data, const std::string& mode) const;
 };
 
 

@@ -305,6 +305,12 @@ bool PurePosixPath::operator!=(const PurePosixPath& other) const
 }
 
 
+bool PurePosixPath::operator<(const PurePosixPath& other) const
+{
+    return string(*this) < string(other);
+}
+
+
 bool PurePosixPath::is_absolute() const
 {
     return parts_.empty() ? false : parts_.front() == sep;
@@ -508,6 +514,12 @@ bool PosixPath::operator==(const PosixPath& other) const
 bool PosixPath::operator!=(const PosixPath& other) const
 {
     return base_ != other.base_;
+}
+
+
+bool PosixPath::operator<(const PosixPath& other) const
+{
+    return base_ < other.base_;
 }
 
 
@@ -725,14 +737,14 @@ string PosixPath::read_text() const
 
 void PosixPath::write_bytes(const string& data) const
 {
-    write_file("wb", data);
+    write_file(data, "wb");
     return;
 }
 
 
 void PosixPath::write_text(const string& data) const
 {
-    write_file("wt", data);
+    write_file(data, "wt");
     return;
 }
 
@@ -748,7 +760,7 @@ string PosixPath::read_file(const string& mode) const
 }
 
 
-void PosixPath::write_file(const string& mode, const string& data) const
+void PosixPath::write_file(const string& data, const string& mode) const
 {
     auto stream(open(mode));
     if (not stream.write(data.c_str(), data.size())) {

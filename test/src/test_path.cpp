@@ -11,7 +11,6 @@
 
 #include <cassert>
 #include <cstdio>
-#include <algorithm>
 #include <fstream>
 #include <iterator>
 #include <memory>
@@ -33,14 +32,12 @@ using std::begin;
 using std::end;
 using std::fstream;
 using std::getline;
-using std::inserter;
 using std::ios;
 using std::make_pair;
 using std::pair;
 using std::runtime_error;
 using std::set;
 using std::string;
-using std::transform;
 using std::unique_ptr;
 using std::vector;
 using testing::Test;
@@ -244,7 +241,20 @@ TYPED_TEST(PurePathTest, ne_op)
     static const TypeParam path("abc");
     ASSERT_FALSE(path != path);  // identity
 }
- 
+
+
+/// Test the PurePath less-than operator.
+///
+TYPED_TEST(PurePathTest, lt_op)
+{
+    static const TypeParam path("abc");
+    ASSERT_FALSE(path < path);  // identity
+    ASSERT_TRUE(TypeParam("abc") < TypeParam("abd"));
+    ASSERT_FALSE(TypeParam("abd") < TypeParam("abc"));
+    ASSERT_FALSE(TypeParam("abc") < TypeParam("./abc"));
+    ASSERT_FALSE(TypeParam("./abc") < TypeParam("abc"));
+}
+
 
 /// Test the PurePath std::string operator.
 ///
@@ -664,9 +674,7 @@ TEST_F(PathTest, iterdir)
     const auto dir(root / "dir");
     dir.mkdir();
     const auto paths(root.iterdir());
-    set<string> items;  // guaranteed ordering
-    const auto str = [](const Path& path) { return string(path); };
-    transform(begin(paths), end(paths), inserter(items, items.begin()), str);
-    ASSERT_EQ(set<string>({string(dir), string(file)}), items);
+    set<Path> items(begin(paths), end(paths));  // need guaranteed ordering
+    ASSERT_EQ(set<Path>({dir, file}), items);
     ASSERT_THROW(file.iterdir(), runtime_error);  // not a directory
 }
