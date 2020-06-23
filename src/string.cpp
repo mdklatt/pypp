@@ -229,9 +229,8 @@ string str::replace(string str, const string& old, const string& sub, ssize_t ma
 {
     ssize_t count(0);
     string::size_type pos(0);
-    while (maxcount == -1 or count < maxcount) {
-        // TODO: Split this into two loops to avoid repeated ifs?
-        if (not old.empty()) {
+    if (not old.empty()) {
+        while (maxcount == -1 or count++ < maxcount) {
             pos = str.find(old, pos);
             if (pos == string::npos) {
                 break;
@@ -239,17 +238,17 @@ string str::replace(string str, const string& old, const string& sub, ssize_t ma
             str.replace(pos, old.length(), sub);
             pos += sub.length();
         }
-        else {
-            // In Python, an empty search string causes replace() to act like
-            // sub.join(str) with leading and trailing delimiters. Not sure
-            // what the use case for that is, but it's reproduced here.
+    }
+    else {
+        // An empty search string causes replace() to act like sub.join(str)
+        // with leading and trailing delimiters.
+        while (maxcount == -1 or count++ < maxcount) {
             str.insert(pos, sub);
             pos += sub.length() + 1;
             if (pos > str.length()) {
                 break;
             }
         }
-        ++count;
     }
     return str;
 }
