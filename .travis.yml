@@ -21,4 +21,4 @@ before_script:
   - cmake --build .
   
 script:
-  - test/test_pypp
+  - test/unit/test_pypp

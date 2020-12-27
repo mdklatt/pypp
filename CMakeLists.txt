@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.8)
 
 project(pypp
-    VERSION 0.1.0.38  # tweak number is only for dev releases
+    VERSION 0.1.0.39  # tweak number is only for dev releases
     LANGUAGES CXX
 )
 
@@ -101,4 +101,4 @@ export(PACKAGE pypp)
 # Add subdirectories to build.
 
 add_subdirectory(doc)
-add_subdirectory(test)
+add_subdirectory(test/unit)

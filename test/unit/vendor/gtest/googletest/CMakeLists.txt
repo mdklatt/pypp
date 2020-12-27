@@ -83,7 +83,7 @@ include_directories(
 # VS 2013     12           1800            std::tr1::tuple
 # VS 2015     14           1900            std::tuple
 # VS 2017     15           >= 1910         std::tuple
-if (MSVC AND MSVC_VERSION EQUAL 1700)
+if (msvc AND MSVC_VERSION EQUAL 1700)
   add_definitions(/D _VARIADIC_MAX=10)
 endif()
  
@@ -120,11 +120,11 @@ if(INSTALL_GTEST)
 
   # configure and install pkgconfig files
   configure_file(
-    cmake/gtest.pc.in
+      cmake/gtest.pc.in
     "${CMAKE_BINARY_DIR}/gtest.pc"
     @ONLY)
   configure_file(
-    cmake/gtest_main.pc.in
+      cmake/gtest_main.pc.in
     "${CMAKE_BINARY_DIR}/gtest_main.pc"
     @ONLY)
   install(FILES "${CMAKE_BINARY_DIR}/gtest.pc" "${CMAKE_BINARY_DIR}/gtest_main.pc"
@@ -203,7 +203,7 @@ if (gtest_build_tests)
   # C++ tests built with non-standard compiler flags.
 
   # MSVC 7.1 does not support STL with exceptions disabled.
-  if (NOT MSVC OR MSVC_VERSION GREATER 1310)
+  if (NOT msvc OR MSVC_VERSION GREATER 1310)
     cxx_library(gtest_no_exception "${cxx_no_exception}"
       src/gtest-all.cc)
     cxx_library(gtest_main_no_exception "${cxx_no_exception}"
@@ -231,7 +231,7 @@ if (gtest_build_tests)
                         PROPERTIES
                         COMPILE_DEFINITIONS "GTEST_LINKED_AS_SHARED_LIBRARY=1")
 
-  if (NOT MSVC OR MSVC_VERSION LESS 1600)  # 1600 is Visual Studio 2010.
+  if (NOT msvc OR MSVC_VERSION LESS 1600)  # 1600 is Visual Studio 2010.
     # Visual Studio 2010, 2012, and 2013 define symbols in std::tr1 that
     # conflict with our own definitions. Therefore using our own tuple does not
     # work on those compilers.
@@ -253,7 +253,7 @@ if (gtest_build_tests)
   py_test(gtest_break_on_failure_unittest)
 
   # Visual Studio .NET 2003 does not support STL with exceptions disabled.
-  if (NOT MSVC OR MSVC_VERSION GREATER 1310)  # 1310 is Visual Studio .NET 2003
+  if (NOT msvc OR MSVC_VERSION GREATER 1310)  # 1310 is Visual Studio .NET 2003
     cxx_executable_with_flags(
       gtest_catch_exceptions_no_ex_test_
       "${cxx_no_exception}"
@@ -290,7 +290,7 @@ if (gtest_build_tests)
   py_test(gtest_shuffle_test)
 
   # MSVC 7.1 does not support STL with exceptions disabled.
-  if (NOT MSVC OR MSVC_VERSION GREATER 1310)
+  if (NOT msvc OR MSVC_VERSION GREATER 1310)
     cxx_executable(gtest_throw_on_failure_test_ test gtest_no_exception)
     set_target_properties(gtest_throw_on_failure_test_
       PROPERTIES

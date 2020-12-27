@@ -333,8 +333,8 @@ may need to tweak your compiler and/or linker flags.  Please see the
 If you have custom matchers defined using `MatcherInterface` or
 `MakePolymorphicMatcher()`, you'll need to update their definitions to
 use the new matcher API (
-[monomorphic](./docs/CookBook.md#writing-new-monomorphic-matchers),
-[polymorphic](./docs/CookBook.md#writing-new-polymorphic-matchers)).
+[monomorphic](docs/CookBook.md#writing-new-monomorphic-matchers),
+[polymorphic](docs/CookBook.md#writing-new-polymorphic-matchers)).
 Matchers defined using `MATCHER()` or `MATCHER_P*()` aren't affected.
 
 Happy testing!

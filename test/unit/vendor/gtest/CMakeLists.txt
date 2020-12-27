@@ -27,7 +27,7 @@ cmake_dependent_option(INSTALL_GTEST "Enable installation of googletest. (Projec
 cmake_dependent_option(INSTALL_GMOCK "Enable installation of googlemock. (Projects embedding googlemock may want to turn this OFF.)" ON "BUILD_GMOCK" OFF)
 
 if(BUILD_GMOCK)
-  add_subdirectory( googlemock )
+  add_subdirectory(googlemock)
 elseif(BUILD_GTEST)
-  add_subdirectory( googletest )
+  add_subdirectory(googletest)
 endif()

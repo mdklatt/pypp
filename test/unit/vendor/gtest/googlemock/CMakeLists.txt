@@ -76,7 +76,7 @@ include_directories("${gmock_SOURCE_DIR}/include"
 # VS 2013     12           1800            std::tr1::tuple
 # VS 2015     14           1900            std::tuple
 # VS 2017     15           >= 1910         std::tuple
-if (MSVC AND MSVC_VERSION EQUAL 1700)
+if (msvc AND MSVC_VERSION EQUAL 1700)
   add_definitions(/D _VARIADIC_MAX=10)
 endif()
 
@@ -88,7 +88,7 @@ endif()
 # Google Mock libraries.  We build them using more strict warnings than what
 # are used for other targets, to ensure that Google Mock can be compiled by
 # a user aggressive about warnings.
-if (MSVC)
+if (msvc)
   cxx_library(gmock
               "${cxx_strict}"
               "${gtest_dir}/src/gtest-all.cc"
@@ -127,11 +127,11 @@ if(INSTALL_GMOCK)
 
   # configure and install pkgconfig files
   configure_file(
-    cmake/gmock.pc.in
+      cmake/gmock.pc.in
     "${CMAKE_BINARY_DIR}/gmock.pc"
     @ONLY)
   configure_file(
-    cmake/gmock_main.pc.in
+      cmake/gmock_main.pc.in
     "${CMAKE_BINARY_DIR}/gmock_main.pc"
     @ONLY)
   install(FILES "${CMAKE_BINARY_DIR}/gmock.pc" "${CMAKE_BINARY_DIR}/gmock_main.pc"
@@ -184,7 +184,7 @@ if (gmock_build_tests)
   ############################################################
   # C++ tests built with non-standard compiler flags.
 
-  if (MSVC)
+  if (msvc)
     cxx_library(gmock_main_no_exception "${cxx_no_exception}"
       "${gtest_dir}/src/gtest-all.cc" src/gmock-all.cc src/gmock_main.cc)
 
