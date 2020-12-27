@@ -10,7 +10,7 @@ compiler:
 
 branches:
   only:
-    - master
+    - main
     - dev
 
 sudo: false

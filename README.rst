@@ -1,17 +1,10 @@
 ####
-py++
+pypp
 ####
-
-.. |travis.png| image:: https://travis-ci.org/mdklatt/pypp.png?branch=master
-   :alt: Travis CI build status
-   :target: `travis`_
-.. _travis: https://travis-ci.org/mdklatt/pypp
-.. _py++: http://github.com/mdklatt/pypp
-
 
 |travis.png|
 
-Python 3 functions you wish C++ had.
+Python functions you wish C++ had.
 
 The overarching design principle here is to emulate Python functionality as
 closely as possible, which occasionally results in some compromises to the
@@ -44,7 +37,6 @@ Documentation (Doxygen)
     
 Documentation (Sphinx)
 ======================
-.. _Breathe: https://breathe.readthedocs.io/en/latest/
 
 .. code-block:: console
 
@@ -58,7 +50,15 @@ extension.
 ==========
 Test Suite
 ==========
+
 .. code-block:: console
 
     $ cd build/Debug
     $ test/test_pypp
+
+
+.. |travis.png| image:: https://travis-ci.org/mdklatt/pypp.png?branch=main
+   :alt: Travis CI build status
+   :target: `travis`_
+.. _travis: https://travis-ci.org/mdklatt/pypp
+.. _Breathe: https://breathe.readthedocs.io/en/latest/
