@@ -15,10 +15,17 @@ branches:
 
 sudo: false
 
+env:
+  - PYPP_BUILD_TYPE="Debug" PYPP_BUILD_DIR="${TRAVIS_BUILD_DIR}/.build/${PYPP_BUILD_TYPE}"
+  - PYPP_BUILD_TYPE="Release" PYPP_BUILD_DIR="${TRAVIS_BUILD_DIR}/.build/${PYPP_BUILD_TYPE}"
+
 before_script:
-  - mkdir build && cd build
-  - cmake -DCMAKE_BUILD_TYPE=Debug ../
+  - mkdir -p "${PYPP_BUILD_DIR}"
+  - cd "${PYPP_BUILD_DIR}"
+  - cmake -DCMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}" "${TRAVIS_BUILD_DIR}"
   - cmake --build .
+  - cd "${TRAVIS_BUILD_DIR}"
   
 script:
-  - test/unit/test_pypp
+  - ${PYPP_BUILD_DIR}/test/unit/test_pypp
+  - cd test/integration && sh test.sh
