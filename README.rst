@@ -4,7 +4,7 @@ pypp
 
 |travis.png|
 
-Python functions you wish C++ had.
+C++ implementation of useful modules from the Python standard library.
 
 The overarching design principle here is to emulate Python functionality as
 closely as possible, which occasionally results in some compromises to the

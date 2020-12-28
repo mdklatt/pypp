@@ -1,0 +1,25 @@
+/**
+ * C++ implementation of useful modules from the Python standard library.
+ *
+ * This project uses the Semantic Versioning scheme: <http://semver.org>.
+ * Major versions introduce significant changes to the API, and backwards
+ * compatibility is not guaranteed. Minor versions are for new features and
+ * other backwards-compatible changes to the API. Patch versions are for bug
+ * fixes and internal code changes that do not affect the API. Tweak versions
+ * indicate development versions.
+ */
+#ifndef PYPP_HPP
+#define PYPP_HPP
+
+#define PYPP_VERSION_MAJOR @pypp_VERSION_MAJOR@
+#define PYPP_VERSION_MINOR @pypp_VERSION_MINOR@
+#define PYPP_VERSION_PATCH @pypp_VERSION_PATCH@
+#define PYPP_VERSION_TWEAK @pypp_VERSION_TWEAK@
+
+#include "func.hpp"
+#include "os.hpp"
+#include "path.hpp"
+#include "string.hpp"
+#include "tempfile.hpp"
+
+#endif  // PYPP_HPP

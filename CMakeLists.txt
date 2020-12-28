@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.8)
 
 project(pypp
-    VERSION 0.1.0.39  # tweak number is only for dev releases
+    VERSION 0.1.0.40
     LANGUAGES CXX
 )
 
@@ -40,6 +40,15 @@ target_compile_features(pypp
 PUBLIC
     cxx_auto_type
 )
+
+
+# Generate header file. Output is written to the same file for every build
+# type, so beware of content that is dependent on the build configuration
+# Lock the output file to prevent a race condition.
+
+message(STATUS ${CMAKE_SOURCE_DIR})
+file(LOCK ${CMAKE_SOURCE_DIR}/include/pypp/pypp.hpp GUARD FILE)
+configure_file(src/pypp.hpp.in ${CMAKE_SOURCE_DIR}/include/pypp/pypp.hpp @ONLY)
 
 
 # Generate package config files.

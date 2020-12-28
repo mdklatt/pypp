@@ -3,6 +3,11 @@
 .build/
 
 
+# Ignore auto-generated files.
+
+include/pypp/pypp.hpp
+
+
 # Ignore Vagrant runtime files.
 
 .vagrant/

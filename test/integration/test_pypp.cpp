@@ -3,7 +3,7 @@
  */
 #include <cassert>
 #include <string>
-#include <pypp/string.hpp>
+#include <pypp/pypp.hpp>
 
 
 /**
