@@ -3,12 +3,6 @@
 /// Link all test files with the `gtest_main` library to create a command line
 /// test runner.
 ///
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-#include "unistd.h"
-#else
-#error "path test suite requires *nix"
-#endif
-
 #include <cassert>
 #include <cstdio>
 #include <fstream>
@@ -20,8 +14,7 @@
 #include <typeinfo>
 #include <vector>
 #include <gtest/gtest.h>
-#include "pypp/path.hpp"
-#include "pypp/tempfile.hpp"
+#include "pypp/pypp.hpp"
 
 
 using namespace pypp::path;

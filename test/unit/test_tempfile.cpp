@@ -1,22 +1,13 @@
-/// Test suite for the tempfile module.
+/// Test suite for the POSIX tempfile module.
 ///
 /// Link all test files with the `gtest_main` library to create a command line
 /// test runner.
 ///
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-#include "sys/stat.h"  // TODO: not portable
-#else
-#error "tempfile module test suite requires *nix"
-#endif
-
 #include <cassert>
 #include <fstream>
 #include <string>
-
 #include <gtest/gtest.h>
-#include "pypp/path.hpp"
-#include "pypp/string.hpp"
-#include "pypp/tempfile.hpp"
+#include "pypp/pypp.hpp"
 
 using pypp::path::basename;
 using pypp::path::dirname;

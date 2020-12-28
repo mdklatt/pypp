@@ -2,6 +2,10 @@
 pypp
 ####
 
+========
+Overview
+========
+
 |travis.png|
 
 C++ implementation of useful modules from the Python standard library.
@@ -13,6 +17,16 @@ performance.
 
 Unlike Python, C++ does not have built-in support for Unicode, and none is
 implied here beyond the ASCII subset.
+
+Limitations
+===========
+
+At least C++11 and CMake v3.8 are required.
+
+These modules are currently limited to POSIX platforms (including MacOS):
+* ``os``
+* ``path``
+* ``tempfile``
 
 ========
 Building

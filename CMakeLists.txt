@@ -5,22 +5,22 @@
 cmake_minimum_required(VERSION 3.8)
 
 project(pypp
-    VERSION 0.1.0
+    VERSION 0.1.0.1
     LANGUAGES CXX
 )
 
 
 # Define project targets.
 
-add_library(pypp
-    src/os.cpp
-    src/path.cpp
+add_library(${CMAKE_PROJECT_NAME}
     src/string.cpp
-    src/tempfile.cpp
+    $<${UNIX}:src/posix/os.cpp>
+    $<${UNIX}:src/posix/path.cpp>
+    $<${UNIX}:src/posix/tempfile.cpp>
 )
 add_library(pypp::pypp ALIAS pypp)
 
-target_include_directories(pypp
+target_include_directories(${CMAKE_PROJECT_NAME}
 PUBLIC
     # Interface paths are relative to the installation path, not the current
     # directory.
@@ -30,13 +30,13 @@ PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_compile_options(pypp
+target_compile_options(${CMAKE_PROJECT_NAME}
 PRIVATE
     -Wall
     $<$<CXX_COMPILER_ID:GNU>:-pedantic>
 )
 
-target_compile_features(pypp
+target_compile_features(${CMAKE_PROJECT_NAME}
 PUBLIC
     cxx_auto_type
 )
@@ -78,6 +78,7 @@ install(TARGETS pypp
 )
 
 install(DIRECTORY include/
+    # TODO: Exclude unused platform-specific directories.
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 

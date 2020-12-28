@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 #include <gtest/gtest.h>
-#include "pypp/string.hpp"
+#include "pypp/pypp.hpp"
 
 
 using testing::Test;

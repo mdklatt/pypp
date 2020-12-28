@@ -1,13 +1,8 @@
-/// Implementation of the os module.
+/// POSIX implementation of the 'os' module.
 ///
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-#include "sys/stat.h"  // TODO: not portable
-#include "dirent.h"  // TODO: not portable
-#include "unistd.h"  // TODO: not portable
-#else
-#error "os module requires *nix"
-#endif
-
+#include "sys/stat.h"
+#include "dirent.h"
+#include "unistd.h"
 #include <cerrno>
 #include <cstring>
 #include <stdexcept>
@@ -53,7 +48,7 @@ void os::makedirs(const string& path, mode_t mode, bool exist_ok)
         const auto root(path::dirname(path));
         if (not (root.empty() or path::isdir(root))) {
             // Recursively create root directories as needed.
-            os::makedirs(root, mode, false);
+            makedirs(root, mode, false);
         }
         if (mkdir(path.c_str(), mode) != 0) {
             if (not (errno == EEXIST or errno == EISDIR)) {

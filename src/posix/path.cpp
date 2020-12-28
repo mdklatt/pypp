@@ -1,13 +1,8 @@
-/// Implementation of the path module.
+/// POSIX implementation of the 'path' module.
 ///
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 #include "unistd.h"
 #include "sys/stat.h"
-#include "dirent.h"  // TODO: not portable
-#else
-#error "path module requires *nix"
-#endif
-
+#include "dirent.h"
 #include <cassert>
 #include <cstdio>
 #include <algorithm>

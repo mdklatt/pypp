@@ -3,22 +3,13 @@
 /// Link all test files with the `gtest_main` library to create a command line
 /// test runner.
 ///
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-#include "sys/stat.h"  // TODO: not portable
-#else
-#error "os module test suite requires *nix"
-#endif
-
 #include <fstream>
 #include <set>
 #include <stdexcept>
 #include <string>
 #include <vector>
-
 #include <gtest/gtest.h>
-#include "pypp/os.hpp"
-#include "pypp/path.hpp"
-#include "pypp/tempfile.hpp"
+#include "pypp/pypp.hpp"
 
 
 using pypp::path::isdir;
@@ -42,9 +33,8 @@ TEST(os, listdir)
 {
     const TemporaryDirectory tmpdir;
     const auto fname(join({tmpdir.name(), "file"}));
-    fstream stream(fname, fstream::out);
-    const auto dname(join({tmpdir.name(), "dir"}));
-    mkdir(dname.c_str(), 0700);
+    fstream stream(fname, fstream::out);  // create empty file
+    makedirs(join({tmpdir.name(), "dir"}), 0700);
     const auto paths(listdir(tmpdir.name()));
     set<string> items(begin(paths), end(paths));  // guaranteed ordering
     ASSERT_EQ(set<string>({"dir", "file"}), items);
@@ -76,8 +66,7 @@ TEST(os, removedirs)
     auto path(tmpdir.name());
     for (const auto& dir: subdirs) {
         // Create subdirectories to remove.
-        path = join({path, dir});
-        assert(mkdir(path.c_str(), 0700) == 0);
+        makedirs(join({path, dir}), 0700);
     }
     removedirs(path);  // will also remove tmpdir itself
     const auto pair(split(tmpdir.name()));

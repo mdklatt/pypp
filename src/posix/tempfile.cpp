@@ -1,11 +1,6 @@
-/// Implementation of the tempfile module.
+/// POSIX implementation of the 'tempfile' module.
 ///
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-#include "unistd.h"  // TODO: not portable
-#else
-#error "tempfile module requires *nix"
-#endif
-
+#include "unistd.h"
 #include <cassert>
 #include <cerrno>
 #include <cstdlib>
