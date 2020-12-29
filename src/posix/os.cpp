@@ -1,8 +1,8 @@
 /// POSIX implementation of the 'os' module.
 ///
-#include "sys/stat.h"
 #include "dirent.h"
 #include "unistd.h"
+#include "sys/stat.h"
 #include <cerrno>
 #include <cstring>
 #include <stdexcept>
@@ -19,8 +19,18 @@ using std::vector;
 using namespace pypp;
 
 
-vector<string> os::listdir(const string& path)
-{
+string os::getcwd() {
+    char cwd[PATH_MAX];
+    errno = 0;  // POSIX requires this to be thread-safe
+    ::getcwd(cwd, sizeof(cwd));
+    if (errno != 0) {
+        throw runtime_error(string(strerror(errno)));
+    }
+    return cwd;
+}
+
+
+vector<string> os::listdir(const string& path) {
     static const vector<string> special({".", ".."});
     vector<string> names;
     errno = 0;  // POSIX requires this to be thread-safe
@@ -42,8 +52,7 @@ vector<string> os::listdir(const string& path)
 }
 
 
-void os::makedirs(const string& path, mode_t mode, bool exist_ok)
-{
+void os::makedirs(const string& path, mode_t mode, bool exist_ok) {
     if (not path::isdir(path)) {
         const auto root(path::dirname(path));
         if (not (root.empty() or path::isdir(root))) {
@@ -65,16 +74,15 @@ void os::makedirs(const string& path, mode_t mode, bool exist_ok)
 }
 
 
-void os::removedirs(const string& path)
-{
+void os::removedirs(const string& path) {
     auto pair(path::split(path));
     if (pair.second.empty()) {
         // Handle path with trailing slash.
         pair = path::split(path);
     }
     if (rmdir(pair.second.c_str()) == 0) {
-        // Recursively remove as many root directories as possible, stopping
-        // silently on failure.
+        // Use recursion to remove as many root directories as possible,
+        // stopping silently on failure.
         // TODO: Mimic Python and report failure for initial directory.
         removedirs(pair.first);
     }

@@ -1,8 +1,9 @@
-/// Test suite for the os module.
-///
-/// Link all test files with the `gtest_main` library to create a command line
-/// test runner.
-///
+/**
+ * Test suite for the os module.
+ *
+ * Link all test files with the `gtest_main` library to create a command line
+ * test runner.
+ */
 #include <fstream>
 #include <set>
 #include <stdexcept>
@@ -27,10 +28,20 @@ using std::vector;
 using namespace pypp::os;
 
 
-/// Test the listdir() function.
-///
-TEST(os, listdir)
-{
+/**
+ *  Test the os::getcwd() function.
+ */
+TEST(os, getcwd) {
+     char buffer[FILENAME_MAX];
+     getcwd(buffer, sizeof(buffer));
+     ASSERT_EQ(getcwd(), string(buffer));
+}
+
+
+/**
+ * Test the os::listdir() function.
+ */
+TEST(os, listdir) {
     const TemporaryDirectory tmpdir;
     const auto fname(join({tmpdir.name(), "file"}));
     fstream stream(fname, fstream::out);  // create empty file
@@ -42,10 +53,10 @@ TEST(os, listdir)
 }
 
 
-/// Test the makedirs() function.
-///
-TEST(os, makedirs)
-{
+/**
+ * Test the os::makedirs() function.
+ */
+TEST(os, makedirs) {
     static const mode_t mode(0700);
     TemporaryDirectory tmpdir;
     const auto path(join({tmpdir.name(), "abc", "xyz"}));
@@ -57,10 +68,10 @@ TEST(os, makedirs)
 }
 
 
-/// Test the removedirs() function.
-///
-TEST(os, removedirs)
-{
+/**
+ * Test the os::removedirs() function.
+ */
+TEST(os, removedirs) {
     static const vector<string> subdirs({"abc", "xyz"});
     TemporaryDirectory tmpdir;
     auto path(tmpdir.name());

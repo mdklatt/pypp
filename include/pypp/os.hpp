@@ -12,6 +12,15 @@
 
 namespace pypp { namespace os {
 
+
+/**
+ * Get the current working directory.
+ *
+ * @return: current working directory
+ */
+std::string getcwd();
+
+
 /**
  * List the names in a directory.
  *
