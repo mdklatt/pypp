@@ -3,11 +3,9 @@
 /// Link all test files with the `gtest_main` library to create a command line
 /// test runner.
 ///
-#include <cassert>
 #include <cstdio>
 #include <fstream>
 #include <iterator>
-#include <memory>
 #include <set>
 #include <string>
 #include <stdexcept>
@@ -31,7 +29,6 @@ using std::pair;
 using std::runtime_error;
 using std::set;
 using std::string;
-using std::unique_ptr;
 using std::vector;
 using testing::Test;
 using testing::Types;
@@ -117,9 +114,9 @@ TEST(path, normpath)
 ///
 TEST(path, abspath)
 {
-    unique_ptr<char> buffer(new char[FILENAME_MAX]);
-    assert(getcwd(buffer.get(), FILENAME_MAX));
-    const string cwd(buffer.get());
+    char buffer[FILENAME_MAX];
+    getcwd(buffer, sizeof(buffer));
+    const string cwd(buffer);
     ASSERT_EQ(abspath(""), cwd);
     ASSERT_EQ(abspath("."), cwd);
     ASSERT_EQ(abspath("/"), "/");
