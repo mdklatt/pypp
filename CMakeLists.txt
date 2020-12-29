@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.8)
 
 project(pypp
-    VERSION 0.2.0.2
+    VERSION 0.2.0.3
     LANGUAGES CXX
 )
 

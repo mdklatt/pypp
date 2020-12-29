@@ -1,5 +1,6 @@
-/// POSIX implementation of the 'path' module.
-///
+/**
+ * POSIX implementation of the 'path' module.
+ */
 #include "unistd.h"
 #include "sys/stat.h"
 #include "dirent.h"
@@ -20,6 +21,7 @@
 #include "pypp/string.hpp"
 
 using pypp::func::in;
+using pypp::os::getcwd;
 using pypp::os::makedirs;
 using pypp::str::endswith;
 using pypp::str::rstrip;
@@ -159,11 +161,7 @@ string path::abspath(const string& path)
     if (isabs(path)) {
         return normpath(path);
     }
-    unique_ptr<char> buffer(new char[FILENAME_MAX]);
-    if (not getcwd(buffer.get(), FILENAME_MAX)) {
-        throw runtime_error("could not get current working directory");
-    }
-    return normpath(join({buffer.get(), path}));
+    return normpath(join({getcwd(), path}));
 }
 
 
@@ -593,11 +591,7 @@ PosixPath PosixPath::with_suffix(const std::string& name) const
 
 PosixPath PosixPath::cwd()
 {
-    unique_ptr<char> buffer(new char[FILENAME_MAX]);
-    if (not getcwd(buffer.get(), FILENAME_MAX)) {
-        throw runtime_error("could not get current working directory");
-    }
-    return PosixPath(string(buffer.get()));
+    return PosixPath(getcwd());
 }
 
 
