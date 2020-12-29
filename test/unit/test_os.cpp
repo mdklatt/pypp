@@ -4,6 +4,7 @@
  * Link all test files with the `gtest_main` library to create a command line
  * test runner.
  */
+#include <unistd.h>  // chdir
 #include <fstream>
 #include <set>
 #include <stdexcept>
@@ -13,6 +14,8 @@
 #include "pypp/pypp.hpp"
 
 
+using pypp::path::abspath;
+using pypp::path::dirname;
 using pypp::path::isdir;
 using pypp::path::join;
 using pypp::path::split;
@@ -24,6 +27,7 @@ using std::fstream;
 using std::string;
 using std::set;
 using std::vector;
+using testing::Test;
 
 using namespace pypp::os;
 
@@ -35,6 +39,36 @@ TEST(os, getcwd) {
      char buffer[FILENAME_MAX];
      getcwd(buffer, sizeof(buffer));
      ASSERT_EQ(getcwd(), string(buffer));
+}
+
+
+/**
+ * Test fixture for the chdir() function.
+ *
+ * Public and protected member variables and methods are injected into each
+ * test that uses this fixture.
+ */
+class ChdirTest: public Test
+{
+public:
+    ChdirTest(): cwd(getcwd()) {}
+
+    ~ChdirTest() override {
+        ::chdir(cwd.c_str());
+    }
+
+private:
+    const string cwd;
+};
+
+
+/**
+ * Test the os::chdir() function.
+ */
+TEST_F(ChdirTest, chdir) {
+    const auto path(abspath(dirname(__FILE__)));
+    chdir(path);
+    ASSERT_EQ(path, getcwd());
 }
 
 

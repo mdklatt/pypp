@@ -21,12 +21,18 @@ using namespace pypp;
 
 string os::getcwd() {
     char cwd[PATH_MAX];
-    errno = 0;  // POSIX requires this to be thread-safe
-    ::getcwd(cwd, sizeof(cwd));
-    if (errno != 0) {
+    if (not ::getcwd(cwd, sizeof(cwd))) {
         throw runtime_error(string(strerror(errno)));
     }
     return cwd;
+}
+
+
+void os::chdir(const string& path) {
+    if (::chdir(path.c_str()) != 0) {
+        throw runtime_error(string(strerror(errno)));
+    }
+    return;
 }
 
 

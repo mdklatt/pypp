@@ -22,6 +22,14 @@ std::string getcwd();
 
 
 /**
+ * Change the current working directory.
+ *
+ * @param path: new working directory path
+ */
+void chdir(const std::string& path);
+
+
+/**
  * List the names in a directory.
  *
  * Special entries (e.g. "." and "..") are ignored.
