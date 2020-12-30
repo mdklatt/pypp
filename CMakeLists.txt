@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.8)
 
 project(PyPP
-    VERSION 0.2.0.4  # tweak number is for dev versions
+    VERSION 0.2.0.5  # tweak number is for dev versions
     LANGUAGES CXX
 )
 
@@ -111,7 +111,17 @@ export(EXPORT pypp_targets
 export(PACKAGE ${PYPP_PACKAGE})
 
 
-# Add subdirectories to build.
+# Build test suite.
 
-add_subdirectory(doc)
-add_subdirectory(test/unit)
+option(PYPP_BUILD_TESTS "Build test suite" OFF)
+if(PYPP_BUILD_TESTS)
+    add_subdirectory(test/unit)
+endif()
+
+
+# Build documentation.
+
+option(PYPP_BUILD_DOCS "Build documentation" OFF)
+if(PYPP_BUILD_DOCS)
+    add_subdirectory(doc)
+endif()
