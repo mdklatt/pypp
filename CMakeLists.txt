@@ -4,23 +4,23 @@
 ##
 cmake_minimum_required(VERSION 3.8)
 
-project(pypp
-    VERSION 0.2.0.3
+project(PyPP
+    VERSION 0.2.0.4  # tweak number is for dev versions
     LANGUAGES CXX
 )
 
 
 # Define project targets.
 
-add_library(${CMAKE_PROJECT_NAME}
+add_library(pypp
     src/string.cpp
     $<${UNIX}:src/posix/os.cpp>
     $<${UNIX}:src/posix/path.cpp>
     $<${UNIX}:src/posix/tempfile.cpp>
 )
-add_library(pypp::pypp ALIAS pypp)
+add_library(PyPP::pypp ALIAS pypp)
 
-target_include_directories(${CMAKE_PROJECT_NAME}
+target_include_directories(pypp
 PUBLIC
     # Interface paths are relative to the installation path, not the current
     # directory.
@@ -30,13 +30,13 @@ PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_compile_options(${CMAKE_PROJECT_NAME}
+target_compile_options(pypp
 PRIVATE
     -Wall
     $<$<CXX_COMPILER_ID:GNU>:-pedantic>
 )
 
-target_compile_features(${CMAKE_PROJECT_NAME}
+target_compile_features(pypp
 PUBLIC
     cxx_auto_type
 )
@@ -55,16 +55,16 @@ configure_file(src/pypp.hpp.in ${CMAKE_SOURCE_DIR}/include/pypp/pypp.hpp @ONLY)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/pypp-config-version.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/PyPPConfigVersion.cmake
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
 configure_package_config_file(
-    ${CMAKE_CURRENT_LIST_DIR}/cmake/pypp-config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/pypp-config.cmake
+    ${CMAKE_CURRENT_LIST_DIR}/cmake/PyPPConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/PyPPConfig.cmake
 INSTALL_DESTINATION
-    ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    ${CMAKE_INSTALL_LIBDIR}/cmake/pypp
 )
 
 
@@ -83,17 +83,17 @@ install(DIRECTORY include/
 )
 
 install(EXPORT pypp_targets
-    FILE PyppTargets.cmake
-    NAMESPACE pypp::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    FILE ${PROJECT_NAME}Targets.cmake
+    NAMESPACE ${PROJECT_NAME}::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pypp
 )
 
 install(
 FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/pypp-config.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/pypp-config-version.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/PyPPConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/PyPPConfigVersion.cmake
 DESTINATION
-    ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    ${CMAKE_INSTALL_LIBDIR}/cmake/pypp
 )
 
 
@@ -102,10 +102,10 @@ DESTINATION
 # requiring this project to be installed.
 
 export(EXPORT pypp_targets
-    FILE ${CMAKE_CURRENT_BINARY_DIR}/pypp-targets.cmake
-    NAMESPACE pypp::
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/PyPPTargets.cmake
+    NAMESPACE PyPP::
 )
-export(PACKAGE pypp)
+export(PACKAGE PyPP)
 
 
 # Add subdirectories to build.

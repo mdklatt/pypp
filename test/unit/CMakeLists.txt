@@ -14,5 +14,5 @@ add_executable(test_pypp
 
 target_link_libraries(test_pypp
 PRIVATE
-    pypp::pypp gtest gtest_main
+    PyPP::pypp gtest gtest_main
 )
