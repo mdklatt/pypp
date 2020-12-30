@@ -9,18 +9,21 @@ project(PyPP
     LANGUAGES CXX
 )
 
+set(PYPP_PACKAGE ${PROJECT_NAME})
+set(PYPP_TARGET pypp)
+
 
 # Define project targets.
 
-add_library(pypp
+add_library(${PYPP_TARGET}
     src/string.cpp
     $<${UNIX}:src/posix/os.cpp>
     $<${UNIX}:src/posix/path.cpp>
     $<${UNIX}:src/posix/tempfile.cpp>
 )
-add_library(PyPP::pypp ALIAS pypp)
+add_library(PyPP::pypp ALIAS ${PYPP_TARGET})
 
-target_include_directories(pypp
+target_include_directories(${PYPP_TARGET}
 PUBLIC
     # Interface paths are relative to the installation path, not the current
     # directory.
@@ -30,13 +33,13 @@ PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_compile_options(pypp
+target_compile_options(${PYPP_TARGET}
 PRIVATE
     -Wall
     $<$<CXX_COMPILER_ID:GNU>:-pedantic>
 )
 
-target_compile_features(pypp
+target_compile_features(${PYPP_TARGET}
 PUBLIC
     cxx_auto_type
 )
@@ -47,7 +50,7 @@ PUBLIC
 # Lock the output file to prevent a race condition.
 
 message(STATUS ${CMAKE_SOURCE_DIR})
-file(LOCK ${CMAKE_SOURCE_DIR}/include/pypp/pypp.hpp GUARD FILE)
+file(LOCK ${CMAKE_SOURCE_DIR}/include/pypp/pypp.hpp)
 configure_file(src/pypp.hpp.in ${CMAKE_SOURCE_DIR}/include/pypp/pypp.hpp @ONLY)
 
 
@@ -55,14 +58,14 @@ configure_file(src/pypp.hpp.in ${CMAKE_SOURCE_DIR}/include/pypp/pypp.hpp @ONLY)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/PyPPConfigVersion.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${PYPP_PACKAGE}ConfigVersion.cmake
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
 configure_package_config_file(
-    ${CMAKE_CURRENT_LIST_DIR}/cmake/PyPPConfig.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/PyPPConfig.cmake
+    ${CMAKE_CURRENT_LIST_DIR}/cmake/${PYPP_PACKAGE}Config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${PYPP_PACKAGE}Config.cmake
 INSTALL_DESTINATION
     ${CMAKE_INSTALL_LIBDIR}/cmake/pypp
 )
@@ -71,7 +74,7 @@ INSTALL_DESTINATION
 # Define installation rules.
 
 include(GNUInstallDirs)  # TODO: what about MacOS or Windows?
-install(TARGETS pypp
+install(TARGETS ${PYPP_TARGET}
     EXPORT pypp_targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -83,15 +86,15 @@ install(DIRECTORY include/
 )
 
 install(EXPORT pypp_targets
-    FILE ${PROJECT_NAME}Targets.cmake
-    NAMESPACE ${PROJECT_NAME}::
+    FILE PyPPTargets.cmake
+    NAMESPACE ${PYPP_PACKAGE}::
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pypp
 )
 
 install(
 FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/PyPPConfig.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/PyPPConfigVersion.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${PYPP_PACKAGE}Config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${PYPP_PACKAGE}ConfigVersion.cmake
 DESTINATION
     ${CMAKE_INSTALL_LIBDIR}/cmake/pypp
 )
@@ -102,10 +105,10 @@ DESTINATION
 # requiring this project to be installed.
 
 export(EXPORT pypp_targets
-    FILE ${CMAKE_CURRENT_BINARY_DIR}/PyPPTargets.cmake
-    NAMESPACE PyPP::
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/${PYPP_PACKAGE}Targets.cmake
+    NAMESPACE ${PYPP_PACKAGE}::
 )
-export(PACKAGE PyPP)
+export(PACKAGE ${PYPP_PACKAGE})
 
 
 # Add subdirectories to build.
