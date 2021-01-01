@@ -1,8 +1,7 @@
-get_filename_component(PYPP_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-
-
-if(NOT TARGET PyPP::pypp)
+if(NOT TARGET "@PYPP_PACKAGE@::@PYPP_TARGET@")
+    get_filename_component(PYPP_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+    message(STATUS "PYPP_CMAKE_DIR: ${PYPP_CMAKE_DIR}")
     include("${PYPP_CMAKE_DIR}/PyPPTargets.cmake")
 endif()
 
-set(PYPP_LIBRARIES PyPP::pypp)
+set(PYPP_LIBRARIES "@PYPP_PACKAGE@::@PYPP_TARGET@")

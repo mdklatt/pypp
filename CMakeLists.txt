@@ -21,7 +21,7 @@ add_library(${PYPP_TARGET}
     $<${UNIX}:src/posix/path.cpp>
     $<${UNIX}:src/posix/tempfile.cpp>
 )
-add_library(PyPP::pypp ALIAS ${PYPP_TARGET})
+add_library(${PYPP_PACKAGE}::${PYPP_TARGET} ALIAS ${PYPP_TARGET})
 
 target_include_directories(${PYPP_TARGET}
 PUBLIC
@@ -86,7 +86,7 @@ install(DIRECTORY include/
 )
 
 install(EXPORT pypp_targets
-    FILE PyPPTargets.cmake
+    FILE ${PYPP_PACKAGE}Targets.cmake
     NAMESPACE ${PYPP_PACKAGE}::
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pypp
 )
