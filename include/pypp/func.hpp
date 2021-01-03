@@ -49,16 +49,9 @@ bool any(const std::vector<T>& seq)
 /// @param seq input sequence
 /// @param start starting index
 /// @return (index, item) pairs
-template <typename T>
-std::vector<std::pair<size_t, T>> enumerate(const std::vector<T>& seq, ssize_t start=0)
-{
-    std::vector<std::pair<size_t, T>> items;
-    items.reserve(seq.size());
-    ssize_t pos(start);
-    for (const auto& item: seq) {
-        items.emplace_back(std::make_pair(pos++, item));
-    }
-    return items;
+template <typename Iterable, typename T=typename Iterable::value_type>
+generator::Enumerator<Iterable, T> enumerate(const Iterable& iterable, ssize_t start=0) {
+    return generator::Enumerator<Iterable, T>(iterable, start);
 }
 
 

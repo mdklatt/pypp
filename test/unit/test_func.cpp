@@ -68,13 +68,13 @@ TEST(func, any_int)
 }
 
 
-/// Test the enumerate() function.
-///
-TEST(func, enumerate)
-{
-    const vector<pair<size_t, char>> pairs{{1, 'a'}, {2, 'b'}};
-    const auto enumerated(enumerate<char>({'a', 'b'}, 1));
-    ASSERT_EQ(enumerated, pairs);
+/**
+ * Test the enumerate() function.
+ */
+TEST(func, enumerate) {
+    using Vector = vector<pair<ssize_t, char>>;
+    auto items(enumerate(string("ab"), 1));
+    ASSERT_EQ(Vector(begin(items), end(items)), Vector({{1, 'a'}, {2, 'b'}}));
 }
 
 
@@ -179,10 +179,10 @@ TYPED_TEST(ArithmeticRangeTest, step_negative) {
     ASSERT_EQ(vector<TypeParam>(begin(values), end(values)), vector<TypeParam>({4, 2}));
 }
 
+
 /**
  * Test the arithmetic range() function for an invalid step.
  */
 TYPED_TEST(ArithmeticRangeTest, step_zero) {
     ASSERT_THROW(range<TypeParam>(1, 3, 0), std::invalid_argument);
 }
-

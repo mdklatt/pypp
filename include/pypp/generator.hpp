@@ -200,8 +200,8 @@ protected:
 /**
  * Generate a sequential range of values.
  *
- * @tparam T1: range type that supports addition and comparison operators
- * @tparam Step: type that supports T1 + T2
+ * @tparam T: range type that supports addition and comparison operators
+ * @tparam Step: type that supports T + Step
  */
 template <typename T, typename Step=T>
 class Range: public Generator<T> {
@@ -261,6 +261,62 @@ private:
     Step step;
 };
 
+
+/**
+ * Enumerate a sequence of items.
+ *
+ * @tparam Iterable: iterable type
+ * @tparam T: value type
+ */
+template <typename Iterable, typename T=typename Iterable::value_type>
+class Enumerator: public Generator<std::pair<ssize_t, T>> {
+public:
+    /**
+     * Constructor.
+     *
+     * @param items: iterable sequence of items to enumerate
+     * @param start: range stop (exclusive)
+     * @param step: range increment
+     */
+    Enumerator(const Iterable& items, ssize_t start=0):
+        pos(std::begin(items)), stop(end(items)), count(start) {}
+
+    /**
+     * Test if the generator is active.
+     *
+     * A subsequent call to next() will succeed for an active generator.
+     *
+     * @return: true if the generator is still active
+     */
+    bool active() const override {
+        return pos != stop;
+    }
+
+    /**
+     * Get the current value of the generator.
+     *
+     * @return: current generator value
+     */
+    std::pair<ssize_t, T> value() const override {
+        return std::make_pair(count, *pos);
+    }
+
+    /**
+     * Generate the next value.
+     *
+     * A std::out_of_range exception is thrown if end() is true.
+     */
+    void next() override {
+        if (++pos != stop) {
+            ++count;
+        }
+    }
+
+private:
+    ssize_t count;
+    typename Iterable::const_iterator pos;
+    typename Iterable::const_iterator stop;
+};
 
 }}  // pypp::generator
 
