@@ -15,6 +15,7 @@ using std::begin;
 using std::end;
 using std::pair;
 using std::string;
+using std::tuple;
 using std::vector;
 using testing::Test;
 using testing::Types;
@@ -88,14 +89,27 @@ TEST(func, in)
 }
 
 
-/// Test the zip() function.
-///
-TEST(func, zip)
-{
-    const vector<pair<int, char>> pairs{{'a', 1}, {'b', 2}};
-    const auto zipped(zip<int, char>({'a', 'b'}, {1, 2, 3}));
-    ASSERT_EQ(zipped, pairs);
+/**
+ * Test the zip() function.
+ */
+TEST(func, zip) {
+    const vector<float> it1({1, 2});
+    const string it2("ab");
+    auto values(zip(it1, it2));
+    using V = vector<tuple<float, float>>;
+    ASSERT_EQ(V(begin(values), end(values)), V({{1, 'a'}, {2, 'b'}}));
+}
 
+
+/**
+ * Test the zip() function for ranges of unequal length.
+ */
+TEST(func, zip_unequal) {
+    const vector<float> it1({1, 2});
+    string it2("abc");
+    auto values(zip(it1, it2));
+    using V = vector<tuple<float, float>>;
+    ASSERT_EQ(V(begin(values), end(values)), V({{1, 'a'}, {2, 'b'}}));
 }
 
 

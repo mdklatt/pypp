@@ -6,10 +6,15 @@
 #ifndef PYPP_GENERATOR_HPP
 #define PYPP_GENERATOR_HPP
 
+#include <iterator>
+#include <tuple>
+#include <utility>
+
+
 namespace pypp { namespace generator {
 
 /**
- * Interface for a Python-like generator that works via C++ iterators.
+ * Interface for generators that work via C++ iterators.
  *
  * A generator produces a sequence of values on-demand, as opposed to a fixed
  * in-memory container. Generator iterators are forward iterators that always
@@ -17,7 +22,7 @@ namespace pypp { namespace generator {
  * iterators point to the same same generator they will always point to the
  * same value, i.e. advancing one iterator advances all sibling iterators.
  *
- * @tparam T: generator return typ
+ * @tparam T: generator return type
  */
 template <typename T>
 class Generator {
@@ -131,9 +136,7 @@ public:
          * of the sequence.
          */
         void advance() {
-            if (not target) {
-                throw std::out_of_range("cannot advance end iterator");
-            }
+            assert(target);
             target->next();
             if (not target->active()) {
                 target = nullptr;
@@ -174,8 +177,6 @@ protected:
     /**
      * Test if the generator is active.
      *
-     * A subsequent call to next() will succeed for an active generator.
-     *
      * @return: true if the generator is still active
      */
     virtual bool active() const = 0;
@@ -183,14 +184,14 @@ protected:
     /**
      * Get the current value of the generator.
      *
+     * The result is only valid if the generator is active.
+     *
      * @return: current generator value
      */
     virtual T value() const = 0;
 
     /**
      * Generate the next value.
-     *
-     * A std::out_of_range exception should be thrown if end() is true.
      */
     virtual void next() = 0;
 
@@ -237,21 +238,15 @@ public:
      * @return: current generator value
      */
     T value() const override {
-        if (not active()) {
-            throw std::out_of_range("generator is exhausted");
-        }
         return current;
     }
 
     /**
      * Generate the next value.
      *
-     * A std::out_of_range exception is thrown if end() is true.
+     * A std::out_of_range exception is thrown if active() is false.
      */
     void next() override {
-        if (not active()) {
-            throw std::out_of_range("generator is exhausted");
-        }
         current += step;
     }
 
@@ -279,7 +274,7 @@ public:
      * @param step: range increment
      */
     Enumerator(const Iterable& items, ssize_t start=0):
-        pos(std::begin(items)), stop(end(items)), count(start) {}
+        pos(std::begin(items)), stop(std::end(items)), count(start) {}
 
     /**
      * Test if the generator is active.
@@ -298,18 +293,16 @@ public:
      * @return: current generator value
      */
     std::pair<ssize_t, T> value() const override {
+        assert(active());
         return std::make_pair(count, *pos);
     }
 
     /**
      * Generate the next value.
-     *
-     * A std::out_of_range exception is thrown if end() is true.
      */
     void next() override {
-        if (++pos != stop) {
-            ++count;
-        }
+        std::advance(pos, 1);
+        ++count;
     }
 
 private:
@@ -317,6 +310,67 @@ private:
     typename Iterable::const_iterator pos;
     typename Iterable::const_iterator stop;
 };
+
+
+/**
+ * Elementwise combination of sequences.
+ *
+ * @tparam IT1: first iterable type
+ * @tparam IT2: second iterable type
+ * @tparam T1: first value type
+ * @tparam T2: second value type
+ */
+template <typename IT1, typename IT2,
+    typename T1=typename IT1::value_type, typename T2=typename IT2::value_type>
+class Zipper: public Generator<std::tuple<T1, T2>> {
+public:
+    /**
+     * Constructor.
+     *
+     * @param items: iterable sequence of items to enumerate
+     * @param start: range stop (exclusive)
+     * @param step: range increment
+     */
+    Zipper(const IT1& it1, const IT2& it2):
+        pos1(std::begin(it1)), end1(std::end(it1)),
+        pos2(std::begin(it2)), end2(std::end(it2)) {}
+
+    /**
+     * Test if the generator is active.
+     *
+     * A subsequent call to next() will succeed for an active generator.
+     *
+     * @return: true if the generator is still active
+     */
+    bool active() const override {
+        return pos1 != end1 and pos2 != end2;
+    }
+
+    /**
+     * Get the current value of the generator.
+     *
+     * @return: current generator value
+     */
+    std::tuple<T1, T2> value() const override {
+        assert(active());
+        return std::make_tuple(*pos1, *pos2);
+    }
+
+    /**
+     * Generate the next value.
+     */
+    void next() override {
+        std::advance(pos1, 1);
+        std::advance(pos2, 1);
+    }
+
+private:
+    typename IT1::const_iterator pos1;
+    typename IT2::const_iterator pos2;
+    typename IT1::const_iterator end1;
+    typename IT2::const_iterator end2;
+};
+
 
 }}  // pypp::generator
 

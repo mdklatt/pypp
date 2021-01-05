@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.8)
 
 project(PyPP
-    VERSION 0.2.0.7  # tweak number is for dev versions
+    VERSION 0.2.0.8  # add tweak number for dev versions
     LANGUAGES CXX
 )
 
@@ -49,7 +49,6 @@ PUBLIC
 # type, so beware of content that is dependent on the build configuration
 # Lock the output file to prevent a race condition.
 
-message(STATUS ${CMAKE_SOURCE_DIR})
 file(LOCK ${CMAKE_SOURCE_DIR}/include/pypp/pypp.hpp)
 configure_file(src/pypp.hpp.in ${CMAKE_SOURCE_DIR}/include/pypp/pypp.hpp @ONLY)
 

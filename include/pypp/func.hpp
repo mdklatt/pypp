@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include <tuple>
 #include <utility>
 #include <vector>
 #include "generator.hpp"
@@ -21,7 +22,7 @@ namespace pypp { namespace func {
 /// @param seq input sequence
 /// @return true if all items are true or sequence is empty
 template <typename T>
-bool all(const std::vector<T>& seq)
+bool all(const std::vector<T>& seq)  // TODO: any iterable
 {
     const auto boolean([](const T& x){ return static_cast<bool>(x); });
     return std::all_of(std::begin(seq), std::end(seq), boolean);
@@ -34,7 +35,7 @@ bool all(const std::vector<T>& seq)
 /// @param seq input sequence
 /// @return true if any item is true and sequence is not empty
 template <typename T>
-bool any(const std::vector<T>& seq)
+bool any(const std::vector<T>& seq)  // TODO: any iterable
 {
     const auto boolean([](const T& x){ return static_cast<bool>(x); });
     return std::any_of(std::begin(seq), std::end(seq), boolean);
@@ -72,26 +73,24 @@ bool in(const T& value, const C& seq)
 }
 
 
-/// Pairwise aggregation of two sequences.
-///
-/// The nth element in the first sequence is paired with the nth element in the
-/// sequence. The shortest input sequence determines the length of the result.
-///
-/// @tparam T1 first sequence value type
-/// @tparam T2 second sequence value type
-/// @param first first sequence
-/// @param second second sequence
-/// @return matched pairs
-template <typename T1, typename T2>
-std::vector<std::pair<T1, T2>> zip(const std::vector<T1>& first, const std::vector<T2>& second)
-{
-    const auto size(std::min(first.size(), second.size()));
-    std::vector<std::pair<T1, T2>> pairs;
-    pairs.reserve(size);
-    for (size_t pos(0); pos < size; ++pos) {
-        pairs.emplace_back(std::make_pair(first[pos], second[pos]));
-    }
-    return pairs;
+/**
+ * Return a generator for an elementwise combination of sequences.
+ *
+ * The nth element in each sequence is combined into a tuple. The shortest
+ * input sequence determines the length of the output sequence.
+ *
+ * @tparam IT1: first iterable type
+ * @tparam IT2: second iterable type
+ * @tparam T1: first value type
+ * @tparam T2: second value type
+ * @param it1: first sequence
+ * @param it2: second sequence
+ * @return: sequence of tuples
+ */
+template <typename IT1, typename IT2,
+    typename T1=typename IT1::value_type, typename T2=typename IT2::value_type>
+generator::Zipper<IT1, IT2, T1, T2> zip(const IT1& it1, const IT2& it2) {
+    return generator::Zipper<IT1, IT2, T1, T2>(it1, it2);
 }
 
 
