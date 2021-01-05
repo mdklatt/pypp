@@ -21,27 +21,44 @@ using testing::Test;
 using testing::Types;
 
 
-/// Test the all() function for bools.
-///
-TEST(func, all_bool)
-{
+using ArithmeticTypes = Types<int, long, float, double>;
+using BooleanTypes = Types<bool, int, long, float, double>;
+using IntegralTypes = Types<char, int, long, size_t, ssize_t>;
+
+
+/**
+ * Test fixture for the all() function.
+ */
+template <typename T>
+class AllFunctionTest: public Test {};  //  need a fixture for typed test
+TYPED_TEST_CASE(AllFunctionTest, BooleanTypes);
+
+
+/**
+ * Test the all() function for an empty sequence.
+ */
+TYPED_TEST(AllFunctionTest, all_empty) {
     // TODO: Use type parametrization.
-    ASSERT_TRUE(all<bool>({}));
-    ASSERT_TRUE(all<bool>({true, true}));
-    ASSERT_FALSE(all<bool>({true, false}));
-    ASSERT_FALSE(all<bool>({false, false}));
+    vector<TypeParam> values;
+    ASSERT_TRUE(all(begin(values), end(values)));
 }
 
 
-/// Test the all() function for ints.
-///
-TEST(func, all_int)
-{
-    // TODO: Use type parametrization.
-    ASSERT_TRUE(all<int>({}));
-    ASSERT_TRUE(all<int>({1, 1}));
-    ASSERT_FALSE(all<int>({1, 0}));
-    ASSERT_FALSE(all<int>({0, 0}));
+/**
+ * Test the all() function for a true result.
+ */
+TYPED_TEST(AllFunctionTest, all_true) {
+    vector<TypeParam> values(TypeParam(1), 2);
+    ASSERT_TRUE(all(begin(values), end(values)));
+}
+
+
+/**
+ * Test the all() function for a false result.
+ */
+TYPED_TEST(AllFunctionTest, all_false) {
+    vector<TypeParam> values(TypeParam(1), TypeParam(0));
+    ASSERT_FALSE(all(begin(values), end(values)));
 }
 
 
@@ -122,7 +139,6 @@ TEST(func, zip_unequal) {
 ///
 template <typename T>
 class IntegralRangeTest: public Test {};
-using IntegralTypes = Types<char, int, long, size_t, ssize_t>;
 TYPED_TEST_CASE(IntegralRangeTest, IntegralTypes);
 
 
@@ -154,7 +170,6 @@ TYPED_TEST(IntegralRangeTest, range_empty) {
  */
 template <typename T>
 class ArithmeticRangeTest: public Test {};
-using ArithmeticTypes = Types<int, long, float, double>;  // no unsigned types
 TYPED_TEST_CASE(ArithmeticRangeTest, ArithmeticTypes);
 
 

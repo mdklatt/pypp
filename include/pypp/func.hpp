@@ -16,16 +16,19 @@
 
 namespace pypp { namespace func {
 
-/// Evaluate the truth of all items in a sequence.
-///
-/// @tparam T sequence value type (must be bool convertible)
-/// @param seq input sequence
-/// @return true if all items are true or sequence is empty
-template <typename T>
-bool all(const std::vector<T>& seq)  // TODO: any iterable
-{
-    const auto boolean([](const T& x){ return static_cast<bool>(x); });
-    return std::all_of(std::begin(seq), std::end(seq), boolean);
+/**
+ * Evaluate the truth of all items in a sequence.
+ *
+ * @tparam IT forward iterator type
+ * @param seq input sequence
+ * @return true if all items are true or sequence is empty
+ */
+template <typename IT>
+bool all(IT first, IT last) {
+    const auto boolean([](const typename IT::value_type& value) {
+        return static_cast<bool>(value);
+    });
+    return std::all_of(first, last, boolean);
 }
 
 
