@@ -39,7 +39,7 @@ TYPED_TEST_CASE(AllFunctionTest, BooleanTypes);
  */
 TYPED_TEST(AllFunctionTest, all_empty) {
     // TODO: Use type parametrization.
-    vector<TypeParam> values;
+    const vector<TypeParam> values;
     ASSERT_TRUE(all(begin(values), end(values)));
 }
 
@@ -48,7 +48,7 @@ TYPED_TEST(AllFunctionTest, all_empty) {
  * Test the all() function for a true result.
  */
 TYPED_TEST(AllFunctionTest, all_true) {
-    vector<TypeParam> values(TypeParam(1), 2);
+    const vector<TypeParam> values(TypeParam(1), 2);
     ASSERT_TRUE(all(begin(values), end(values)));
 }
 
@@ -57,32 +57,43 @@ TYPED_TEST(AllFunctionTest, all_true) {
  * Test the all() function for a false result.
  */
 TYPED_TEST(AllFunctionTest, all_false) {
-    vector<TypeParam> values(TypeParam(1), TypeParam(0));
+    const vector<TypeParam> values(TypeParam(1), TypeParam(0));
     ASSERT_FALSE(all(begin(values), end(values)));
 }
 
 
-/// Test the any() function for bools.
-///
-TEST(func, any_bool)
-{
-    // TODO: Use type parametrization.
-    ASSERT_TRUE(any<bool>({true, true}));
-    ASSERT_TRUE(any<bool>({true, false}));
-    ASSERT_FALSE(any<bool>({false, false}));
-    ASSERT_FALSE(any<bool>({}));
+/**
+ * Test fixture for the any() function.
+ */
+template <typename T>
+class AnyFunctionTest: public Test {};  //  need a fixture for typed test
+TYPED_TEST_CASE(AnyFunctionTest, BooleanTypes);
+
+
+/**
+ * Test the any() function for an empty sequence.
+ */
+TYPED_TEST(AnyFunctionTest, any_empty) {
+    const vector<TypeParam> values;
+    ASSERT_FALSE(any(begin(values), end(values)));
 }
 
 
-/// Test the any() function for ints.
-///
-TEST(func, any_int)
-{
-    // TODO: Use type parametrization.
-    ASSERT_TRUE(any<int>({1, 1}));
-    ASSERT_TRUE(any<int>({1, 0}));
-    ASSERT_FALSE(any<int>({0, 0}));
-    ASSERT_FALSE(any<int>({}));
+/**
+ * Test the any() function for a true result.
+ */
+TYPED_TEST(AnyFunctionTest, any_true) {
+    const vector<TypeParam> values({TypeParam(1), TypeParam(0)});
+    ASSERT_TRUE(any(begin(values), end(values)));
+}
+
+
+/**
+ * Test the any() function for a false result.
+ */
+TYPED_TEST(AnyFunctionTest, any_false) {
+    vector<TypeParam> values(TypeParam(0), 2);
+    ASSERT_FALSE(any(begin(values), end(values)));
 }
 
 

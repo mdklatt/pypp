@@ -32,16 +32,19 @@ bool all(IT first, IT last) {
 }
 
 
-/// Evaluate the truth of any item in a sequence.
-///
-/// @tparam T sequence value type (must be bool convertible)
-/// @param seq input sequence
-/// @return true if any item is true and sequence is not empty
-template <typename T>
-bool any(const std::vector<T>& seq)  // TODO: any iterable
-{
-    const auto boolean([](const T& x){ return static_cast<bool>(x); });
-    return std::any_of(std::begin(seq), std::end(seq), boolean);
+/**
+ * Evaluate the truth of any items in a sequence.
+ *
+ * @tparam IT forward iterator type
+ * @param seq input sequence
+ * @return true if all items are true or sequence is empty
+ */
+template <typename IT>
+bool any(IT first, IT last) {
+    const auto boolean([](const typename IT::value_type& value) {
+        return static_cast<bool>(value);
+    });
+    return std::any_of(first, last, boolean);
 }
 
 
