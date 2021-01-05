@@ -10,10 +10,10 @@ Overview
 
 C++ implementation of useful modules from the Python standard library.
 
-The overarching design principle here is to emulate Python functionality as
-closely as possible, which occasionally results in some compromises to the
-ideal C++ approach to the problem. Also, user friendliness is prioritized over
-performance.
+In some cases, the Python API is modified to be more compati le with idiomatic
+C++. For example, an iterable range is typically an object in Python but a
+pair of iterators in C++.
+
 
 Unlike Python, C++ does not have built-in support for Unicode, and none is
 implied here beyond the ASCII subset.
