@@ -98,16 +98,6 @@ TYPED_TEST(AnyFunctionTest, any_false) {
 
 
 /**
- * Test the enumerate() function.
- */
-TEST(func, enumerate) {
-    using Vector = vector<pair<ssize_t, char>>;
-    auto items(enumerate(string("ab"), 1));
-    ASSERT_EQ(Vector(begin(items), end(items)), Vector({{1, 'a'}, {2, 'b'}}));
-}
-
-
-/**
  * Test the in() function for a true result.
  */
 TEST(func, in_true) {
@@ -121,7 +111,18 @@ TEST(func, in_true) {
  */
 TEST(func, in_false) {
     const string values("abc");
-    ASSERT_TRUE(in('x', begin(values), end(values)));
+    ASSERT_FALSE(in('x', begin(values), end(values)));
+}
+
+
+/**
+ * Test the enumerate() function.
+ */
+TEST(func, enumerate) {
+    const string values("ab");
+    auto gen(enumerate(begin(values), end(values), 1));
+    using V = vector<pair<ssize_t, char>>;
+    ASSERT_EQ(V(begin(gen), end(gen)), V({{1, 'a'}, {2, 'b'}}));
 }
 
 
@@ -149,13 +150,9 @@ TEST(func, zip_unequal) {
 }
 
 
-/// Test fixture for the incremental range() function.
-///
-/// This is used to group tests and provide common set-up and tear-down code.
-/// A new test fixture is created for each test to prevent any side effects
-/// between tests. Member variables and methods are injected into each test
-/// that uses this fixture.
-///
+/**
+ * Test fixture for the incremental range() function.
+ */
 template <typename T>
 class IntegralRangeTest: public Test {};
 TYPED_TEST_CASE(IntegralRangeTest, IntegralTypes);

@@ -260,21 +260,20 @@ private:
 /**
  * Enumerate a sequence of items.
  *
- * @tparam Iterable: iterable type
- * @tparam T: value type
+ * @tparam IT: forward iterator type
  */
-template <typename Iterable, typename T=typename Iterable::value_type>
-class Enumerator: public Generator<std::pair<ssize_t, T>> {
+template <typename IT>
+class Enumerator: public Generator<std::pair<ssize_t, typename IT::value_type>> {
 public:
     /**
      * Constructor.
      *
-     * @param items: iterable sequence of items to enumerate
-     * @param start: range stop (exclusive)
-     * @param step: range increment
+     * @param first: first position
+     * @param last: last position
+     * @param start: starting count
      */
-    Enumerator(const Iterable& items, ssize_t start=0):
-        pos(std::begin(items)), stop(std::end(items)), count(start) {}
+    Enumerator(IT first, IT last, ssize_t start=0):
+        pos(first), last(last), count(start) {}
 
     /**
      * Test if the generator is active.
@@ -284,7 +283,7 @@ public:
      * @return: true if the generator is still active
      */
     bool active() const override {
-        return pos != stop;
+        return pos != last;
     }
 
     /**
@@ -292,7 +291,7 @@ public:
      *
      * @return: current generator value
      */
-    std::pair<ssize_t, T> value() const override {
+    std::pair<ssize_t, typename IT::value_type> value() const override {
         assert(active());
         return std::make_pair(count, *pos);
     }
@@ -307,8 +306,8 @@ public:
 
 private:
     ssize_t count;
-    typename Iterable::const_iterator pos;
-    typename Iterable::const_iterator stop;
+    IT pos;
+    IT last;
 };
 
 

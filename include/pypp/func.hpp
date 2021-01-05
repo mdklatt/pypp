@@ -65,17 +65,18 @@ bool in(const T& value, IT first, IT last) {
 }
 
 
-/// Index each item in a sequence.
-///
-/// Each input item is paired with its index in the sequence.
-///
-/// @tparam T sequence value type
-/// @param seq input sequence
-/// @param start starting index
-/// @return (index, item) pairs
-template <typename Iterable, typename T=typename Iterable::value_type>
-generator::Enumerator<Iterable, T> enumerate(const Iterable& iterable, ssize_t start=0) {
-    return generator::Enumerator<Iterable, T>(iterable, start);
+/**
+ * Number each item in a sequence.
+ *
+ * @tparam IT: forward iterator type
+ * @param first: first position
+ * @param last: last position
+ * @param start: starting count
+ * @return (number, item) pairs
+ */
+template <typename IT>
+generator::Enumerator<IT> enumerate(const IT& first, const IT& last, ssize_t start=0) {
+    return generator::Enumerator<IT>(first, last, start);
 }
 
 
