@@ -269,7 +269,7 @@ public:
      * Constructor.
      *
      * @param first: first position
-     * @param last: last position
+     * @param last: last position (exclusive)
      * @param start: starting count
      */
     Enumerator(IT first, IT last, ssize_t start=0):
@@ -314,35 +314,30 @@ private:
 /**
  * Elementwise combination of sequences.
  *
- * @tparam IT1: first iterable type
- * @tparam IT2: second iterable type
- * @tparam T1: first value type
- * @tparam T2: second value type
+ * @tparam IT1: first forward iterator type
+ * @tparam IT2: second forward iterator type
  */
-template <typename IT1, typename IT2,
-    typename T1=typename IT1::value_type, typename T2=typename IT2::value_type>
-class Zipper: public Generator<std::tuple<T1, T2>> {
+template <typename IT1, typename IT2>
+class Zipper: public Generator<std::tuple<typename IT1::value_type, typename IT2::value_type>> {
 public:
     /**
      * Constructor.
      *
-     * @param items: iterable sequence of items to enumerate
-     * @param start: range stop (exclusive)
-     * @param step: range increment
+     * @param first1: first position of first sequence
+     * @param last1: last position of first sequence (exclusive)
+     * @param first2: first position of second sequence
+     * @param last2: last position of second sequence (exclusive)
      */
-    Zipper(const IT1& it1, const IT2& it2):
-        pos1(std::begin(it1)), end1(std::end(it1)),
-        pos2(std::begin(it2)), end2(std::end(it2)) {}
+    Zipper(IT1 first1, IT1 last1, IT2 first2, IT2 last2):
+        pos1(first1), last1(last1), pos2(first2), last2(last2) {}
 
     /**
      * Test if the generator is active.
      *
-     * A subsequent call to next() will succeed for an active generator.
-     *
      * @return: true if the generator is still active
      */
     bool active() const override {
-        return pos1 != end1 and pos2 != end2;
+        return pos1 != last1 and pos2 != last2;
     }
 
     /**
@@ -350,7 +345,7 @@ public:
      *
      * @return: current generator value
      */
-    std::tuple<T1, T2> value() const override {
+    std::tuple<typename IT1::value_type, typename IT2::value_type> value() const override {
         assert(active());
         return std::make_tuple(*pos1, *pos2);
     }
@@ -364,10 +359,10 @@ public:
     }
 
 private:
-    typename IT1::const_iterator pos1;
-    typename IT2::const_iterator pos2;
-    typename IT1::const_iterator end1;
-    typename IT2::const_iterator end2;
+    IT1 pos1;
+    IT1 last1;
+    IT2 pos2;
+    IT2 last2;
 };
 
 

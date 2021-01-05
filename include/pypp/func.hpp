@@ -86,18 +86,17 @@ generator::Enumerator<IT> enumerate(const IT& first, const IT& last, ssize_t sta
  * The nth element in each sequence is combined into a tuple. The shortest
  * input sequence determines the length of the output sequence.
  *
- * @tparam IT1: first iterable type
- * @tparam IT2: second iterable type
- * @tparam T1: first value type
- * @tparam T2: second value type
- * @param it1: first sequence
- * @param it2: second sequence
+ * @tparam IT1: first forward iterator type
+ * @tparam IT2: second forward iterator type
+ * @param first1: first position of first sequence
+ * @param last1: last position of first sequence (exclusive)
+ * @param first2: first position of second sequence
+ * @param last2: last position of second sequence (exclusive)
  * @return: sequence of tuples
  */
-template <typename IT1, typename IT2,
-    typename T1=typename IT1::value_type, typename T2=typename IT2::value_type>
-generator::Zipper<IT1, IT2, T1, T2> zip(const IT1& it1, const IT2& it2) {
-    return generator::Zipper<IT1, IT2, T1, T2>(it1, it2);
+template <typename IT1, typename IT2>
+generator::Zipper<IT1, IT2> zip(IT1 first1, IT1 last1, IT2 first2, IT2 last2) {
+    return generator::Zipper<IT1, IT2>(first1, last1, first2, last2);
 }
 
 

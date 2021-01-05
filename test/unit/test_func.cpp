@@ -132,9 +132,9 @@ TEST(func, enumerate) {
 TEST(func, zip) {
     const vector<float> it1({1, 2});
     const string it2("ab");
-    auto values(zip(it1, it2));
+    auto gen(zip(begin(it1), end(it1), begin(it2), end(it2)));
     using V = vector<tuple<float, float>>;
-    ASSERT_EQ(V(begin(values), end(values)), V({{1, 'a'}, {2, 'b'}}));
+    ASSERT_EQ(V(begin(gen), end(gen)), V({{1, 'a'}, {2, 'b'}}));
 }
 
 
@@ -143,10 +143,10 @@ TEST(func, zip) {
  */
 TEST(func, zip_unequal) {
     const vector<float> it1({1, 2});
-    string it2("abc");
-    auto values(zip(it1, it2));
+    const string it2("abc");
+    auto gen(zip(begin(it1), end(it1), begin(it2), end(it2)));
     using V = vector<tuple<float, float>>;
-    ASSERT_EQ(V(begin(values), end(values)), V({{1, 'a'}, {2, 'b'}}));
+    ASSERT_EQ(V(begin(gen), end(gen)), V({{1, 'a'}, {2, 'b'}}));
 }
 
 
