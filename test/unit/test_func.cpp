@@ -1,8 +1,9 @@
-/// Test suite for the func module.
-///
-/// Link all test files with the `gtest_main` library to create a command line
-/// test runner.
-///
+/**
+ * Test suite for the func module.
+ *
+ * Link all test files with the `gtest_main` library to create a command line
+ * test runner.
+ */
 #include <iterator>
 #include <string>
 #include <gtest/gtest.h>
@@ -13,6 +14,7 @@ using namespace pypp::func;
 
 using std::begin;
 using std::end;
+using std::make_tuple;
 using std::pair;
 using std::string;
 using std::tuple;
@@ -133,8 +135,8 @@ TEST(func, zip) {
     const vector<float> it1({1, 2});
     const string it2("ab");
     auto gen(zip(begin(it1), end(it1), begin(it2), end(it2)));
-    using V = vector<tuple<float, float>>;
-    ASSERT_EQ(V(begin(gen), end(gen)), V({{1, 'a'}, {2, 'b'}}));
+    using V = vector<tuple<float, char>>;
+    ASSERT_EQ(V(begin(gen), end(gen)), V({make_tuple(1, 'a'), make_tuple(2, 'b')}));
 }
 
 
@@ -145,8 +147,8 @@ TEST(func, zip_unequal) {
     const vector<float> it1({1, 2});
     const string it2("abc");
     auto gen(zip(begin(it1), end(it1), begin(it2), end(it2)));
-    using V = vector<tuple<float, float>>;
-    ASSERT_EQ(V(begin(gen), end(gen)), V({{1, 'a'}, {2, 'b'}}));
+    using V = vector<tuple<float, char>>;
+    ASSERT_EQ(V(begin(gen), end(gen)), V({make_tuple(1, 'a'), make_tuple(2, 'b')}));
 }
 
 
