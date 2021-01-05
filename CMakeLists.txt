@@ -9,11 +9,18 @@ project(PyPP
     LANGUAGES CXX
 )
 
-set(PYPP_PACKAGE ${PROJECT_NAME})
-set(PYPP_TARGET pypp)
+
+# Set language standards.
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 
 # Define project targets.
+
+set(PYPP_PACKAGE ${PROJECT_NAME})
+set(PYPP_TARGET pypp)
 
 add_library(${PYPP_TARGET}
     src/string.cpp
