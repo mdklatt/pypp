@@ -774,9 +774,11 @@ vector<PosixPath> PosixPath::iterdir() const
         throw runtime_error(string(strerror(errno)) + ": " + path);
     }
     vector<PosixPath> entries;
+    const auto first(begin(special));
+    const auto last(end(special));
     dirent* entry;
     while ((entry = readdir(dir))) {
-        if (not in(entry->d_name, special)) {
+        if (not in(entry->d_name, first, last)) {
             entries.emplace_back(*this / PosixPath(entry->d_name));
         }
     }

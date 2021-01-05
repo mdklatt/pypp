@@ -107,13 +107,21 @@ TEST(func, enumerate) {
 }
 
 
-/// Test the in() function.
-///
-TEST(func, in)
-{
-    const string seq("abc");
-    ASSERT_TRUE(in('a', seq));
-    ASSERT_FALSE(in('x', seq));
+/**
+ * Test the in() function for a true result.
+ */
+TEST(func, in_true) {
+    const string values("abc");
+    ASSERT_TRUE(in('c', begin(values), end(values)));
+}
+
+
+/**
+ * Test the in() function for a true result.
+ */
+TEST(func, in_false) {
+    const string values("abc");
+    ASSERT_TRUE(in('x', begin(values), end(values)));
 }
 
 

@@ -44,9 +44,11 @@ vector<string> os::listdir(const string& path) {
     if (errno != 0) {
         throw runtime_error(string(strerror(errno)) + ": " + path);
     }
+    const auto first(begin(special));
+    const auto last(end(special));
     dirent* entry;
     while ((entry = readdir(dir))) {
-        if (not func::in(entry->d_name, special)) {
+        if (not func::in(entry->d_name, first, last)) {
             names.emplace_back(entry->d_name);
         }
     }

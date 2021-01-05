@@ -17,10 +17,11 @@
 namespace pypp { namespace func {
 
 /**
- * Evaluate the truth of all items in a sequence.
+ * Evaluate the truth of all values in [first, last).
  *
  * @tparam IT forward iterator type
- * @param seq input sequence
+ * @param first: first position
+ * @param last: last position
  * @return true if all items are true or sequence is empty
  */
 template <typename IT>
@@ -33,11 +34,12 @@ bool all(IT first, IT last) {
 
 
 /**
- * Evaluate the truth of any items in a sequence.
+ * Evaluate the truth of all values in [first, last).
  *
  * @tparam IT forward iterator type
- * @param seq input sequence
- * @return true if all items are true or sequence is empty
+ * @param first: first position
+ * @param last: last position
+ * @return true if all values are true or sequence is empty
  */
 template <typename IT>
 bool any(IT first, IT last) {
@@ -45,6 +47,21 @@ bool any(IT first, IT last) {
         return static_cast<bool>(value);
     });
     return std::any_of(first, last, boolean);
+}
+
+
+/**
+ * Return true if a value is in [first, last).
+ *
+ * @tparam IT forward iterator type
+ * @tparam T search value type (must be comparable to IT::value_type)
+ * @param first: first position
+ * @param last: last position
+ * @return true if value is in sequence
+ */
+template <typename IT, typename T=typename IT::value_type>
+bool in(const T& value, IT first, IT last) {
+    return std::find(first, last, value) != last;
 }
 
 
@@ -59,23 +76,6 @@ bool any(IT first, IT last) {
 template <typename Iterable, typename T=typename Iterable::value_type>
 generator::Enumerator<Iterable, T> enumerate(const Iterable& iterable, ssize_t start=0) {
     return generator::Enumerator<Iterable, T>(iterable, start);
-}
-
-
-/// Return true if a value is in a sequence.
-///
-/// The value to search for must be comparable to the sequence value type.
-///
-/// @tparam T value type (must be comparable with sequence value type)
-/// @tparam C sequence container type
-/// @param value search value
-/// @param cont search sequence
-/// @return true if value is in sequence
-template <typename T, class C>
-bool in(const T& value, const C& seq)
-{
-    const auto end(std::end(seq));
-    return std::find(begin(seq), end, value) != end;
 }
 
 
