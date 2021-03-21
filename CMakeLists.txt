@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.8)
 
 project(PyPP
-    VERSION 0.2.0.12  # add tweak number for dev versions
+    VERSION 0.2.0.13  # add tweak number for dev versions
     LANGUAGES CXX
 )
 

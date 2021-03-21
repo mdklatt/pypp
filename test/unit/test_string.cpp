@@ -137,23 +137,25 @@ TEST(string, strip_chars)
 }
 
 
-/// Test the join() function for a string separator.
-///
-TEST(string, join_str)
-{
+/**
+ * Test the join() function for a string separator.
+ *
+ */
+TEST(string, join_str) {
     static const string sep(", ");
-    ASSERT_EQ(join(sep, {"a", "b", "c",}), "a, b, c");
-    ASSERT_EQ(join(sep, {"a", "b", ",c,"}), "a, b, ,c,");
+    ASSERT_EQ(join({"a", "b", "c",}, sep), "a, b, c");
+    ASSERT_EQ(join({"a", "b", ",c,"}, sep), "a, b, ,c,");
+    ASSERT_EQ(join({"a", "b", ",c,"}), "ab,c,");
 }
 
 
-/// Test the join() function for a char separator.
-///
-TEST(string, join_char)
-{
+/**
+ * Test the join() function for a char separator.
+ */
+TEST(string, join_char) {
     static const char sep(',');
-    ASSERT_EQ(join(sep, {"a", "b", "c",}), "a,b,c");
-    ASSERT_EQ(join(sep, {"a", "b", ",c,"}), "a,b,,c,");
+    ASSERT_EQ(join({"a", "b", "c",}, sep), "a,b,c");
+    ASSERT_EQ(join({"a", "b", ",c,"}, sep), "a,b,,c,");
 }
 
 

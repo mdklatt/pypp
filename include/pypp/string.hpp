@@ -73,16 +73,19 @@ std::string rstrip(const std::string& str, const std::string& chars=whitespace);
 std::string strip(const std::string& str, const std::string& chars=whitespace);
 
 
-/// Join strings using a separator.
-///
-/// @param sep separator
-/// @param items strings to join
-/// @return
-std::string join(const std::string& sep, const std::vector<std::string>& items);
+/**
+ * Join strings using a separator.
+ *
+ * @param items: strings to join
+ * @param sep: separator
+ * @return: joined values
+ */
+// TODO: take iterators?
+std::string join(const std::vector<std::string>& items, const std::string& sep="");
 
 
-/// @overload
-std::string join(char sep, const std::vector<std::string>& items);
+/** @overload */
+std::string join(const std::vector<std::string>& items, char sep);
 
 
 /// Split a string on whitespace.

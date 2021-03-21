@@ -77,18 +77,11 @@ string str::strip(const string& str, const string& chars)
 }
 
 
-string str::join(const string& sep, const vector<string>& items)
-{
-    // If this was a clean-sheet design it would make more sense to put the
-    // 'sep' argument last, and possibly give it a default value of "". The
-    // goal here, however, is to resemble Python, where this function is used
-    // as a member function of the separator string.
-    //
+string str::join(const vector<string>& items, const string& sep) {
     // To conform with the Python join behavior, there is no special handling
     // of items that contain the separator, e.g. joining "abc" and "d,ef," will
-    // produce "abc,d,ef,". This means that that join() and split() are not
-    // strict inverses of each other unless the caller takes care to pick a
-    // separator that is distinct from any input.
+    // produce "abc,d,ef,". This means that join() and split() are not strict
+    // inverses of each other unless a distinct separator is used.
     string joined(items.front());
     for (auto iter(next(items.cbegin())); iter != items.cend(); ++iter) {
         // Skip first element to avoid leading delimiter.
@@ -98,9 +91,8 @@ string str::join(const string& sep, const vector<string>& items)
 }
 
 
-string str::join(char sep, const vector<string>& items)
-{
-    return join(string(1, sep), items);
+string str::join(const vector<string>& items, char sep) {
+    return join(items, string(1, sep));
 }
 
 
