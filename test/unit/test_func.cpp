@@ -40,7 +40,6 @@ TYPED_TEST_CASE(AllFunctionTest, BooleanTypes);
  * Test the all() function for an empty sequence.
  */
 TYPED_TEST(AllFunctionTest, all_empty) {
-    // TODO: Use type parametrization.
     const vector<TypeParam> values;
     ASSERT_TRUE(all(begin(values), end(values)));
 }

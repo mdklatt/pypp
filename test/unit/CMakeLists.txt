@@ -6,6 +6,7 @@ add_subdirectory(vendor/gtest EXCLUDE_FROM_ALL)
 
 add_executable(test_pypp
     test_func.cpp
+    test_itertools.cpp
     test_os.cpp
     test_path.cpp
     test_string.cpp

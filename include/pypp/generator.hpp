@@ -6,7 +6,9 @@
 #ifndef PYPP_GENERATOR_HPP
 #define PYPP_GENERATOR_HPP
 
+#include <exception>
 #include <iterator>
+#include <limits>
 #include <tuple>
 #include <utility>
 
@@ -199,6 +201,64 @@ protected:
 
 
 /**
+ * An unbounded counter.
+ *
+ * @tparam T: range type that supports addition and comparison operators
+ * @tparam Step: type that supports T + Step
+ */
+template <typename T, typename Step=T>
+class Counter: public Generator<T> {
+public:
+    /**
+     * Construct an instance.
+     *
+     * @param start: range start
+     * @param stop: range stop (exclusive)
+     * @param step: range increment
+     */
+    Counter(T start, Step step): current(start), step(step) {}
+
+    /**
+     * Test if the generator is active.
+     *
+     * @return: true if the generator is still active
+     */
+    bool active() const override {
+        //using limits = std::numeric_limits<T>;
+        return true;
+    }
+
+    /**
+     * Get the current value of the generator.
+     *
+     * The result is only valid if the generator is active.
+     *
+     * @return: current generator value
+     */
+    T value() const override {
+        return current;
+    }
+
+    /**
+     * Generate the next value.
+     *
+     * A std::out_of_range exception is thrown on overflow.
+     */
+    void next() override {
+        const auto previous(current);
+        current += step;
+        if ((step > 0 and current < previous) or (step < 0 and current > previous)) {
+            throw std::out_of_range("count overflow");
+        }
+    }
+
+private:
+    T current;
+    const Step step;
+};
+
+
+/**
  * Generate a sequential range of values.
  *
  * @tparam T: range type that supports addition and comparison operators
@@ -224,8 +284,6 @@ public:
     /**
      * Test if the generator is active.
      *
-     * A subsequent call to next() will succeed for an active generator.
-     *
      * @return: true if the generator is still active
      */
     bool active() const override {
@@ -234,6 +292,8 @@ public:
 
     /**
      * Get the current value of the generator.
+     *
+     * The result is only valid if the generator is active.
      *
      * @return: current generator value
      */
@@ -252,8 +312,8 @@ public:
 
 private:
     T current;
-    T stop;
-    Step step;
+    const T stop;
+    const Step step;
 };
 
 
@@ -273,12 +333,12 @@ public:
      * @param start: starting count
      */
     Enumerator(IT first, IT last, ssize_t start=0):
-        pos(first), last(last), count(start) {}
+            pos(first), last(last), count(start) {}
 
     /**
      * Test if the generator is active.
      *
-     * A subsequent call to next() will succeed for an active generator.
+     * The result is only valid if the generator is active.
      *
      * @return: true if the generator is still active
      */
@@ -307,7 +367,7 @@ public:
 private:
     ssize_t count;
     IT pos;
-    IT last;
+    const IT last;
 };
 
 
@@ -329,10 +389,12 @@ public:
      * @param last2: last position of second sequence (exclusive)
      */
     Zipper(IT1 first1, IT1 last1, IT2 first2, IT2 last2):
-        pos1(first1), last1(last1), pos2(first2), last2(last2) {}
+            pos1(first1), last1(last1), pos2(first2), last2(last2) {}
 
     /**
      * Test if the generator is active.
+     *
+     * The result is only valid if the generator is active.
      *
      * @return: true if the generator is still active
      */

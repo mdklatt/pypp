@@ -18,6 +18,7 @@
 
 #include "func.hpp"
 #include "generator.hpp"
+#include "itertools.hpp"
 #include "string.hpp"
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
