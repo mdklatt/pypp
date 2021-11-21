@@ -5,8 +5,7 @@ PyPP
 ========
 Overview
 ========
-
-|travis.png|
+|ci-badge|
 
 C++ implementation of useful modules from the Python standard library.
 
@@ -70,8 +69,8 @@ Test Suite
     $ test/test_pypp
 
 
-.. |travis.png| image:: https://travis-ci.org/mdklatt/pypp.png?branch=main
-   :alt: Travis CI build status
-   :target: `travis`_
-.. _travis: https://travis-ci.org/mdklatt/pypp
+.. |ci-badge| image:: https://github.com/mdklatt/pypp/actions/workflows/build.yml/badge.svg
+   :alt: GitHub CI status
+   :target: `github-ci`_
+.. _github-ci: https://github.com/mdklatt/pypp/actions/workflows/build.yml
 .. _Breathe: https://breathe.readthedocs.io/en/latest/
