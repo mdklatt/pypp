@@ -2,10 +2,10 @@
 ##
 ## The project defines the pypp::pypp target for use by external projects.
 ##
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.10)
 
 project(PyPP
-    VERSION 0.2.0.14  # add tweak number for dev versions
+    VERSION 0.2.0.15  # add tweak number for dev versions
     LANGUAGES CXX
 )
 
@@ -136,7 +136,32 @@ export(PACKAGE ${PYPP_PACKAGE})
 
 option(PYPP_BUILD_TESTS "Build test suite" OFF)
 if(PYPP_BUILD_TESTS)
-    add_subdirectory(test/unit)
+    message(STATUS "Building test suite")
+    enable_testing()
+    include(CTest)
+    add_subdirectory(test/vendor/gtest EXCLUDE_FROM_ALL)
+
+    add_executable(test_pypp
+        test/unit/test_func.cpp
+        test/unit/test_itertools.cpp
+        test/unit/test_os.cpp
+        test/unit/test_path.cpp
+        test/unit/test_string.cpp
+        test/unit/test_tempfile.cpp
+    )
+
+    target_link_libraries(test_pypp
+        PRIVATE
+        PyPP::pypp gtest gtest_main
+    )
+
+    include(GoogleTest)
+    gtest_discover_tests(test_pypp)
+    add_test(
+        NAME unit
+        COMMAND test_pypp
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
 endif()
 
 
