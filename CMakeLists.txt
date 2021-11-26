@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.8)
 
 project(PyPP
-    VERSION 0.2.0.13  # add tweak number for dev versions
+    VERSION 0.2.0.14  # add tweak number for dev versions
     LANGUAGES CXX
 )
 
@@ -27,6 +27,7 @@ add_library(${PYPP_TARGET}
     $<${UNIX}:src/posix/os.cpp>
     $<${UNIX}:src/posix/path.cpp>
     $<${UNIX}:src/posix/tempfile.cpp>
+    # TODO: $<${WIN32}:src/win/...>
 )
 add_library(${PYPP_PACKAGE}::${PYPP_TARGET} ALIAS ${PYPP_TARGET})
 
@@ -86,9 +87,23 @@ install(TARGETS ${PYPP_TARGET}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
-install(DIRECTORY include/
-    # TODO: Exclude unused platform-specific directories.
+install(DIRECTORY include/pypp
+    # Platform-specific headers are defined below.
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    PATTERN posix EXCLUDE
+    PATTERN win EXCLUDE
+)
+
+if(${UNIX})
+    set(PYPP_PLATFORM posix)
+elseif(${WIN32})
+    set(PYPP_PLATFORM win)
+else()
+    message(FATAL_ERROR "Unsupported platform")
+endif()
+
+install(DIRECTORY include/pypp/${PYPP_PLATFORM}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/pypp
 )
 
 install(EXPORT pypp_targets

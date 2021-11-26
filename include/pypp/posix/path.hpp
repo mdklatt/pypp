@@ -509,10 +509,6 @@ private:
     void write_file(const std::string& data, const std::string& mode) const;
 };
 
-
-using Path = PosixPath;
-using PurePath = PurePosixPath;
-
 }}  // namespace pypp::path
 
 #endif  // PYPP_POSIX_PATH_HPP

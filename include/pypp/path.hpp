@@ -8,7 +8,14 @@
 #define PYPP_PATH_HPP
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+
 #include "pypp/posix/path.hpp"
+namespace pypp { namespace path {
+
+using PurePath = pypp::path::PurePosixPath;
+using Path = pypp::path::PosixPath;
+
+}}
 #else
 #error "path module requires POSIX"
 #endif
