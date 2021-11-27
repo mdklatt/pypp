@@ -1,10 +1,9 @@
 /**
- * POSIX implementation of the 'path' module.
+ * Implementations of the 'path' module.
  */
 #include "unistd.h"
 #include "sys/stat.h"
 #include "dirent.h"
-#include <cassert>
 #include <cstdio>
 #include <algorithm>
 #include <deque>
@@ -54,6 +53,9 @@ using path::PurePosixPath;
 using path::PosixPath;
 
 
+const string path::sep("/");
+
+
 // In the Python implementation a Path inherits from a PurePath, and
 // metaprogramming is used to ensure that methods return an object of the
 // correct type. All of the C++ solutions for this will have a negative impact
@@ -63,65 +65,7 @@ using path::PosixPath;
 // methods.
 
 
-const string path::sep("/");  // *nix, but works for Windows too
-
-
-string path::join(const vector<string>& parts)
-{
-    // The Python documentation for os.path.join() is ambiguous about the
-    // handling of path separators. Path separators are added as needed
-    // between segments, while existing separators are left unmodified.
-    string joined;
-    const auto last(prev(parts.cend()));
-    for (auto iter(parts.cbegin()); iter != parts.cend(); ++iter) {
-        if (startswith(*iter, sep)) {
-            // Absolute path, ignore previous segments.
-            joined = *iter;
-        }
-        else {
-            joined += *iter;
-        }
-        if (not endswith(joined, sep) and iter != last) {
-            joined += sep;
-        }
-    }
-    assert(joined.length() <= FILENAME_MAX);
-    return joined;
-}
-
-
-pair<string, string> path::split(const string& path)
-{
-    auto pos(path.rfind(sep));
-    if (pos == string::npos) {
-        // No directory.
-        return make_pair(string(""), path);
-    }
-    pos += sep.length();
-    string root(path.substr(0, pos));
-    if (root.find_first_not_of(sep) != string::npos) {
-        // Strip trailing separators unless this is the root directory.
-        root = rstrip(root, sep);
-    }
-    const auto name(path.substr(pos));
-    return make_pair(root, name);
-}
-
-
-string path::dirname(const string& path)
-{
-    return split(path).first;
-}
-
-
-string path::basename(const string& path)
-{
-    return split(path).second;
-}
-
-
-string path::normpath(const string& path)
-{
+string path::normpath(const string& path) {
     static const string current(".");
     static const string parent("..");
     ssize_t level(0);
@@ -156,170 +100,86 @@ string path::normpath(const string& path)
 }
 
 
-string path::abspath(const string& path)
-{
-    if (isabs(path)) {
-        return normpath(path);
-    }
-    return normpath(join({getcwd(), path}));
-}
-
-
-bool path::isabs(const string& path)
-{
-    return startswith(path, sep);
-}
-
-
-pair<string, string> path::splitext(const string& path)
-{
-    const auto pos(path.rfind('.'));
-    string root;
-    string ext;
-    if (pos == 0 or pos == string::npos) {
-        root = path;
-    }
-    else {
-        root = path.substr(0, pos);
-        ext = path.substr(pos, string::npos);
-    }
-    return make_pair(root, ext);
-}
-
-
-bool path::exists(const string& path)
-{
+bool path::exists(const string& path) {
     struct stat info{};
     return stat(path.c_str(), &info) == 0;
 }
 
 
-bool path::isfile(const string& path)
-{
+bool path::isfile(const string& path) {
     struct stat info{};
     return stat(path.c_str(), &info) == 0 and S_ISREG(info.st_mode);
 }
 
 
-bool path::isdir(const string& path)
-{
+bool path::isdir(const string& path) {
     struct stat info{};
     return stat(path.c_str(), &info) == 0 and S_ISDIR(info.st_mode);
 }
 
 
-bool path::islink(const string& path)
-{
+bool path::islink(const string& path) {
     struct stat info{};
     return lstat(path.c_str(), &info) == 0 and S_ISLNK(info.st_mode);
 }
 
 
-PurePosixPath::PurePosixPath(string path)
-{
-    if (isabs(path)) {
-        parts_.emplace_back(sep);
-        path.erase(path.begin());
-    }
-    const auto parts(str::split(normpath(path), sep));
-    if (parts.size() > 1 or parts.front() != ".") {
-        copy(begin(parts), end(parts), back_inserter(parts_));
-    }
-}
+PurePosixPath::PurePosixPath(string path): PureBasePath(move(path)) {}
 
 
-PurePosixPath PurePosixPath::joinpath(const PurePosixPath& other) const
-{
+PurePosixPath PurePosixPath::joinpath(const PurePosixPath& other) const {
     return PurePosixPath(join({string(*this), string(other)}));
 }
 
 
-PurePosixPath PurePosixPath::joinpath(const std::string& other) const
-{
+PurePosixPath PurePosixPath::joinpath(const string& other) const {
     const vector<string> parts({string(*this), other});
     return PurePosixPath(join(parts));
 }
 
 
-PurePosixPath::operator std::string() const
-{
-    auto result(parts_.empty() ? "." : str::join(parts_, sep));
-    if (is_absolute() and parts_.size() > 1) {
-        // Fix the double slash at the beginning.
-        result.erase(result.begin());
-    }
-    return result;
-}
-
-
-const vector<string>& PurePosixPath::parts() const
-{
-    return parts_;
-}
-
-
-PurePosixPath PurePosixPath::operator/(const string& other) const
-{
+PurePosixPath PurePosixPath::operator/(const string& other) const {
     // Not sold on using division to join paths (why not addition?), but
     // sticking with the Python pathlib semantics for now.
     return joinpath(other);
 }
 
 
-PurePosixPath PurePosixPath::operator/(const PurePosixPath& other) const
-{
+PurePosixPath PurePosixPath::operator/(const PurePosixPath& other) const {
     return joinpath(other);
 }
 
 
-PurePosixPath& PurePosixPath::operator/=(const string& path)
-{
+PurePosixPath& PurePosixPath::operator/=(const string& path) {
     *this = joinpath(path);
     return *this;
 }
 
 
-PurePosixPath& PurePosixPath::operator/=(const PurePosixPath& other)
-{
+PurePosixPath& PurePosixPath::operator/=(const PurePosixPath& other) {
     *this = joinpath(other);
     return *this;
 }
 
 
-bool PurePosixPath::operator==(const PurePosixPath& other) const
-{
-    return parts_ == other.parts_;
+bool PurePosixPath::operator==(const PurePosixPath& other) const {
+    return compare(other) == 0;
 }
 
 
-bool PurePosixPath::operator!=(const PurePosixPath& other) const
-{
+bool PurePosixPath::operator!=(const PurePosixPath& other) const {
     return not (*this == other);
 }
 
 
-bool PurePosixPath::operator<(const PurePosixPath& other) const
-{
-    return string(*this) < string(other);
+bool PurePosixPath::operator<(const PurePosixPath& other) const {
+    return compare(other) < 0;
 }
 
 
-bool PurePosixPath::is_absolute() const
-{
-    return parts_.empty() ? false : parts_.front() == sep;
-}
-
-
-string PurePosixPath::name() const
-{
-    return is_root() ? "" : parts_.back();
-}
-
-
-PurePosixPath PurePosixPath::parent() const
-{
+PurePosixPath PurePosixPath::parent() const {
     PurePosixPath path(*this);
-    const auto str{string(path)};
+    const string str(path);
     if (not is_root()) {
         path.parts_.pop_back();
     }
@@ -327,8 +187,7 @@ PurePosixPath PurePosixPath::parent() const
 }
 
 
-vector<PurePosixPath> PurePosixPath::parents() const
-{
+vector<PurePosixPath> PurePosixPath::parents() const {
     vector<PurePosixPath> paths;
     PurePosixPath path(*this);
     while (not path.is_root()) {
@@ -339,8 +198,7 @@ vector<PurePosixPath> PurePosixPath::parents() const
 }
 
 
-PurePosixPath PurePosixPath::relative_to(const PurePosixPath& other) const
-{
+PurePosixPath PurePosixPath::relative_to(const PurePosixPath& other) const {
     const string error("path does not start with '" + string(other) + "'");
     if (parts_.size() < other.parts_.size()) {
         throw invalid_argument(error);
@@ -355,58 +213,7 @@ PurePosixPath PurePosixPath::relative_to(const PurePosixPath& other) const
 }
 
 
-std::string PurePosixPath::root() const
-{
-    return is_absolute() ? "/" : "";
-}
-
-
-std::string PurePosixPath::stem() const
-{
-    string stem;
-    tie(stem, std::ignore) = splitext(name());
-    if (stem == ".") {
-        // This is slightly different behavior than splitext(), which does not
-        // ignore a solitary ".".
-        stem = "";
-    }
-    else if (not parts_.empty() and endswith(parts_.back(), ".")) {
-        stem += ".";
-    }
-    return stem;
-}
-
-
-string PurePosixPath::suffix() const
-{
-    string suffix;
-    tie(std::ignore, suffix) = splitext(name());
-    if (suffix == ".") {
-        // This is slightly different behavior than splitext(), which does not
-        // ignore a solitary ".".
-        suffix = "";
-    }
-    return suffix;
-}
-
-
-vector<string> PurePosixPath::suffixes() const
-{
-    const auto name(this->name());
-    if (startswith(name, ".") or endswith(name, ".")) {
-        return vector<string>();
-    }
-    auto suffixes = str::split(name, ".");
-    auto pos(suffixes.erase(suffixes.begin()));  // ignore stem
-    for (; pos != suffixes.end(); ++pos) {
-        *pos = "." + *pos;
-    }
-    return suffixes;
-}
-
-
-PurePosixPath PurePosixPath::with_name(const string& name) const
-{
+PurePosixPath PurePosixPath::with_name(const string& name) const {
     static const regex valid_name("^[^.][^" + sep + "]*$");
     if (not regex_match(name, valid_name)) {
         throw invalid_argument("invalid name '" + name + "'");
@@ -418,8 +225,7 @@ PurePosixPath PurePosixPath::with_name(const string& name) const
 }
 
 
-PurePosixPath PurePosixPath::with_suffix(const string& suffix) const
-{
+PurePosixPath PurePosixPath::with_suffix(const string& suffix) const {
     static const regex valid_suffix("^\\.[^" + sep + "]+$");
     if (not (suffix.empty() or regex_match(suffix, valid_suffix))) {
         throw invalid_argument("invalid suffix '" + suffix + "'");
@@ -429,12 +235,6 @@ PurePosixPath PurePosixPath::with_suffix(const string& suffix) const
     }
     const auto name(stem() + suffix);
     return parent() / name;
-}
-
-
-bool PurePosixPath::is_root() const
-{
-    return parts_.empty() or (parts_.size() == 1 and is_absolute());
 }
 
 

@@ -23,11 +23,12 @@ set(PYPP_PACKAGE ${PROJECT_NAME})
 set(PYPP_TARGET pypp)
 
 add_library(${PYPP_TARGET}
+    src/path.cpp
     src/string.cpp
-    $<${UNIX}:src/posix/os.cpp>
-    $<${UNIX}:src/posix/path.cpp>
-    $<${UNIX}:src/posix/tempfile.cpp>
-    # TODO: $<${WIN32}:src/win/...>
+    $<$<BOOL:${UNIX}>:src/posix/os.cpp>
+    $<$<BOOL:${UNIX}>:src/posix/path.cpp>
+    $<$<BOOL:${UNIX}>:src/posix/tempfile.cpp>
+    # TODO: $<$<BOOL:${WIN32}>:src/win/path.cpp>
 )
 add_library(${PYPP_PACKAGE}::${PYPP_TARGET} ALIAS ${PYPP_TARGET})
 

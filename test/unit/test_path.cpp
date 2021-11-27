@@ -205,6 +205,15 @@ using PurePathTypes = Types<PurePath, Path>;
 TYPED_TEST_CASE(PurePathTest, PurePathTypes);
 
 
+/**
+ * Test the copy operator.
+ */
+TYPED_TEST(PurePathTest, copy) {
+    const TypeParam path("abc");
+    ASSERT_EQ(TypeParam(path), path);
+}
+
+
 /// Test the PurePath equality operator.
 ///
 TYPED_TEST(PurePathTest, eq_op)
