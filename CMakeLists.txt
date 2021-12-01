@@ -1,11 +1,7 @@
-## CMake configuration file for the pypp library.
-##
-## The project defines the pypp::pypp target for use by external projects.
-##
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 
 project(PyPP
-    VERSION 0.2.0.16  # add tweak number for dev versions
+    VERSION 0.2.0.17  # tweak number is only for dev versions
     LANGUAGES CXX
 )
 
@@ -136,11 +132,17 @@ export(PACKAGE ${PYPP_PACKAGE})
 # Build test suite.
 
 option(PYPP_BUILD_TESTS "Build test suite" OFF)
+
 if(PYPP_BUILD_TESTS)
     message(STATUS "Building test suite")
     enable_testing()
     include(CTest)
-    add_subdirectory(test/vendor/gtest EXCLUDE_FROM_ALL)
+    include(FetchContent)
+    FetchContent_Declare(googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG release-1.8.1  # TODO: upgrade to v1.11.0
+    )
+    FetchContent_MakeAvailable(googletest)
 
     add_executable(test_pypp
         test/unit/test_func.cpp
@@ -152,7 +154,7 @@ if(PYPP_BUILD_TESTS)
     )
 
     target_link_libraries(test_pypp
-        PRIVATE
+    PRIVATE
         PyPP::pypp gtest gtest_main
     )
 
