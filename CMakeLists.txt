@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 project(PyPP
-    VERSION 0.2.0.15  # add tweak number for dev versions
+    VERSION 0.2.0.16  # add tweak number for dev versions
     LANGUAGES CXX
 )
 
@@ -28,7 +28,7 @@ add_library(${PYPP_TARGET}
     $<$<BOOL:${UNIX}>:src/posix/os.cpp>
     $<$<BOOL:${UNIX}>:src/posix/path.cpp>
     $<$<BOOL:${UNIX}>:src/posix/tempfile.cpp>
-    # TODO: $<$<BOOL:${WIN32}>:src/win/path.cpp>
+    $<$<BOOL:${WIN32}>:src/win/path.cpp>
 )
 add_library(${PYPP_PACKAGE}::${PYPP_TARGET} ALIAS ${PYPP_TARGET})
 

@@ -12,9 +12,9 @@
 namespace pypp { namespace path {
 
 /**
- * Path separator.
+ * Platform-specific path separator.
  */
-extern const std::string sep;  // platform-specific
+extern const std::string SEP;
 
 
 /**
@@ -23,10 +23,10 @@ extern const std::string sep;  // platform-specific
  * Use an empty string as the last to segment to ensure that the path ends in a
  * trailing separator.
  * 
- * @param parts individual path parts
+ * @param paths: path segments
  * @return complete path
  */
-std::string join(const std::vector<std::string>& parts);
+std::string join(const std::vector<std::string>& paths);
 
 
 /**
@@ -36,8 +36,8 @@ std::string join(const std::vector<std::string>& parts);
  * Calling join() on the resulting segments will return an equivalent (but not
  * necessarily identical) path.
  * 
- * @param path input path
- * @return (root, name) pair
+ * @param path: input path
+ * @return: (root, name) pair
  */
 std::pair<std::string, std::string> split(const std::string& path);
 
@@ -207,15 +207,19 @@ public:
     std::vector<std::string> suffixes() const;
 
 protected:
-    /** @property path components */
+    /** @property: path separator*/
+    std::string sep;
+
+    /** @property: path components */
     std::vector<std::string> parts_;
 
     /**
      * Create a path object.
      *
-     * @param path path as a string
+     * @param path: path value
+     * @param sep: path separator
      */
-    explicit PureBasePath(std::string path=".");
+    PureBasePath(std::string path, const std::string& sep);
 
     /**
      * Lexical path comparison.
@@ -234,25 +238,274 @@ protected:
      * @return true if path is a root
      */
     bool is_root() const;
+
+    /**
+     * Set the path name.
+     *
+     * This is for use by derived classes to implement their with_name()
+     * method.
+     *
+     * @param name: new name
+     */
+    void set_name(const std::string& name);
+
+    /**
+     * Set the path suffix.
+     *
+     * This is for use by derived classes to implement their with_suffix()
+     * method.
+     *
+     * @param suffix: new suffix
+     */
+    void set_suffix(const std::string& suffix);
 };
+
+
+/**
+ * System-independent representation of a POSIX file path.
+ */
+class PurePosixPath : public PureBasePath {
+public:
+    /**
+     * Create a path object.
+     *
+     * @param path path as a string
+     */
+    explicit PurePosixPath(std::string path=".");
+
+    /**
+     * Join this path with another path.
+     *
+     * @param other: other path to join with
+     * @return: new joined path
+     */
+    PurePosixPath joinpath(const PurePosixPath& other) const;
+
+    /** @overload */
+    PurePosixPath joinpath(const std::string& other) const;
+
+    /**
+     * Join this path with another path
+     *
+     * @param other path to join with
+     * @return new joined path
+     */
+    PurePosixPath operator/(const std::string& other) const;
+
+    /** @overload */
+    PurePosixPath operator/(const PurePosixPath& other) const;
+
+    /**
+     * Join this path in place with another path.
+     *
+     * @param  path to join with
+     * @return modified path
+     */
+    PurePosixPath& operator/=(const std::string& other);
+
+    /** @overload */
+    PurePosixPath& operator/=(const PurePosixPath& other);
+
+    /**
+     * Equality operator.
+     *
+     * @param other path to compare
+     * @return true if path is equal to other
+     */
+    bool operator==(const PurePosixPath& other) const;
+
+    /**
+     * Inequality operator.
+     *
+     * @param other path to compare
+     * @return true if path is not equal to other
+     */
+    bool operator!=(const PurePosixPath& other) const;
+
+    /**
+     * Less-than operator.
+     *
+     * This a lexical comparison and does not imply anything about directory
+     * hierarchies. This is intended to allow the use of class instances in
+     * contexts that require a sort order.
+     *
+     * @param other: path to compare
+     * @return: true if path is less than other
+     */
+    bool operator<(const PurePosixPath& other) const;
+
+    /**
+     * Compute the direct parent path.
+     *
+     * @return: parent path
+     */
+    PurePosixPath parent() const;
+
+    /**
+     * Compute all ancestor paths, starting with the direct parent.
+     *
+     * @return: ancestor paths
+     */
+    std::vector<PurePosixPath> parents() const;
+
+    /**
+     * Compute a relative path.
+     *
+     * @param other: parent path
+     * @return: relative path
+     */
+    PurePosixPath relative_to(const PurePosixPath& other) const;
+
+    /**
+     * Replace the path name.
+     *
+     * @return: new path
+     */
+    PurePosixPath with_name(const std::string& name) const;
+
+    /**
+     * Replace the path suffix.
+     *
+     * @return: new path
+     */
+    PurePosixPath with_suffix(const std::string& suffix) const;
+};
+
+
+/**
+ * System-independent representation of a Windows file path.
+ */
+class PureWindowsPath : public PureBasePath {
+public:
+    /**
+     * Create a path object.
+     *
+     * @param path: path as a string
+     */
+    explicit PureWindowsPath(std::string path=".");
+
+    /**
+     * Join this path with another path.
+     *
+     * @param other: other path to join with
+     * @return: new joined path
+     */
+    PureWindowsPath joinpath(const PureWindowsPath& other) const;
+
+    /** @overload */
+    PureWindowsPath joinpath(const std::string& other) const;
+
+    /**
+     * Join this path with another path
+     *
+     * @param other: path to join with
+     * @return: new joined path
+     */
+    PureWindowsPath operator/(const std::string& other) const;
+
+    /** @overload */
+    PureWindowsPath operator/(const PureWindowsPath& other) const;
+
+    /**
+     * Join this path in place with another path.
+     *
+     * @param path: to join with
+     * @return: modified path
+     */
+    PureWindowsPath& operator/=(const std::string& other);
+
+    /** @overload */
+    PureWindowsPath& operator/=(const PureWindowsPath& other);
+
+    /**
+     * Equality operator.
+     *
+     * @param other: path to compare
+     * @return: true if path is equal to other
+     */
+    bool operator==(const PureWindowsPath& other) const;
+
+    /**
+     * Inequality operator.
+     *
+     * @param other: path to compare
+     * @return: true if path is not equal to other
+     */
+    bool operator!=(const PureWindowsPath& other) const;
+
+    /**
+     * Less-than operator.
+     *
+     * This a lexical comparison and does not imply anything about directory
+     * hierarchies. This is intended to allow the use of class instances in
+     * contexts that require a sort order.
+     *
+     * @param other: path to compare
+     * @return: true if path is less than other
+     */
+    bool operator<(const PureWindowsPath& other) const;
+
+    /**
+     * Compute the direct parent path.
+     *
+     * @return: parent path
+     */
+    PureWindowsPath parent() const;
+
+    /**
+     * Compute all ancestor paths, starting with the direct parent.
+     *
+     * @return: ancestor paths
+     */
+    std::vector<PureWindowsPath> parents() const;
+
+    /**
+     * Compute a relative path.
+     *
+     * @param other: parent path
+     * @return: relative path
+     */
+    PureWindowsPath relative_to(const PureWindowsPath& other) const;
+
+    /**
+     * Replace the path name.
+     *
+     * @return: path with new name
+     */
+    PureWindowsPath with_name(const std::string& name) const;
+
+    /**
+     * Replace the path suffix.
+     *
+     * @return: path with new suffix
+     */
+    PureWindowsPath with_suffix(const std::string& suffix) const;
+};
+
 
 }}  // namespace pypp::path
 
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+// POSIX implementation.
 #include "pypp/posix/path.hpp"
 namespace pypp { namespace path {
 
 using PurePath = pypp::path::PurePosixPath;
 using Path = pypp::path::PosixPath;
 
-}}  // namespace pypp::path
-
+}}
 #elif defined (_WIN32)
-#error "path module requires POSIX"
-// TODO: #include "pypp/win/path.hpp"
+// Windows implementation.
+#include "pypp/win/path.hpp"
+namespace pypp { namespace path {
+
+using PurePath = pypp::path::PureWindowsPath;
+using Path = pypp::path::WindowsPath;
+
+}}
 #else
-#error "path module requires POSIX"
+#error "Unknown platform"
 #endif
 
 #endif  // PYPP_PATH_HPP

@@ -1,12 +1,10 @@
 /**
- * Common file path manipulations for POSIX platforms.
- *
- * This combines functionality from the Python os.path and pathlib modules.
+ * Windows-specific implementations of the 'path' module.
  *
  * @file
  */
-#ifndef PYPP_POSIX_PATH_HPP
-#define PYPP_POSIX_PATH_HPP
+#ifndef PYPP_WIN_PATH_HPP
+#define PYPP_WIN_PATH_HPP
 
 #include <fstream>
 #include <string>
@@ -17,11 +15,9 @@
 
 namespace pypp { namespace path {
 
-
-
 ///
 ///
-class PosixPath
+class WindowsPath
 {
 public:
     /// Represent the path as a std::string.
@@ -67,96 +63,96 @@ public:
     /// Get the current working directory.
     ///
     /// @return path of the current working directory
-    static PosixPath cwd();
+    static WindowsPath cwd();
 
     /// Create a path object.
     ///
     /// @param path path as a string
-    explicit PosixPath(const std::string& path=".");
+    explicit WindowsPath(const std::string& path=".");
 
     /// Copy constructor.
     ///
     /// @param path
-    explicit PosixPath(PurePosixPath  path);
+    explicit WindowsPath(PureWindowsPath  path);
 
     /// Join this path with another path.
     ///
     /// @param path other path to join with
     /// @return new joined path
-    PosixPath joinpath(const PosixPath& path) const;
+    WindowsPath joinpath(const WindowsPath& path) const;
 
     /// @overload
-    PosixPath joinpath(const std::string& path) const;
+    WindowsPath joinpath(const std::string& path) const;
 
     /// Join this path with another path,
     ///
     /// @param path path to join with
     /// @return new joined path
-    PosixPath operator/(const std::string& path) const;
+    WindowsPath operator/(const std::string& path) const;
 
     /// @return overload
-    PosixPath operator/(const PosixPath& other) const;
+    WindowsPath operator/(const WindowsPath& other) const;
 
     /// Join this path in place with another path.
     ///
     /// @param other path to join with
     /// @return modified path
-    PosixPath& operator/=(const std::string& other);
+    WindowsPath& operator/=(const std::string& other);
 
     /// @overload
-    PosixPath& operator/=(const PosixPath& other);
+    WindowsPath& operator/=(const WindowsPath& other);
 
     /// Equality operator.
     ///
     /// @param other path to compare
     /// @return true if path is equal to other
-    bool operator==(const PosixPath& other) const;
+    bool operator==(const WindowsPath& other) const;
 
     /// Inequality operator.
     ///
     /// @param other path to compare
     /// @return true if path is not equal to other
-    bool operator!=(const PosixPath& other) const;
+    bool operator!=(const WindowsPath& other) const;
 
     /// Less-than operator.
     ///
     /// This a lexical comparison and does not imply anything about directory
-    /// hierarchies. This is mainly intended to allow the use of PosixPath
+    /// hierarchies. This is mainly intended to allow the use of WindowsPath
     /// objects in contexts that require a sort order.
     ///
     /// @param other path to compare
     /// @return true if path is less than other
-    bool operator<(const PosixPath& other) const;
+    bool operator<(const WindowsPath& other) const;
 
     /// Compute the direct parent path.
     ///
     /// @return parent path
-    PosixPath parent() const;
+    WindowsPath parent() const;
 
     /// Compute all ancestor paths, starting with the direct parent.
     ///
     /// @return ancestor paths
-    std::vector<PosixPath> parents() const;
+    std::vector<WindowsPath> parents() const;
 
     /// Compute a relative path.
     ///
     /// @param other parent path
     /// @return relative path
-    PosixPath relative_to(const PosixPath& other) const;
+    WindowsPath relative_to(const WindowsPath& other) const;
 
     /// Replace the path name.
     ///
     /// @return new path
-    PosixPath with_name(const std::string& name) const;
+    WindowsPath with_name(const std::string& name) const;
 
     /// Replace the path suffix.
     ///
     /// @return new path
-    PosixPath with_suffix(const std::string& suffix) const;
+    WindowsPath with_suffix(const std::string& suffix) const;
 
     /// Convert to a PurePath object.
     ///
-    PurePosixPath pure() const;
+    PureWindowsPath pure() const;
 
     /// Test for the existence of the path.
     ///
@@ -197,7 +193,7 @@ public:
     /// Create a symbolic link at this path.
     ///
     /// @param target: path to link to
-    void symlink_to(const PosixPath& target) const;
+    void symlink_to(const WindowsPath& target) const;
 
     /// @overload
     void symlink_to(const std::string& target) const;
@@ -249,10 +245,10 @@ public:
     /// Unlike Python, this returns a complete sequence, not a generator.
     ///
     /// @return
-    std::vector<PosixPath> iterdir() const;
+    std::vector<WindowsPath> iterdir() const;
 
 private:
-    PurePosixPath base_;
+    PureWindowsPath base_;
 
     /// Read file contents.
     ///
@@ -269,4 +265,4 @@ private:
 
 }}  // namespace pypp::path
 
-#endif  // PYPP_POSIX_PATH_HPP
+#endif  // PYPP_WIN_PATH_HPP

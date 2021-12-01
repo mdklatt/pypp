@@ -6,11 +6,9 @@
 #include "dirent.h"
 #include <cstdio>
 #include <algorithm>
-#include <deque>
 #include <iterator>
 #include <map>
 #include <memory>
-#include <regex>
 #include <stdexcept>
 #include <sstream>
 #include <utility>
@@ -27,7 +25,6 @@ using pypp::str::rstrip;
 using pypp::str::startswith;
 using std::back_inserter;
 using std::copy;
-using std::deque;
 using std::find;
 using std::fstream;
 using std::ios_base;
@@ -39,8 +36,6 @@ using std::move;
 using std::ostringstream;
 using std::pair;
 using std::prev;
-using std::regex;
-using std::regex_match;
 using std::remove;
 using std::runtime_error;
 using std::string;
@@ -53,7 +48,7 @@ using path::PurePosixPath;
 using path::PosixPath;
 
 
-const string path::sep("/");
+const string path::SEP("/");
 
 
 // In the Python implementation a Path inherits from a PurePath, and
@@ -63,41 +58,6 @@ const string path::sep("/");
 // that a Path is not recognizable as a PurePath, but the use case for
 // interoperability seems limited, and can be handled using explicit conversion
 // methods.
-
-
-string path::normpath(const string& path) {
-    static const string current(".");
-    static const string parent("..");
-    ssize_t level(0);
-    deque<string> parts;
-    for (const auto& item: str::split(path, sep)) {
-        // Process each part of the path.
-        if (item.empty() or item == current) {
-            continue;
-        }
-        if (item == parent) {
-            --level;
-            if (level >= 0) {
-                parts.pop_back();
-            }
-            else if (not isabs(path)) {
-                parts.push_back(parent);
-            }
-        }
-        else {
-            ++level;
-            parts.push_back(item);
-        }
-    }
-    string normed(join({parts.cbegin(), parts.cend()}));
-    if (isabs(path)) {
-        normed.insert(0, sep);
-    }
-    else if (normed.empty()) {
-        normed = current;
-    }
-    return normed;
-}
 
 
 bool path::exists(const string& path) {
@@ -121,120 +81,6 @@ bool path::isdir(const string& path) {
 bool path::islink(const string& path) {
     struct stat info{};
     return lstat(path.c_str(), &info) == 0 and S_ISLNK(info.st_mode);
-}
-
-
-PurePosixPath::PurePosixPath(string path): PureBasePath(move(path)) {}
-
-
-PurePosixPath PurePosixPath::joinpath(const PurePosixPath& other) const {
-    return PurePosixPath(join({string(*this), string(other)}));
-}
-
-
-PurePosixPath PurePosixPath::joinpath(const string& other) const {
-    const vector<string> parts({string(*this), other});
-    return PurePosixPath(join(parts));
-}
-
-
-PurePosixPath PurePosixPath::operator/(const string& other) const {
-    // Not sold on using division to join paths (why not addition?), but
-    // sticking with the Python pathlib semantics for now.
-    return joinpath(other);
-}
-
-
-PurePosixPath PurePosixPath::operator/(const PurePosixPath& other) const {
-    return joinpath(other);
-}
-
-
-PurePosixPath& PurePosixPath::operator/=(const string& path) {
-    *this = joinpath(path);
-    return *this;
-}
-
-
-PurePosixPath& PurePosixPath::operator/=(const PurePosixPath& other) {
-    *this = joinpath(other);
-    return *this;
-}
-
-
-bool PurePosixPath::operator==(const PurePosixPath& other) const {
-    return compare(other) == 0;
-}
-
-
-bool PurePosixPath::operator!=(const PurePosixPath& other) const {
-    return not (*this == other);
-}
-
-
-bool PurePosixPath::operator<(const PurePosixPath& other) const {
-    return compare(other) < 0;
-}
-
-
-PurePosixPath PurePosixPath::parent() const {
-    PurePosixPath path(*this);
-    const string str(path);
-    if (not is_root()) {
-        path.parts_.pop_back();
-    }
-    return path;
-}
-
-
-vector<PurePosixPath> PurePosixPath::parents() const {
-    vector<PurePosixPath> paths;
-    PurePosixPath path(*this);
-    while (not path.is_root()) {
-        path = path.parent();
-        paths.emplace_back(path);
-    }
-    return paths;
-}
-
-
-PurePosixPath PurePosixPath::relative_to(const PurePosixPath& other) const {
-    const string error("path does not start with '" + string(other) + "'");
-    if (parts_.size() < other.parts_.size()) {
-        throw invalid_argument(error);
-    }
-    const auto diff(mismatch(other.parts_.begin(), other.parts_.end(), parts_.begin()));
-    if (diff.first != other.parts_.end() and not other.parts_.empty()) {
-        throw invalid_argument(error);
-    }
-    PurePosixPath path;
-    path.parts_ = {diff.second, parts_.end()};
-    return path;
-}
-
-
-PurePosixPath PurePosixPath::with_name(const string& name) const {
-    static const regex valid_name("^[^.][^" + sep + "]*$");
-    if (not regex_match(name, valid_name)) {
-        throw invalid_argument("invalid name '" + name + "'");
-    }
-    if (this->name().empty()) {
-        throw invalid_argument("path has an empty name");
-    }
-    return parent() / name;
-}
-
-
-PurePosixPath PurePosixPath::with_suffix(const string& suffix) const {
-    static const regex valid_suffix("^\\.[^" + sep + "]+$");
-    if (not (suffix.empty() or regex_match(suffix, valid_suffix))) {
-        throw invalid_argument("invalid suffix '" + suffix + "'");
-    }
-    if (this->name().empty()) {
-        throw invalid_argument("path has an empty name");
-    }
-    const auto name(stem() + suffix);
-    return parent() / name;
 }
 
 

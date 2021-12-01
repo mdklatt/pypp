@@ -1,8 +1,9 @@
-/// Test suite for the path module.
-///
-/// Link all test files with the `gtest_main` library to create a command line
-/// test runner.
-///
+/**
+ * Test suite for the path module.
+ *
+ * Link all test files with the `gtest_main` library to create a command line
+ * test runner.
+ */
 #include <cstdio>
 #include <fstream>
 #include <iterator>
@@ -34,10 +35,10 @@ using testing::Test;
 using testing::Types;
 
 
-/// Test the join() function.
-///
-TEST(path, join)
-{
+/**
+ * Test the join() function.
+ */
+TEST(path, join) {
     ASSERT_EQ(join({"/abc/"}), "/abc/");
     ASSERT_EQ(join({"/abc", "xyz"}), "/abc/xyz");
     ASSERT_EQ(join({"/abc", "", "xyz"}), "/abc/xyz");
@@ -48,10 +49,10 @@ TEST(path, join)
 }
 
 
-/// Test the split() function.
-///
-TEST(path, split)
-{
+/**
+ * Test the split() function.
+ */
+TEST(path, split) {
     ASSERT_EQ(split("//abc"), make_pair(string("//"), string("abc")));
     ASSERT_EQ(split("/abc/xyz"), make_pair(string("/abc"), string("xyz")));
     ASSERT_EQ(split("abc//xyz"), make_pair(string("abc"), string("xyz")));
@@ -61,10 +62,10 @@ TEST(path, split)
 }
 
 
-/// Test the dirname() function.
-///
-TEST(path, dirname)
-{
+/**
+ * Test the dirname() function.
+ */
+TEST(path, dirname) {
     ASSERT_EQ(dirname("//abc"), "//");
     ASSERT_EQ(dirname("/abc/xyz"), "/abc");
     ASSERT_EQ(dirname("abc//xyz"), "abc");
@@ -74,10 +75,10 @@ TEST(path, dirname)
 }
 
 
-/// Test the basename() function.
-///
-TEST(path, basename)
-{
+/**
+ * Test the basename() function.
+ */
+TEST(path, basename) {
     // The explicit string casts for the expected values are needed to avoid
     // spurious failures on Linux with both clang and gcc (i.e. Travis CI).
     // Without a cast, Google Test appears to test for pointer equality instead
@@ -92,10 +93,10 @@ TEST(path, basename)
 }
 
 
-/// Test the normpath() function.
-///
-TEST(path, normpath)
-{
+/**
+ * Test the normpath() function.
+ */
+TEST(path, normpath) {
     ASSERT_EQ(normpath(""), ".");
     ASSERT_EQ(normpath("./."), ".");
     ASSERT_EQ(normpath("abc"), "abc");
@@ -110,10 +111,10 @@ TEST(path, normpath)
 }
 
 
-/// Test the abspath() function.
-///
-TEST(path, abspath)
-{
+/**
+ * Test the abspath() function.
+ */
+TEST(path, abspath) {
     char buffer[FILENAME_MAX];
     getcwd(buffer, sizeof(buffer));
     const string cwd(buffer);
@@ -126,10 +127,10 @@ TEST(path, abspath)
 }
 
 
-/// Test the isabs() function.
-///
-TEST(path, isabs)
-{
+/**
+ * Test the isabs() function.
+ */
+TEST(path, isabs) {
     ASSERT_FALSE(isabs(""));
     ASSERT_FALSE(isabs("abc"));
     ASSERT_TRUE(isabs("/"));
@@ -137,10 +138,10 @@ TEST(path, isabs)
 }
 
 
-/// Test the splitext() function.
-///
-TEST(path, splitext)
-{
+/**
+ * Test the splitext() function.
+ */
+TEST(path, splitext) {
     ASSERT_EQ(splitext(""), make_pair(string(""), string("")));
     ASSERT_EQ(splitext("."), make_pair(string("."), string("")));
     ASSERT_EQ(splitext(".abc"), make_pair(string(".abc"), string("")));
@@ -151,39 +152,39 @@ TEST(path, splitext)
 }
 
 
-/// Test the exists() function.
-///
-TEST(path, exists)
-{
+/**
+ * Test the exists() function.
+ */
+TEST(path, exists) {
     ASSERT_TRUE(exists(__FILE__));
     ASSERT_FALSE(exists(""));
 }
 
 
-/// Test the isfile() function.
-///
-TEST(path, isfile)
-{
+/**
+ * Test the isfile() function.
+ */
+TEST(path, isfile) {
     ASSERT_TRUE(isfile(__FILE__));
     ASSERT_FALSE(isfile(""));
     ASSERT_FALSE(isfile("/"));
 }
 
 
-/// Test the isdir() function.
-///
-TEST(path, isdir)
-{
+/**
+ * Test the isdir() function.
+ */
+TEST(path, isdir) {
     ASSERT_TRUE(isdir("/"));
     ASSERT_FALSE(isdir(""));
     ASSERT_FALSE(isdir(__FILE__));
 }
 
 
-/// Test the islink() function.
-///
-TEST(path, islink)
-{
+/**
+ * Test the islink() function.
+ */
+TEST(path, islink) {
     const TemporaryDirectory tmpdir;
     const auto link(join({tmpdir.name(), "test_islink"}));
     symlink(__FILE__, link.c_str());
@@ -194,11 +195,12 @@ TEST(path, islink)
 }
 
 
-/// Test Fixture for PurePath unit tests.
-///
-/// The fixture will be type-parametrized over all classes that implement the
-/// PurePath interface.
-///
+/**
+ * Test Fixture for PurePath unit tests.
+ *
+ * The fixture will be type-parametrized over all classes that implement the
+ * PurePath interface.
+ */
 template <typename T>
 class PurePathTest: public Test {};
 using PurePathTypes = Types<PurePath, Path>;
@@ -214,10 +216,10 @@ TYPED_TEST(PurePathTest, copy) {
 }
 
 
-/// Test the PurePath equality operator.
-///
-TYPED_TEST(PurePathTest, eq_op)
-{
+/**
+ * Test the PurePath equality operator.
+ */
+TYPED_TEST(PurePathTest, eq_op) {
     ASSERT_TRUE(TypeParam() == TypeParam());
     ASSERT_TRUE(TypeParam("abc") == TypeParam("abc"));
     ASSERT_TRUE(TypeParam("abc") == TypeParam("./abc"));
@@ -228,10 +230,10 @@ TYPED_TEST(PurePathTest, eq_op)
 }
 
 
-/// Test the PurePath inequality operator.
-///
-TYPED_TEST(PurePathTest, ne_op)
-{
+/**
+ * Test the PurePath inequality operator.
+ */
+TYPED_TEST(PurePathTest, ne_op) {
     ASSERT_FALSE(TypeParam() != TypeParam());
     ASSERT_FALSE(TypeParam("abc") != TypeParam("abc"));
     ASSERT_FALSE(TypeParam("abc") != TypeParam("./abc"));
@@ -242,10 +244,10 @@ TYPED_TEST(PurePathTest, ne_op)
 }
 
 
-/// Test the PurePath less-than operator.
-///
-TYPED_TEST(PurePathTest, lt_op)
-{
+/**
+ * Test the PurePath less-than operator.
+ */
+TYPED_TEST(PurePathTest, lt_op) {
     static const TypeParam path("abc");
     ASSERT_FALSE(path < path);  // identity
     ASSERT_TRUE(TypeParam("abc") < TypeParam("abd"));
@@ -255,10 +257,10 @@ TYPED_TEST(PurePathTest, lt_op)
 }
 
 
-/// Test the PurePath std::string operator.
-///
-TYPED_TEST(PurePathTest, string_op)
-{
+/**
+ * Test the PurePath std::string operator.
+ */
+TYPED_TEST(PurePathTest, string_op) {
     ASSERT_EQ(".", string(TypeParam()));
     ASSERT_EQ(".", string(TypeParam(".")));
     ASSERT_EQ(".", string(TypeParam("./")));
@@ -269,10 +271,10 @@ TYPED_TEST(PurePathTest, string_op)
 }
 
 
-/// Test the PurePath::is_absolute() method.
-///
-TYPED_TEST(PurePathTest, is_absolute)
-{
+/**
+ * Test the PurePath::is_absolute() method.
+ */
+TYPED_TEST(PurePathTest, is_absolute) {
     ASSERT_FALSE(TypeParam().is_absolute());
     ASSERT_FALSE(TypeParam("abc").is_absolute());
     ASSERT_FALSE(TypeParam("./abc").is_absolute());
@@ -280,10 +282,10 @@ TYPED_TEST(PurePathTest, is_absolute)
 }
 
 
-/// Test the PurePath::name() method.
-///
-TYPED_TEST(PurePathTest, name)
-{
+/**
+ * Test the PurePath::name() method.
+ */
+TYPED_TEST(PurePathTest, name) {
     ASSERT_EQ("", TypeParam("").name());
     ASSERT_EQ("", TypeParam(".").name());
     ASSERT_EQ("", TypeParam("/").name());
@@ -295,10 +297,10 @@ TYPED_TEST(PurePathTest, name)
 }
 
 
-/// Test the PurePath::parts() method.
-///
-TYPED_TEST(PurePathTest, parts)
-{
+/**
+ * Test the PurePath::parts() method.
+ */
+TYPED_TEST(PurePathTest, parts) {
     ASSERT_EQ(vector<string>(), TypeParam().parts());
     ASSERT_EQ(vector<string>(), TypeParam("").parts());
     ASSERT_EQ(vector<string>(), TypeParam(".").parts());
@@ -312,10 +314,10 @@ TYPED_TEST(PurePathTest, parts)
 }
 
 
-/// Test the PurePath::root() method.
-///
-TYPED_TEST(PurePathTest, root)
-{
+/**
+ * Test the PurePath::root() method.
+ */
+TYPED_TEST(PurePathTest, root) {
     ASSERT_EQ("", TypeParam().root());
     ASSERT_EQ("", TypeParam("abc/def").root());
     ASSERT_EQ("/", TypeParam("/").root());
@@ -323,10 +325,10 @@ TYPED_TEST(PurePathTest, root)
 }
 
 
-/// Test the PurePath::stem() method.
-///
-TYPED_TEST(PurePathTest, stem)
-{
+/**
+ * Test the PurePath::stem() method.
+ */
+TYPED_TEST(PurePathTest, stem) {
     ASSERT_EQ("", TypeParam().stem());
     ASSERT_EQ("", TypeParam(".").stem());
     ASSERT_EQ("abc.", TypeParam("abc.").stem());
@@ -335,10 +337,10 @@ TYPED_TEST(PurePathTest, stem)
 }
 
 
-/// Test the PurePath::suffix() method.
-///
-TYPED_TEST(PurePathTest, suffix)
-{
+/**
+ * Test the PurePath::suffix() method.
+ */
+TYPED_TEST(PurePathTest, suffix) {
     ASSERT_EQ("", TypeParam().suffix());
     ASSERT_EQ("", TypeParam("abc.").suffix());
     ASSERT_EQ("", TypeParam(".abc").suffix());
@@ -347,10 +349,10 @@ TYPED_TEST(PurePathTest, suffix)
 }
 
 
-/// Test the PurePath::suffixes() method.
-///
-TYPED_TEST(PurePathTest, suffixes)
-{
+/**
+ * Test the PurePath::suffixes() method.
+ */
+TYPED_TEST(PurePathTest, suffixes) {
     ASSERT_EQ(vector<string>(), TypeParam().suffixes());
     ASSERT_EQ(vector<string>(), TypeParam("abc.").suffixes());
     ASSERT_EQ(vector<string>(), TypeParam(".abc").suffixes());
@@ -360,10 +362,10 @@ TYPED_TEST(PurePathTest, suffixes)
 }
 
 
-/// Test the PurePath::joinpath() method.
-///
-TYPED_TEST(PurePathTest, joinpath)
-{
+/**
+ * Test the PurePath::joinpath() method.
+ */
+TYPED_TEST(PurePathTest, joinpath) {
     ASSERT_EQ(TypeParam(), TypeParam().joinpath(TypeParam()));
     ASSERT_EQ(TypeParam("/"), TypeParam().joinpath(TypeParam("/")));
     ASSERT_EQ(TypeParam("abc"), TypeParam().joinpath(TypeParam("abc")));
@@ -373,10 +375,10 @@ TYPED_TEST(PurePathTest, joinpath)
 }
 
 
-/// Test the PurePath join operator.
-///
-TYPED_TEST(PurePathTest, join_op)
-{
+/**
+ * Test the PurePath join operator.
+ */
+TYPED_TEST(PurePathTest, join_op) {
     ASSERT_EQ(TypeParam(), TypeParam() / TypeParam());
     ASSERT_EQ(TypeParam("/"), TypeParam() / TypeParam("/"));
     ASSERT_EQ(TypeParam("abc"), TypeParam() / TypeParam("abc"));
@@ -386,20 +388,20 @@ TYPED_TEST(PurePathTest, join_op)
 }
 
 
-/// Test the PurePath join assignment operator.
-///
-TYPED_TEST(PurePathTest, join_assign_op)
-{
+/**
+ * Test the PurePath join assignment operator.
+ */
+TYPED_TEST(PurePathTest, join_assign_op) {
     TypeParam path("abc");
     path /= "def";
     ASSERT_EQ(TypeParam("abc/def"), path);
 }
 
 
-/// Test the PurePath::parent() method.
-///
-TYPED_TEST(PurePathTest, parent)
-{
+/**
+ * Test the PurePath::parent() method.
+ */
+TYPED_TEST(PurePathTest, parent) {
     ASSERT_EQ(TypeParam(), TypeParam().parent());
     ASSERT_EQ(TypeParam(), TypeParam("abc").parent());
     ASSERT_EQ(TypeParam("/"), TypeParam("/abc").parent());
@@ -409,10 +411,10 @@ TYPED_TEST(PurePathTest, parent)
 }
 
 
-/// Test the PurePath::parents() method.
-///
-TYPED_TEST(PurePathTest, parents)
-{
+/**
+ * Test the PurePath::parents() method.
+ */
+TYPED_TEST(PurePathTest, parents) {
     ASSERT_EQ(vector<TypeParam>(), TypeParam().parents());
     ASSERT_EQ(vector<TypeParam>(), TypeParam("/").parents());
     ASSERT_EQ(vector<TypeParam>({TypeParam("abc"), TypeParam()}), TypeParam("abc/def").parents());
@@ -420,10 +422,10 @@ TYPED_TEST(PurePathTest, parents)
 }
 
 
-/// Test the PurePath::relative_to() method.
-///
-TYPED_TEST(PurePathTest, relative_to)
-{
+/**
+ * Test the PurePath::relative_to() method.
+ */
+TYPED_TEST(PurePathTest, relative_to) {
     ASSERT_THROW(TypeParam("").relative_to(TypeParam("/")), invalid_argument);
     ASSERT_THROW(TypeParam("abc").relative_to(TypeParam("def")), invalid_argument);
     ASSERT_THROW(TypeParam("abc").relative_to(TypeParam("abc/def")), invalid_argument);
@@ -434,10 +436,10 @@ TYPED_TEST(PurePathTest, relative_to)
 
 
 
-/// Test the PurePath::with_name() method.
-///
-TYPED_TEST(PurePathTest, with_name)
-{
+/**
+ * Test the PurePath::with_name() method.
+ */
+TYPED_TEST(PurePathTest, with_name) {
     ASSERT_THROW(TypeParam("").with_name("abc"), invalid_argument);
     ASSERT_THROW(TypeParam(".").with_name("abc"), invalid_argument);
     ASSERT_THROW(TypeParam("/").with_name("abc"), invalid_argument);
@@ -450,10 +452,10 @@ TYPED_TEST(PurePathTest, with_name)
 }
 
 
-/// Test the PurePath::with_suffx() method.
-///
-TYPED_TEST(PurePathTest, with_suffix)
-{
+/**
+ * Test the PurePath::with_suffx() method.
+ */
+TYPED_TEST(PurePathTest, with_suffix) {
     ASSERT_THROW(TypeParam("").with_suffix(".xyz"), invalid_argument);
     ASSERT_THROW(TypeParam(".").with_suffix(".xyz"), invalid_argument);
     ASSERT_THROW(TypeParam("/").with_suffix(".xyz"), invalid_argument);
@@ -466,40 +468,40 @@ TYPED_TEST(PurePathTest, with_suffix)
 }
 
 
-/// Test fixture for Path methods that are not part of the PurePath interface.
-///
-/// This is used to group tests and provide common set-up and tear-down code.
-/// A new test fixture is created for each test to prevent any side effects
-/// between tests. Member variables and methods are injected into each test
-/// that uses this fixture.
-///
-class PathTest: public Test
-{
+/**
+ * Test fixture for Path methods that are not part of the PurePath interface.
+ *
+ * This is used to group tests and provide common set-up and tear-down code.
+ * A new test fixture is created for each test to prevent any side effects
+ * between tests. Member variables and methods are injected into each test
+ * that uses this fixture.
+ */
+class PathTest: public Test {
 protected:
     const TemporaryDirectory tmpdir;
 };
 
 
-/// Test the Path::cwd() method.
-///
-TEST_F(PathTest, cwd)
-{
+/**
+ * Test the Path::cwd() method.
+ */
+TEST_F(PathTest, cwd) {
     ASSERT_EQ(abspath("."), string(Path::cwd()));
 }
 
 
-/// Test the Path::pure() method.
-///
-TEST_F(PathTest, pure)
-{
+/**
+ * Test the Path::pure() method.
+ */
+TEST_F(PathTest, pure) {
     ASSERT_EQ(PurePath("abc"), Path("abc").pure());
 }
 
 
-/// Test the Path::exists() method.
-///
-TEST_F(PathTest, exists)
-{
+/**
+ * Test the Path::exists() method.
+ */
+TEST_F(PathTest, exists) {
     Path path(tmpdir.name());
     ASSERT_TRUE(path.exists());  // directory
     path /= "exists_test";
@@ -509,10 +511,10 @@ TEST_F(PathTest, exists)
 }
 
 
-/// Test the Path::is_dir() method.
-///
-TEST_F(PathTest, is_dir)
-{
+/**
+ * Test the Path::is_dir() method.
+ */
+TEST_F(PathTest, is_dir) {
     Path path(tmpdir.name());
     ASSERT_TRUE(path.is_dir());
     path /= "is_dir_test";
@@ -522,10 +524,10 @@ TEST_F(PathTest, is_dir)
 }
 
 
-/// Test the Path::is_file() method.
-///
-TEST_F(PathTest, is_file)
-{
+/**
+ * Test the Path::is_file() method.
+ */
+TEST_F(PathTest, is_file) {
     Path path(tmpdir.name());
     ASSERT_FALSE(path.is_file());  // not a file
     path /= "is_file_test";
@@ -535,10 +537,10 @@ TEST_F(PathTest, is_file)
 }
 
 
-/// Test the Path::is_symlink_test() method.
-///
-TEST_F(PathTest, is_symlink)
-{
+/**
+ * Test the Path::is_symlink_test() method.
+ */
+TEST_F(PathTest, is_symlink) {
     Path path(Path(tmpdir.name()) / "is_symlink_test");
     ASSERT_FALSE(path.is_symlink());  // does not exist
     symlink(__FILE__, string(path).c_str());
@@ -546,10 +548,10 @@ TEST_F(PathTest, is_symlink)
 }
 
 
-/// Test the Path::open() method.
-///
-TEST_F(PathTest, open)
-{
+/**
+ * Test the Path::open() method.
+ */
+TEST_F(PathTest, open) {
     // The only reliable way to check the validity of the returned stream is to
     // attempt an I/O operation on it.
     const auto path(Path(tmpdir.name()) / "open_test");
@@ -565,10 +567,10 @@ TEST_F(PathTest, open)
 }
 
 
-/// Test the Path::mkdir() method.
-///
-TEST_F(PathTest, mkdir)
-{
+/**
+ * Test the Path::mkdir() method.
+ */
+TEST_F(PathTest, mkdir) {
     const auto path(Path(tmpdir.name()) / "mkdir_test" / "subdir");
     ASSERT_THROW(path.mkdir(), runtime_error);  // parent doesn't exist
     path.mkdir(0777, true);
@@ -578,10 +580,10 @@ TEST_F(PathTest, mkdir)
 }
 
 
-/// Test the Path::symlink_to() method.
-///
-TEST_F(PathTest, symlink_to)
-{
+/**
+ * Test the Path::symlink_to() method.
+ */
+TEST_F(PathTest, symlink_to) {
     const auto path(Path(tmpdir.name()) / "symlink_to_test");
     path.symlink_to(Path(__FILE__));
     ASSERT_TRUE(path.is_symlink());
@@ -589,10 +591,10 @@ TEST_F(PathTest, symlink_to)
 }
 
 
-/// Test the Path::unlink() method.
-///
-TEST_F(PathTest, unlink)
-{
+/**
+ * Test the Path::unlink() method.
+ */
+TEST_F(PathTest, unlink) {
     const auto path(Path(tmpdir.name()) / "unlink_test");
     path.open("wt");
     path.unlink();
@@ -601,10 +603,10 @@ TEST_F(PathTest, unlink)
 }
 
 
-/// Test the Path::rmdir() method.
-///
-TEST_F(PathTest, rmdir)
-{
+/**
+ * Test the Path::rmdir() method.
+ */
+TEST_F(PathTest, rmdir) {
     const auto path(Path(tmpdir.name()) / "rmdir_test");
     const auto file(path / "file");
     ASSERT_THROW(path.rmdir(), runtime_error);  // doesn't exist
@@ -618,10 +620,10 @@ TEST_F(PathTest, rmdir)
 }
 
 
-/// Test the Path::read_bytes() method.
-///
-TEST_F(PathTest, read_bytes)
-{
+/**
+ * Test the Path::read_bytes() method.
+ */
+TEST_F(PathTest, read_bytes) {
     static const string data("Some test data");  // TODO: test non-ASCII bytes
     const auto path(Path(tmpdir.name()) / "read_bytes_test");
     path.open("wb").write(data.c_str(), data.size());
@@ -629,10 +631,10 @@ TEST_F(PathTest, read_bytes)
 }
 
 
-/// Test the Path::read_text() method.
-///
-TEST_F(PathTest, read_text)
-{
+/**
+ * Test the Path::read_text() method.
+ */
+TEST_F(PathTest, read_text) {
     static const string data("Some test data");
     const auto path(Path(tmpdir.name()) / "read_text_test");
     path.open("wt").write(data.c_str(), data.size());
@@ -640,10 +642,10 @@ TEST_F(PathTest, read_text)
 }
 
 
-/// Test the Path::write_bytes() method.
-///
-TEST_F(PathTest, write_bytes)
-{
+/**
+ * Test the Path::write_bytes() method.
+ */
+TEST_F(PathTest, write_bytes) {
     static const string data("Some test data");  // TODO: test non-ASCII bytes
     const auto path(Path(tmpdir.name()) / "write_bytes_test");
     path.write_bytes(data);
@@ -653,10 +655,10 @@ TEST_F(PathTest, write_bytes)
 }
 
 
-/// Test the Path::write_text() method.
-///
-TEST_F(PathTest, write_text)
-{
+/**
+ * Test the Path::write_text() method.
+ */
+TEST_F(PathTest, write_text) {
     static const string data("Some test data");
     const auto path(Path(tmpdir.name()) / "write_text_test");
     path.write_text(data);
@@ -666,10 +668,10 @@ TEST_F(PathTest, write_text)
 }
 
 
-/// Test the Path::iterdir() method.
-///
-TEST_F(PathTest, iterdir)
-{
+/**
+ * Test the Path::iterdir() method.
+ */
+TEST_F(PathTest, iterdir) {
     const TemporaryDirectory tmpdir;
     const Path root(tmpdir.name());
     const auto file(root / "file");
@@ -680,4 +682,41 @@ TEST_F(PathTest, iterdir)
     set<Path> items(begin(paths), end(paths));  // need guaranteed ordering
     ASSERT_EQ(set<Path>({dir, file}), items);
     ASSERT_THROW(file.iterdir(), runtime_error);  // not a directory
+}
+
+
+/**
+ * Test Fixture for PureWindowsPath unit tests.
+ *
+ * The fixture will be type-parametrized over all classes that implement the
+ * PurePath interface.
+ */
+class PureWindowsPathTest: public Test {};
+
+
+/**
+ * Test the PureWindowsPath equality operator.
+ */
+TEST_F(PureWindowsPathTest, eq_op) {
+    ASSERT_TRUE(PureWindowsPath() == PureWindowsPath());
+    ASSERT_TRUE(PureWindowsPath("abc") == PureWindowsPath("abc"));
+    ASSERT_TRUE(PureWindowsPath("abc") == PureWindowsPath(".\\abc"));
+    ASSERT_FALSE(PureWindowsPath("abc") == PureWindowsPath("\\abc\\"));
+    ASSERT_FALSE(PureWindowsPath("abc") == PureWindowsPath());
+    static const PureWindowsPath path("abc");
+    ASSERT_TRUE(path == path);  // identity
+}
+
+
+/**
+ * Test the PureWindowsPath inequality operator.
+ */
+TEST_F(PureWindowsPathTest, ne_op) {
+    ASSERT_FALSE(PureWindowsPath() != PureWindowsPath());
+    ASSERT_FALSE(PureWindowsPath("abc") != PureWindowsPath("abc"));
+    ASSERT_FALSE(PureWindowsPath("abc") != PureWindowsPath(".\\abc"));
+    ASSERT_TRUE(PureWindowsPath("abc") != PureWindowsPath("\\abc\\"));
+    ASSERT_TRUE(PureWindowsPath("abc") != PureWindowsPath());
+    static const PureWindowsPath path("abc");
+    ASSERT_FALSE(path != path);  // identity
 }

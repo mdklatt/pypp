@@ -19,11 +19,11 @@
 #include "func.hpp"
 #include "generator.hpp"
 #include "itertools.hpp"
+#include "path.hpp"
 #include "string.hpp"
 
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 #include "os.hpp"
-#include "path.hpp"
 #include "tempfile.hpp"
 #else
 #warning "excluding POSIX-only modules"

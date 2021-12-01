@@ -19,12 +19,13 @@ implied here beyond the ASCII subset.
 Limitations
 ===========
 
-At least C++11 and CMake v3.8 are required.
+At least C++11 and CMake v3.10 are required.
 
 These modules are currently limited to POSIX platforms (including MacOS):
-* ``os``
-* ``path``
-* ``tempfile``
+
+- ``os``
+- ``path``
+- ``tempfile``
 
 ========
 Building
@@ -65,8 +66,7 @@ Test Suite
 
 .. code-block:: console
 
-    $ cd build/Debug
-    $ test/test_pypp
+    $ cd build/Debug && ctest
 
 
 .. |ci-badge| image:: https://github.com/mdklatt/pypp/actions/workflows/build.yml/badge.svg

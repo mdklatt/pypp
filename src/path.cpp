@@ -1,9 +1,11 @@
 /**
- * POSIX implementation of the 'path' module.
+ * System-independent components of the 'path' module.
  */
 #include <cassert>
 #include <cstdio>
 #include <deque>
+#include <regex>
+#include <stdexcept>
 #include <tuple>
 #include <utility>
 #include "pypp/os.hpp"
@@ -15,18 +17,53 @@ using pypp::os::getcwd;
 using pypp::str::endswith;
 using pypp::str::rstrip;
 using pypp::str::startswith;
+using std::deque;
+using std::invalid_argument;
 using std::pair;
+using std::regex;
+using std::regex_match;
 using std::string;
 using std::vector;
 
 using namespace pypp;
-using pypp::path::PureBasePath;
+using path::PureBasePath;
+using path::PurePosixPath;
+using path::PureWindowsPath;
 
 
-string path::join(const vector<string>& parts) {
+namespace {
+
+// Platform-agnostic implementations that are not part of the public API.
+
+/**
+ * Determine if a path is absolute.
+ *
+ * @param path: input path
+ * @param sep: path separator
+ * @return: true for an absolute path
+ */
+bool isabs(const string& path, const string& sep) {
+    return startswith(path, sep);
+}
+
+
+/**
+ * Join path segments into a complete path.
+ *
+ * Use an empty string as the last to segment to ensure that the path ends in a
+ * trailing separator.
+ *
+ * @param parts: individual path parts
+ * @param sep: path separator
+ * @return: complete path
+ */
+string join(const vector<string>& parts, const string& sep) {
     // The Python documentation for os.path.join() is ambiguous about the
-    // handling of path separators. Path separators are added as needed
-    // between segments, while existing separators are left unmodified.
+    // handling of path separators, stating that the joined path has "exactly
+    // one directory separator following each non-empty part". However, the
+    // result of `os.path.join("abc//", "xyz")` is `abc//xzy`. That is, the
+    // extra separator in "abc//" is left as-is. That behavior is reproduced
+    // here.
     string joined;
     const auto last(prev(parts.cend()));
     for (auto iter(parts.cbegin()); iter != parts.cend(); ++iter) {
@@ -46,7 +83,18 @@ string path::join(const vector<string>& parts) {
 }
 
 
-pair<string, string> path::split(const string& path) {
+/**
+ * Split a path into directory and name components.
+ *
+ * If the path has a trailing separator, the pathname component will be empty.
+ * Calling join() on the resulting segments will return an equivalent (but not
+ * necessarily identical) path.
+ *
+ * @param path: input path
+ * @param sep: path separator
+ * @return: (root, name) pair
+ */
+pair<string, string> split(const string& path, const string& sep) {
     auto pos(path.rfind(sep));
     if (pos == string::npos) {
         // No directory.
@@ -63,6 +111,60 @@ pair<string, string> path::split(const string& path) {
 }
 
 
+/**
+ * Normalize a path.
+ *
+ * @param path: input path
+ * @param sep: path separator
+ * @return normalized path
+ */
+string normpath(const std::string& path, const std::string& sep) {
+    static const string current{"."};
+    static const string parent{".."};
+    ssize_t level{0};
+    deque<string> parts;
+    for (const auto& item: str::split(path, sep)) {
+        // Process each part of the path.
+        if (item.empty() or item == current) {
+            continue;
+        }
+        if (item == parent) {
+            --level;
+            if (level >= 0) {
+                parts.pop_back();
+            }
+            else if (not path::isabs(path)) {
+                parts.push_back(parent);
+            }
+        }
+        else {
+            ++level;
+            parts.push_back(item);
+        }
+    }
+    string normed(join({parts.cbegin(), parts.cend()}, sep));
+    if (isabs(path, sep)) {
+        normed.insert(0, sep);
+    }
+    else if (normed.empty()) {
+        normed = current;
+    }
+    return normed;
+}
+
+}  // internal linkage
+
+
+string path::join(const vector<string>& paths) {
+    return ::join(paths, SEP);
+}
+
+
+pair<string, string> path::split(const string& path) {
+    return ::split(path, SEP);
+}
+
+
 string path::dirname(const string& path) {
     return split(path).first;
 }
@@ -73,8 +175,12 @@ string path::basename(const string& path) {
 }
 
 
-string path::abspath(const string& path)
-{
+string path::normpath(const std::string& path) {
+    return ::normpath(path, SEP);
+}
+
+
+string path::abspath(const string& path) {
     if (isabs(path)) {
         return normpath(path);
     }
@@ -83,7 +189,7 @@ string path::abspath(const string& path)
 
 
 bool path::isabs(const string& path) {
-    return startswith(path, sep);
+    return ::isabs(path, SEP);
 }
 
 
@@ -102,12 +208,13 @@ pair<string, string> path::splitext(const string& path) {
 }
 
 
-PureBasePath::PureBasePath(string path) {
+PureBasePath::PureBasePath(string path, const string& sep):
+    sep(sep) {
     if (isabs(path)) {
         parts_.emplace_back(sep);
         path.erase(path.begin());
     }
-    const auto parts(str::split(normpath(path), sep));
+    const auto parts(str::split(::normpath(path, sep), sep));
     if (parts.size() > 1 or parts.front() != ".") {
         copy(begin(parts), end(parts), back_inserter(parts_));
     }
@@ -125,7 +232,7 @@ PureBasePath::operator std::string() const {
 
 
 bool PureBasePath::is_absolute() const {
-    return parts_.empty() ? false : parts_.front() == sep;
+    return not parts_.empty() && parts_.front() == sep;
 }
 
 
@@ -192,4 +299,238 @@ short PureBasePath::compare(const PureBasePath& other) const {
         return 0;
     }
     return lhs < rhs ? -1 : 1;
+}
+
+
+void PureBasePath::set_name(const std::string& name) {
+    static const regex valid_name("^[^.][^" + sep + "]*$");
+    if (not regex_match(name, valid_name)) {
+        throw invalid_argument("invalid name '" + name + "'");
+    }
+    if (this->name().empty()) {
+        throw invalid_argument("path has an empty name");
+    }
+    parts_.pop_back();
+    parts_.emplace_back(name);
+    return;
+}
+
+
+void PureBasePath::set_suffix(const string& suffix) {
+    static const regex valid_suffix("^\\.[^" + sep + "]+$");
+    if (not (suffix.empty() or regex_match(suffix, valid_suffix))) {
+        throw invalid_argument("invalid suffix '" + suffix + "'");
+    }
+    if (this->name().empty()) {
+        throw invalid_argument("path has an empty name");
+    }
+    const auto name(stem() + suffix);
+    set_name(stem() + suffix);
+    return;
+}
+
+
+PurePosixPath::PurePosixPath(string path): PureBasePath(move(path), "/") {}
+
+
+PurePosixPath PurePosixPath::joinpath(const PurePosixPath& other) const {
+    return PurePosixPath(join({string(*this), string(other)}));
+}
+
+
+PurePosixPath PurePosixPath::joinpath(const string& other) const {
+    const vector<string> parts({string(*this), other});
+    return PurePosixPath(join(parts));
+}
+
+
+PurePosixPath PurePosixPath::operator/(const string& other) const {
+    // Not sold on using division to join paths (why not addition?), but
+    // sticking with the Python pathlib semantics for now.
+    return joinpath(other);
+}
+
+
+PurePosixPath PurePosixPath::operator/(const PurePosixPath& other) const {
+    return joinpath(other);
+}
+
+
+PurePosixPath& PurePosixPath::operator/=(const string& path) {
+    *this = joinpath(path);
+    return *this;
+}
+
+
+PurePosixPath& PurePosixPath::operator/=(const PurePosixPath& other) {
+    *this = joinpath(other);
+    return *this;
+}
+
+
+bool PurePosixPath::operator==(const PurePosixPath& other) const {
+    return compare(other) == 0;
+}
+
+
+bool PurePosixPath::operator!=(const PurePosixPath& other) const {
+    return not (*this == other);
+}
+
+
+bool PurePosixPath::operator<(const PurePosixPath& other) const {
+    return compare(other) < 0;
+}
+
+
+PurePosixPath PurePosixPath::parent() const {
+    PurePosixPath path(*this);
+    const string str(path);
+    if (not is_root()) {
+        path.parts_.pop_back();
+    }
+    return path;
+}
+
+
+vector<PurePosixPath> PurePosixPath::parents() const {
+    vector<PurePosixPath> paths;
+    PurePosixPath path(*this);
+    while (not path.is_root()) {
+        path = path.parent();
+        paths.emplace_back(path);
+    }
+    return paths;
+}
+
+
+PurePosixPath PurePosixPath::relative_to(const PurePosixPath& other) const {
+    const string error("path does not start with '" + string(other) + "'");
+    if (parts_.size() < other.parts_.size()) {
+        throw invalid_argument(error);
+    }
+    const auto diff(mismatch(other.parts_.begin(), other.parts_.end(), parts_.begin()));
+    if (diff.first != other.parts_.end() and not other.parts_.empty()) {
+        throw invalid_argument(error);
+    }
+    PurePosixPath path;
+    path.parts_ = {diff.second, parts_.end()};
+    return path;
+}
+
+
+PurePosixPath PurePosixPath::with_name(const string& name) const {
+    PurePosixPath path(*this);
+    path.set_name(name);
+    return path;
+}
+
+
+PurePosixPath PurePosixPath::with_suffix(const string& suffix) const {
+    PurePosixPath path(*this);
+    path.set_suffix(suffix);
+    return path;
+}
+
+
+PureWindowsPath::PureWindowsPath(string path): PureBasePath(move(path), "\\") {}
+
+
+PureWindowsPath PureWindowsPath::joinpath(const PureWindowsPath& other) const {
+    return PureWindowsPath(join({string(*this), string(other)}));
+}
+
+
+PureWindowsPath PureWindowsPath::joinpath(const string& other) const {
+    const vector<string> parts({string(*this), other});
+    return PureWindowsPath(join(parts));
+}
+
+
+PureWindowsPath PureWindowsPath::operator/(const string& other) const {
+    // Not sold on using division to join paths (why not addition?), but
+    // sticking with the Python pathlib semantics for now.
+    return joinpath(other);
+}
+
+
+PureWindowsPath PureWindowsPath::operator/(const PureWindowsPath& other) const {
+    return joinpath(other);
+}
+
+
+PureWindowsPath& PureWindowsPath::operator/=(const string& path) {
+    *this = joinpath(path);
+    return *this;
+}
+
+
+PureWindowsPath& PureWindowsPath::operator/=(const PureWindowsPath& other) {
+    *this = joinpath(other);
+    return *this;
+}
+
+
+bool PureWindowsPath::operator==(const PureWindowsPath& other) const {
+    return compare(other) == 0;
+}
+
+
+bool PureWindowsPath::operator!=(const PureWindowsPath& other) const {
+    return not (*this == other);
+}
+
+
+bool PureWindowsPath::operator<(const PureWindowsPath& other) const {
+    return compare(other) < 0;
+}
+
+
+PureWindowsPath PureWindowsPath::parent() const {
+    PureWindowsPath path(*this);
+    const string str(path);
+    if (not is_root()) {
+        path.parts_.pop_back();
+    }
+    return path;
+}
+
+
+vector<PureWindowsPath> PureWindowsPath::parents() const {
+    vector<PureWindowsPath> paths;
+    PureWindowsPath path(*this);
+    while (not path.is_root()) {
+        path = path.parent();
+        paths.emplace_back(path);
+    }
+    return paths;
+}
+
+
+PureWindowsPath PureWindowsPath::relative_to(const PureWindowsPath& other) const {
+    const string error{"path does not start with '" + string(other) + "'"};
+    if (parts_.size() < other.parts_.size()) {
+        throw invalid_argument(error);
+    }
+    const auto diff(mismatch(other.parts_.begin(), other.parts_.end(), parts_.begin()));
+    if (diff.first != other.parts_.end() and not other.parts_.empty()) {
+        throw invalid_argument(error);
+    }
+    PureWindowsPath path;
+    path.parts_ = {diff.second, parts_.end()};
+    return path;
+}
+
+
+PureWindowsPath PureWindowsPath::with_name(const string& name) const {
+    PureWindowsPath path(*this);
+    path.set_name(name);
+    return path;
+}
+
+
+PureWindowsPath PureWindowsPath::with_suffix(const string& suffix) const {
+    PureWindowsPath path(*this);
+    path.set_suffix(suffix);
+    return path;
 }
