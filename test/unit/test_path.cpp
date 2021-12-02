@@ -16,6 +16,7 @@
 #include "pypp/pypp.hpp"
 
 
+using namespace pypp;
 using namespace pypp::path;
 
 using pypp::tempfile::TemporaryDirectory;
@@ -201,9 +202,18 @@ TEST(path, islink) {
  * The fixture will be type-parametrized over all classes that implement the
  * PurePath interface.
  */
-template <typename T>
-class PurePathTest: public Test {};
-using PurePathTypes = Types<PurePath, Path>;
+template <typename Path>
+class PurePathTest: public Test {
+protected:
+    /**
+     * Replace separator with the class-specific value.
+     */
+    string sep(const string& path) {
+        const auto sep(Path().sep());
+        return sep != "/" ? str::replace(path, "/", sep) : path;
+    }
+};
+using PurePathTypes = Types<PurePosixPath, PureWindowsPath>;
 TYPED_TEST_CASE(PurePathTest, PurePathTypes);
 
 
@@ -220,10 +230,11 @@ TYPED_TEST(PurePathTest, copy) {
  * Test the PurePath equality operator.
  */
 TYPED_TEST(PurePathTest, eq_op) {
+    const auto sep(TypeParam().sep());
     ASSERT_TRUE(TypeParam() == TypeParam());
     ASSERT_TRUE(TypeParam("abc") == TypeParam("abc"));
-    ASSERT_TRUE(TypeParam("abc") == TypeParam("./abc"));
-    ASSERT_FALSE(TypeParam("abc") == TypeParam("/abc/"));
+    ASSERT_TRUE(TypeParam("abc") == TypeParam(this->sep("./abc")));
+    ASSERT_FALSE(TypeParam("abc") == TypeParam(this->sep("/abc/")));
     ASSERT_FALSE(TypeParam("abc") == TypeParam());
     static const TypeParam path("abc");
     ASSERT_TRUE(path == path);  // identity
@@ -234,10 +245,11 @@ TYPED_TEST(PurePathTest, eq_op) {
  * Test the PurePath inequality operator.
  */
 TYPED_TEST(PurePathTest, ne_op) {
+    const auto sep(TypeParam().sep());
     ASSERT_FALSE(TypeParam() != TypeParam());
     ASSERT_FALSE(TypeParam("abc") != TypeParam("abc"));
-    ASSERT_FALSE(TypeParam("abc") != TypeParam("./abc"));
-    ASSERT_TRUE(TypeParam("abc") != TypeParam("/abc/"));
+    ASSERT_FALSE(TypeParam("abc") != TypeParam(this->sep("./abc")));
+    ASSERT_TRUE(TypeParam("abc") != TypeParam(this->sep("/abc/")));
     ASSERT_TRUE(TypeParam("abc") != TypeParam());
     static const TypeParam path("abc");
     ASSERT_FALSE(path != path);  // identity
@@ -252,8 +264,8 @@ TYPED_TEST(PurePathTest, lt_op) {
     ASSERT_FALSE(path < path);  // identity
     ASSERT_TRUE(TypeParam("abc") < TypeParam("abd"));
     ASSERT_FALSE(TypeParam("abd") < TypeParam("abc"));
-    ASSERT_FALSE(TypeParam("abc") < TypeParam("./abc"));
-    ASSERT_FALSE(TypeParam("./abc") < TypeParam("abc"));
+    ASSERT_FALSE(TypeParam("abc") < TypeParam(this->sep("./abc")));
+    ASSERT_FALSE(TypeParam(this->sep("./abc")) < TypeParam("abc"));
 }
 
 
@@ -263,11 +275,11 @@ TYPED_TEST(PurePathTest, lt_op) {
 TYPED_TEST(PurePathTest, string_op) {
     ASSERT_EQ(".", string(TypeParam()));
     ASSERT_EQ(".", string(TypeParam(".")));
-    ASSERT_EQ(".", string(TypeParam("./")));
-    ASSERT_EQ("/", string(TypeParam("/")));
-    ASSERT_EQ("/abc", string(TypeParam("/abc")));
+    ASSERT_EQ(".", string(TypeParam(this->sep("./"))));
+    ASSERT_EQ(this->sep("/"), string(TypeParam(this->sep("/"))));
+    ASSERT_EQ(this->sep("/abc"), string(TypeParam(this->sep("/abc"))));
     ASSERT_EQ("abc", string(TypeParam("abc")));
-    ASSERT_EQ("abc", string(TypeParam("abc/")));
+    ASSERT_EQ("abc", string(TypeParam(this->sep("abc/"))));
 }
 
 
@@ -277,8 +289,8 @@ TYPED_TEST(PurePathTest, string_op) {
 TYPED_TEST(PurePathTest, is_absolute) {
     ASSERT_FALSE(TypeParam().is_absolute());
     ASSERT_FALSE(TypeParam("abc").is_absolute());
-    ASSERT_FALSE(TypeParam("./abc").is_absolute());
-    ASSERT_TRUE(TypeParam("/abc").is_absolute());
+    ASSERT_FALSE(TypeParam(this->sep("./abc")).is_absolute());
+    ASSERT_TRUE(TypeParam(this->sep("/abc")).is_absolute());
 }
 
 
@@ -288,12 +300,12 @@ TYPED_TEST(PurePathTest, is_absolute) {
 TYPED_TEST(PurePathTest, name) {
     ASSERT_EQ("", TypeParam("").name());
     ASSERT_EQ("", TypeParam(".").name());
-    ASSERT_EQ("", TypeParam("/").name());
+    ASSERT_EQ("", TypeParam(this->sep("/")).name());
     ASSERT_EQ(".abc", TypeParam(".abc").name());
-    ASSERT_EQ("abc", TypeParam("./abc").name());
-    ASSERT_EQ("abc", TypeParam("/abc").name());
-    ASSERT_EQ("abc", TypeParam("/abc/").name());
-    ASSERT_EQ("def", TypeParam("abc/def").name());
+    ASSERT_EQ("abc", TypeParam(this->sep("./abc")).name());
+    ASSERT_EQ("abc", TypeParam(this->sep("/abc")).name());
+    ASSERT_EQ("abc", TypeParam(this->sep("/abc/")).name());
+    ASSERT_EQ("def", TypeParam(this->sep("abc/def")).name());
 }
 
 
@@ -304,13 +316,13 @@ TYPED_TEST(PurePathTest, parts) {
     ASSERT_EQ(vector<string>(), TypeParam().parts());
     ASSERT_EQ(vector<string>(), TypeParam("").parts());
     ASSERT_EQ(vector<string>(), TypeParam(".").parts());
-    ASSERT_EQ(vector<string>({".."}), TypeParam("./..").parts());
-    ASSERT_EQ(vector<string>({"/"}), TypeParam("/").parts());
-    ASSERT_EQ(vector<string>({"abc"}), TypeParam("./abc").parts());
-    ASSERT_EQ(vector<string>({"/", "abc"}), TypeParam("/abc").parts());
-    ASSERT_EQ(vector<string>({"abc", "def"}), TypeParam("abc/def").parts());
-    ASSERT_EQ(vector<string>({"abc", "def"}), TypeParam("abc//def").parts());
-    ASSERT_EQ(vector<string>({"..", "abc"}), TypeParam("../abc").parts());
+    ASSERT_EQ(vector<string>({".."}), TypeParam(this->sep("./..")).parts());
+    ASSERT_EQ(vector<string>({this->sep("/")}), TypeParam(this->sep("/")).parts());
+    ASSERT_EQ(vector<string>({"abc"}), TypeParam(this->sep("./abc")).parts());
+    ASSERT_EQ(vector<string>({this->sep("/"), "abc"}), TypeParam(this->sep("/abc")).parts());
+    ASSERT_EQ(vector<string>({"abc", "def"}), TypeParam(this->sep("abc/def")).parts());
+    ASSERT_EQ(vector<string>({"abc", "def"}), TypeParam(this->sep("abc//def")).parts());
+    ASSERT_EQ(vector<string>({"..", "abc"}), TypeParam(this->sep("../abc")).parts());
 }
 
 
@@ -319,9 +331,9 @@ TYPED_TEST(PurePathTest, parts) {
  */
 TYPED_TEST(PurePathTest, root) {
     ASSERT_EQ("", TypeParam().root());
-    ASSERT_EQ("", TypeParam("abc/def").root());
-    ASSERT_EQ("/", TypeParam("/").root());
-    ASSERT_EQ("/", TypeParam("/abc/def").root());
+    ASSERT_EQ("", TypeParam(this->sep("abc/def")).root());
+    ASSERT_EQ(this->sep("/"), TypeParam(this->sep("/")).root());
+    ASSERT_EQ(this->sep("/"), TypeParam(this->sep("/abc/def")).root());
 }
 
 
@@ -332,8 +344,8 @@ TYPED_TEST(PurePathTest, stem) {
     ASSERT_EQ("", TypeParam().stem());
     ASSERT_EQ("", TypeParam(".").stem());
     ASSERT_EQ("abc.", TypeParam("abc.").stem());
-    ASSERT_EQ("def.", TypeParam("/abc/def.").stem());
-    ASSERT_EQ("def", TypeParam("/abc/def.xyz").stem());
+    ASSERT_EQ("def.", TypeParam(this->sep("/abc/def.")).stem());
+    ASSERT_EQ("def", TypeParam(this->sep("/abc/def.xyz")).stem());
 }
 
 
@@ -367,10 +379,10 @@ TYPED_TEST(PurePathTest, suffixes) {
  */
 TYPED_TEST(PurePathTest, joinpath) {
     ASSERT_EQ(TypeParam(), TypeParam().joinpath(TypeParam()));
-    ASSERT_EQ(TypeParam("/"), TypeParam().joinpath(TypeParam("/")));
+    ASSERT_EQ(TypeParam(this->sep("/")), TypeParam().joinpath(TypeParam(this->sep("/"))));
     ASSERT_EQ(TypeParam("abc"), TypeParam().joinpath(TypeParam("abc")));
-    ASSERT_EQ(TypeParam("abc/def"), TypeParam("abc").joinpath(TypeParam("def/")));
-    ASSERT_EQ(TypeParam("abc/def"), TypeParam("abc").joinpath("def/"));
+    ASSERT_EQ(TypeParam(this->sep("abc/def")), TypeParam("abc").joinpath(TypeParam(this->sep("def/"))));
+    ASSERT_EQ(TypeParam(this->sep("abc/def")), TypeParam("abc").joinpath(this->sep("def/")));
     //ASSERT_EQ(TypeParam("/def"), TypeParam("abc").joinpath(TypeParam("/def")));  // FIXME
 }
 
@@ -380,10 +392,10 @@ TYPED_TEST(PurePathTest, joinpath) {
  */
 TYPED_TEST(PurePathTest, join_op) {
     ASSERT_EQ(TypeParam(), TypeParam() / TypeParam());
-    ASSERT_EQ(TypeParam("/"), TypeParam() / TypeParam("/"));
+    ASSERT_EQ(TypeParam(this->sep("/")), TypeParam() / TypeParam(this->sep("/")));
     ASSERT_EQ(TypeParam("abc"), TypeParam() / TypeParam("abc"));
-    ASSERT_EQ(TypeParam("abc/def"), TypeParam("abc") / TypeParam("def/"));
-    ASSERT_EQ(TypeParam("abc/def"), TypeParam("abc") / "def");
+    ASSERT_EQ(TypeParam(this->sep("abc/def")), TypeParam("abc") / TypeParam(this->sep("def/")));
+    ASSERT_EQ(TypeParam(this->sep("abc/def")), TypeParam("abc") / "def");
     //ASSERT_EQ(TypeParam("/def"), TypeParam("abc") / TypeParam("/def"));  // FIXME
 }
 
@@ -394,7 +406,7 @@ TYPED_TEST(PurePathTest, join_op) {
 TYPED_TEST(PurePathTest, join_assign_op) {
     TypeParam path("abc");
     path /= "def";
-    ASSERT_EQ(TypeParam("abc/def"), path);
+    ASSERT_EQ(TypeParam(this->sep("abc/def")), path);
 }
 
 
@@ -404,10 +416,10 @@ TYPED_TEST(PurePathTest, join_assign_op) {
 TYPED_TEST(PurePathTest, parent) {
     ASSERT_EQ(TypeParam(), TypeParam().parent());
     ASSERT_EQ(TypeParam(), TypeParam("abc").parent());
-    ASSERT_EQ(TypeParam("/"), TypeParam("/abc").parent());
-    ASSERT_EQ(TypeParam("abc"), TypeParam("abc/def").parent());
-    ASSERT_EQ(TypeParam("abc/def"), TypeParam("abc/def/xyz").parent());
-    ASSERT_EQ(TypeParam("/"), TypeParam("/").parent());
+    ASSERT_EQ(TypeParam(this->sep("/")), TypeParam(this->sep("/abc")).parent());
+    ASSERT_EQ(TypeParam("abc"), TypeParam(this->sep("abc/def")).parent());
+    ASSERT_EQ(TypeParam(this->sep("abc/def")), TypeParam(this->sep("abc/def/xyz")).parent());
+    ASSERT_EQ(TypeParam(this->sep("/")), TypeParam(this->sep("/")).parent());
 }
 
 
@@ -416,9 +428,9 @@ TYPED_TEST(PurePathTest, parent) {
  */
 TYPED_TEST(PurePathTest, parents) {
     ASSERT_EQ(vector<TypeParam>(), TypeParam().parents());
-    ASSERT_EQ(vector<TypeParam>(), TypeParam("/").parents());
-    ASSERT_EQ(vector<TypeParam>({TypeParam("abc"), TypeParam()}), TypeParam("abc/def").parents());
-    ASSERT_EQ(vector<TypeParam>({TypeParam("/abc"), TypeParam("/")}), TypeParam("/abc/def").parents());
+    ASSERT_EQ(vector<TypeParam>(), TypeParam(this->sep("/")).parents());
+    ASSERT_EQ(vector<TypeParam>({TypeParam("abc"), TypeParam()}), TypeParam(this->sep("abc/def")).parents());
+    ASSERT_EQ(vector<TypeParam>({TypeParam(this->sep("/abc")), TypeParam(this->sep("/"))}), TypeParam(this->sep("/abc/def")).parents());
 }
 
 
@@ -426,12 +438,12 @@ TYPED_TEST(PurePathTest, parents) {
  * Test the PurePath::relative_to() method.
  */
 TYPED_TEST(PurePathTest, relative_to) {
-    ASSERT_THROW(TypeParam("").relative_to(TypeParam("/")), invalid_argument);
+    ASSERT_THROW(TypeParam("").relative_to(TypeParam(this->sep("/"))), invalid_argument);
     ASSERT_THROW(TypeParam("abc").relative_to(TypeParam("def")), invalid_argument);
-    ASSERT_THROW(TypeParam("abc").relative_to(TypeParam("abc/def")), invalid_argument);
+    ASSERT_THROW(TypeParam("abc").relative_to(TypeParam(this->sep("abc/def"))), invalid_argument);
     ASSERT_EQ(TypeParam("abc"), TypeParam("abc").relative_to(TypeParam("")));
     ASSERT_EQ(TypeParam(), TypeParam("abc").relative_to(TypeParam("abc")));
-    ASSERT_EQ(TypeParam("def"), TypeParam("abc/def").relative_to(TypeParam("abc")));
+    ASSERT_EQ(TypeParam("def"), TypeParam(this->sep("abc/def")).relative_to(TypeParam("abc")));
 }
 
 
@@ -442,13 +454,13 @@ TYPED_TEST(PurePathTest, relative_to) {
 TYPED_TEST(PurePathTest, with_name) {
     ASSERT_THROW(TypeParam("").with_name("abc"), invalid_argument);
     ASSERT_THROW(TypeParam(".").with_name("abc"), invalid_argument);
-    ASSERT_THROW(TypeParam("/").with_name("abc"), invalid_argument);
+    ASSERT_THROW(TypeParam(this->sep("/")).with_name("abc"), invalid_argument);
     ASSERT_THROW(TypeParam("abc").with_name(""), invalid_argument);
     ASSERT_THROW(TypeParam("abc").with_name("."), invalid_argument);
-    ASSERT_THROW(TypeParam("abc").with_name("def/"), invalid_argument);
+    ASSERT_THROW(TypeParam("abc").with_name(this->sep("def/")), invalid_argument);
     ASSERT_EQ(TypeParam("xyz"), TypeParam("abc").with_name("xyz"));
-    ASSERT_EQ(TypeParam("/xyz"), TypeParam("/abc").with_name("xyz"));
-    ASSERT_EQ(TypeParam("abc/xyz"), TypeParam("abc/def").with_name("xyz"));
+    ASSERT_EQ(TypeParam(this->sep("/xyz")), TypeParam(this->sep("/abc")).with_name("xyz"));
+    ASSERT_EQ(TypeParam(this->sep("abc/xyz")), TypeParam(this->sep("abc/def")).with_name("xyz"));
 }
 
 
@@ -458,9 +470,9 @@ TYPED_TEST(PurePathTest, with_name) {
 TYPED_TEST(PurePathTest, with_suffix) {
     ASSERT_THROW(TypeParam("").with_suffix(".xyz"), invalid_argument);
     ASSERT_THROW(TypeParam(".").with_suffix(".xyz"), invalid_argument);
-    ASSERT_THROW(TypeParam("/").with_suffix(".xyz"), invalid_argument);
+    ASSERT_THROW(TypeParam(this->sep("/")).with_suffix(".xyz"), invalid_argument);
     ASSERT_THROW(TypeParam("abc").with_suffix("."), invalid_argument);
-    ASSERT_THROW(TypeParam("abc").with_suffix("./"), invalid_argument);
+    ASSERT_THROW(TypeParam("abc").with_suffix(this->sep("./")), invalid_argument);
     ASSERT_EQ(TypeParam("abc"), TypeParam("abc").with_suffix(""));
     ASSERT_EQ(TypeParam("abc.xyz"), TypeParam("abc").with_suffix(".xyz"));
     ASSERT_EQ(TypeParam("abc..xyz"), TypeParam("abc.").with_suffix(".xyz"));
@@ -682,49 +694,4 @@ TEST_F(PathTest, iterdir) {
     set<Path> items(begin(paths), end(paths));  // need guaranteed ordering
     ASSERT_EQ(set<Path>({dir, file}), items);
     ASSERT_THROW(file.iterdir(), runtime_error);  // not a directory
-}
-
-
-/**
- * Test Fixture for PureWindowsPath unit tests.
- *
- * The fixture will be type-parametrized over all classes that implement the
- * PurePath interface.
- */
-class PureWindowsPathTest: public Test {};
-
-
-/**
- * Test the PureWindowsPath::sep() method.
- */
-TEST_F(PureWindowsPathTest, sep) {
-    const PureWindowsPath path;
-    ASSERT_EQ("\\", path.sep());
-}
-
-/**
- * Test the PureWindowsPath equality operator.
- */
-TEST_F(PureWindowsPathTest, eq_op) {
-    ASSERT_TRUE(PureWindowsPath() == PureWindowsPath());
-    ASSERT_TRUE(PureWindowsPath("abc") == PureWindowsPath("abc"));
-    ASSERT_TRUE(PureWindowsPath("abc") == PureWindowsPath(".\\abc"));
-    ASSERT_FALSE(PureWindowsPath("abc") == PureWindowsPath("\\abc\\"));
-    ASSERT_FALSE(PureWindowsPath("abc") == PureWindowsPath());
-    static const PureWindowsPath path("abc");
-    ASSERT_TRUE(path == path);  // identity
-}
-
-
-/**
- * Test the PureWindowsPath inequality operator.
- */
-TEST_F(PureWindowsPathTest, ne_op) {
-    ASSERT_FALSE(PureWindowsPath() != PureWindowsPath());
-    ASSERT_FALSE(PureWindowsPath("abc") != PureWindowsPath("abc"));
-    ASSERT_FALSE(PureWindowsPath("abc") != PureWindowsPath(".\\abc"));
-    ASSERT_TRUE(PureWindowsPath("abc") != PureWindowsPath("\\abc\\"));
-    ASSERT_TRUE(PureWindowsPath("abc") != PureWindowsPath());
-    static const PureWindowsPath path("abc");
-    ASSERT_FALSE(path != path);  // identity
 }
