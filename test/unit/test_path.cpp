@@ -695,6 +695,14 @@ class PureWindowsPathTest: public Test {};
 
 
 /**
+ * Test the PureWindowsPath::sep() method.
+ */
+TEST_F(PureWindowsPathTest, sep) {
+    const PureWindowsPath path;
+    ASSERT_EQ("\\", path.sep());
+}
+
+/**
  * Test the PureWindowsPath equality operator.
  */
 TEST_F(PureWindowsPathTest, eq_op) {

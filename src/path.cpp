@@ -208,8 +208,7 @@ pair<string, string> path::splitext(const string& path) {
 }
 
 
-PureBasePath::PureBasePath(string path, const string& sep):
-    sep(sep) {
+PureBasePath::PureBasePath(string path, const string& sep) {
     if (isabs(path)) {
         parts_.emplace_back(sep);
         path.erase(path.begin());
@@ -222,7 +221,7 @@ PureBasePath::PureBasePath(string path, const string& sep):
 
 
 PureBasePath::operator std::string() const {
-    auto result(parts_.empty() ? "." : str::join(parts_, sep));
+    auto result(parts_.empty() ? "." : str::join(parts_, sep()));
     if (is_absolute() and parts_.size() > 1) {
         // Fix the double slash at the beginning.
         result.erase(result.begin());
@@ -232,7 +231,7 @@ PureBasePath::operator std::string() const {
 
 
 bool PureBasePath::is_absolute() const {
-    return not parts_.empty() && parts_.front() == sep;
+    return not parts_.empty() && parts_.front() == sep();
 }
 
 
@@ -242,7 +241,7 @@ string PureBasePath::name() const {
 
 
 string PureBasePath::root() const {
-    return is_absolute() ? sep : "";
+    return is_absolute() ? sep() : "";
 }
 
 
@@ -303,7 +302,7 @@ short PureBasePath::compare(const PureBasePath& other) const {
 
 
 void PureBasePath::set_name(const std::string& name) {
-    static const regex valid_name("^[^.][^" + sep + "]*$");
+    static const regex valid_name("^[^.][^" + sep() + "]*$");
     if (not regex_match(name, valid_name)) {
         throw invalid_argument("invalid name '" + name + "'");
     }
@@ -317,7 +316,7 @@ void PureBasePath::set_name(const std::string& name) {
 
 
 void PureBasePath::set_suffix(const string& suffix) {
-    static const regex valid_suffix("^\\.[^" + sep + "]+$");
+    static const regex valid_suffix("^\\.[^" + sep() + "]+$");
     if (not (suffix.empty() or regex_match(suffix, valid_suffix))) {
         throw invalid_argument("invalid suffix '" + suffix + "'");
     }

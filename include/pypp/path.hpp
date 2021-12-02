@@ -157,6 +157,14 @@ public:
      */
     explicit operator std::string() const;
 
+    virtual ~PureBasePath() = default;
+
+    /**
+     *
+     * @return: path separator
+     */
+    virtual std::string sep() const = 0;
+
     /**
      * Determine if the path is absolute.
      *
@@ -168,7 +176,7 @@ public:
      * Get the final path component.
      *
      * @return name
-     */ 
+     */
     std::string name() const;
 
     /**
@@ -207,9 +215,6 @@ public:
     std::vector<std::string> suffixes() const;
 
 protected:
-    /** @property: path separator*/
-    std::string sep;
-
     /** @property: path components */
     std::vector<std::string> parts_;
 
@@ -369,6 +374,11 @@ public:
      * @return: new path
      */
     PurePosixPath with_suffix(const std::string& suffix) const;
+
+    /**
+     *
+     */
+    virtual std::string sep() const { return "/"; }
 };
 
 
@@ -480,6 +490,11 @@ public:
      * @return: path with new suffix
      */
     PureWindowsPath with_suffix(const std::string& suffix) const;
+
+    /**
+     *
+     */
+    virtual std::string sep() const { return "\\"; }
 };
 
 
