@@ -236,7 +236,9 @@ TEST(string, endswith)
 {
     ASSERT_TRUE(endswith("abc", "bc"));
     ASSERT_TRUE(endswith("abc", "abc"));
-    ASSERT_FALSE(endswith("abc", "xyz"));
+    ASSERT_TRUE(endswith("abc", 'c'));
+    ASSERT_FALSE(endswith("abc", "ab"));
+    ASSERT_FALSE(endswith("abc", 'b'));
     ASSERT_FALSE(endswith("abc", "abcabc"));  // test suffix longer than str
 }
 

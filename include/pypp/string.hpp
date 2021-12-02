@@ -163,15 +163,21 @@ bool startswith(const std::string& str, const std::string& prefix);
 bool startswith(const std::string& str, char prefix);
 
 
-/// Determine if a string ends with a suffix.
-///
-/// Unlike the Python version, this does not support optional beginning and
-/// ending positions for the comparision. Use `str.substr()` as needed instead.
-///
-/// @param str string to test
-/// @param suffix string to match
-/// @return true if the string ends with the suffix
+/**
+ * Determine if a string ends with a suffix.
+ *
+ * Unlike the Python version, this does not support optional beginning and
+ * ending positions for the comparision. Use `str.substr()` as needed instead.
+ *
+ * @param str: string to test
+ * @param suffix: suffix to match
+ * @return: true if the string ends with the suffix
+ */
 bool endswith(const std::string& str, const std::string& suffix);
+
+
+/** @overload */
+bool endswith(const std::string& str, char prefix);
 
 
 /// Replace all occurrences of text in a string.

@@ -207,6 +207,11 @@ bool str::endswith(const string& str, const string& suffix) {
 }
 
 
+bool str::endswith(const string& str, char suffix) {
+    return str.back() == suffix;
+}
+
+
 string str::replace(string str, const string& old, const string& sub, ssize_t maxcount) {
     ssize_t count(0);
     string::size_type pos(0);
