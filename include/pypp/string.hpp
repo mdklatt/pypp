@@ -146,15 +146,21 @@ std::vector<std::string> rsplit(const std::string& str, ssize_t maxsplit=-1);
 std::vector<std::string> rsplit(const std::string& str, const std::string& sep, ssize_t maxsplit=-1);
 
 
-/// Determine if a string starts with a prefix.
-///
-/// Unlike the Python version, this does not support optional beginning and
-/// ending positions for the comparision. Use `str.substr()` as needed instead.
-///
-/// @param str string to test
-/// @param prefix string to match
-/// @return true if the string begins with the prefix
+/**
+ * Determine if a string starts with a prefix.
+ *
+ * Unlike the Python version, this does not support optional beginning and
+ * ending positions for the comparision. Use `str.substr()` as needed instead.
+ *
+ * @param str: string to test
+ * @param prefix: prefix to match
+ * @return: true if the string begins with the prefix
+ */
 bool startswith(const std::string& str, const std::string& prefix);
+
+
+/** @overload */
+bool startswith(const std::string& str, char prefix);
 
 
 /// Determine if a string ends with a suffix.

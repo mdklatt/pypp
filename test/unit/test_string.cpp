@@ -217,13 +217,15 @@ TEST(string, rsplit_sep)
 }
 
 
-/// Test the startswith() function.
-///
-TEST(string, startswith)
-{
+/**
+ * Test the startswith() function.
+ */
+TEST(string, startswith) {
     ASSERT_TRUE(startswith("abc", "ab"));
     ASSERT_TRUE(startswith("abc", "abc"));
-    ASSERT_FALSE(startswith("abc", "xyz"));
+    ASSERT_TRUE(startswith("abc", 'a'));
+    ASSERT_FALSE(startswith("abc", "bc"));
+    ASSERT_FALSE(startswith("abc", 'b'));
     ASSERT_FALSE(startswith("abc", "abcabc"));  // test prefix longer than str
 }
 

@@ -191,6 +191,11 @@ bool str::startswith(const string& str, const string& prefix) {
 }
 
 
+bool str::startswith(const string& str, char prefix) {
+    return str.front() == prefix;
+}
+
+
 bool str::endswith(const string& str, const string& suffix) {
     // Making a deliberate decision to break with Python functionality, which
     // supports optional beginning and ending positions for the comparison.
