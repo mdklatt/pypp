@@ -5,6 +5,7 @@
 #include "sys/stat.h"
 #include "dirent.h"
 #include <cstdio>
+#include <cstring>
 #include <algorithm>
 #include <iterator>
 #include <map>
