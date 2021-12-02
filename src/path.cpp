@@ -209,7 +209,7 @@ pair<string, string> path::splitext(const string& path) {
 
 
 PureBasePath::PureBasePath(string path, const string& sep) {
-    if (isabs(path)) {
+    if (::isabs(path, sep)) {
         parts_.emplace_back(sep);
         path.erase(path.begin());
     }
@@ -231,7 +231,7 @@ PureBasePath::operator std::string() const {
 
 
 bool PureBasePath::is_absolute() const {
-    return not parts_.empty() && parts_.front() == sep();
+    return not parts_.empty() and parts_.front() == sep();
 }
 
 
@@ -441,8 +441,7 @@ PureWindowsPath PureWindowsPath::joinpath(const PureWindowsPath& other) const {
 
 
 PureWindowsPath PureWindowsPath::joinpath(const string& other) const {
-    const vector<string> parts({string(*this), other});
-    return PureWindowsPath(join(parts));
+    return PureWindowsPath(join({string(*this), other}));
 }
 
 
