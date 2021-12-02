@@ -49,7 +49,7 @@ using path::PurePosixPath;
 using path::PosixPath;
 
 
-const string path::SEP("/");
+const char path::SEP(PYPP_POSIX_SEP);
 
 
 // In the Python implementation a Path inherits from a PurePath, and

@@ -10,4 +10,4 @@ using namespace pypp;
 using path::PureWindowsPath;
 
 
-const string path::SEP("\\");
+const char path::SEP(PYPP_WINDOWS_SEP);

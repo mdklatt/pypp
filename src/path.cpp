@@ -42,7 +42,7 @@ namespace {
  * @param sep: path separator
  * @return: true for an absolute path
  */
-bool isabs(const string& path, const string& sep) {
+bool isabs(const string& path, char sep) {
     return startswith(path, sep);
 }
 
@@ -57,7 +57,7 @@ bool isabs(const string& path, const string& sep) {
  * @param sep: path separator
  * @return: joined path
  */
-string join(const vector<string>& paths, const string& sep) {
+string join(const vector<string>& paths, char sep) {
     // The Python documentation for os.path.join() is ambiguous about the
     // handling of path separators, stating that the joined path has "exactly
     // one directory separator following each non-empty part". However, the
@@ -94,17 +94,17 @@ string join(const vector<string>& paths, const string& sep) {
  * @param sep: path separator
  * @return: (root, name) pair
  */
-pair<string, string> split(const string& path, const string& sep) {
+pair<string, string> split(const string& path, char sep) {
     auto pos(path.rfind(sep));
     if (pos == string::npos) {
         // No directory.
         return make_pair(string(""), path);
     }
-    pos += sep.length();
+    pos += 1;
     string root(path.substr(0, pos));
     if (root.find_first_not_of(sep) != string::npos) {
         // Strip trailing separators unless this is the root directory.
-        root = rstrip(root, sep);
+        root = rstrip(root, string{1, sep});
     }
     const auto name(path.substr(pos));
     return make_pair(root, name);
@@ -118,12 +118,12 @@ pair<string, string> split(const string& path, const string& sep) {
  * @param sep: path separator
  * @return normalized path
  */
-string normpath(const std::string& path, const std::string& sep) {
+string normpath(const std::string& path, char sep) {
     static const string current{"."};
     static const string parent{".."};
     ssize_t level{0};
     deque<string> parts;
-    for (const auto& item: str::split(path, sep)) {
+    for (const auto& item: str::split(path, string(1, sep))) {
         // Process each part of the path.
         if (item.empty() or item == current) {
             continue;
@@ -144,7 +144,7 @@ string normpath(const std::string& path, const std::string& sep) {
     }
     string normed(join({parts.cbegin(), parts.cend()}, sep));
     if (isabs(path, sep)) {
-        normed.insert(0, sep);
+        normed.insert(0, 1, sep);
     }
     else if (normed.empty()) {
         normed = current;
@@ -208,20 +208,23 @@ pair<string, string> path::splitext(const string& path) {
 }
 
 
-PureBasePath::PureBasePath(string path, const string& sep) {
+template <char SEP>
+PureBasePath<SEP>::PureBasePath(string path) {
+    static const string pathsep(1, sep);
     if (::isabs(path, sep)) {
-        parts_.emplace_back(sep);
+        parts_.emplace_back(pathsep);
         path.erase(path.begin());
     }
-    const auto parts(str::split(::normpath(path, sep), sep));
+    const auto parts(str::split(::normpath(path, sep), pathsep));
     if (parts.size() > 1 or parts.front() != ".") {
         copy(begin(parts), end(parts), back_inserter(parts_));
     }
 }
 
 
-PureBasePath::operator std::string() const {
-    auto result(parts_.empty() ? "." : str::join(parts_, sep()));
+template <char SEP>
+PureBasePath<SEP>::operator std::string() const {
+    auto result(parts_.empty() ? "." : str::join(parts_, sep));
     if (is_absolute() and parts_.size() > 1) {
         // Fix the double slash at the beginning.
         result.erase(result.begin());
@@ -230,27 +233,32 @@ PureBasePath::operator std::string() const {
 }
 
 
-bool PureBasePath::is_absolute() const {
-    return not parts_.empty() and parts_.front() == sep();
+template <char SEP>
+bool PureBasePath<SEP>::is_absolute() const {
+    return not parts_.empty() and ::isabs(parts_.front(), sep);
 }
 
 
-string PureBasePath::name() const {
+template <char SEP>
+string PureBasePath<SEP>::name() const {
     return is_root() ? "" : parts_.back();
 }
 
 
-string PureBasePath::root() const {
-    return is_absolute() ? sep() : "";
+template <char SEP>
+string PureBasePath<SEP>::root() const {
+    return is_absolute() ? string(1, sep) : "";
 }
 
 
-bool PureBasePath::is_root() const {
+template <char SEP>
+bool PureBasePath<SEP>::is_root() const {
     return parts_.empty() or (parts_.size() == 1 and is_absolute());
 }
 
 
-string PureBasePath::stem() const {
+template <char SEP>
+string PureBasePath<SEP>::stem() const {
     string stem;
     tie(stem, std::ignore) = splitext(name());
     if (stem == ".") {
@@ -265,7 +273,8 @@ string PureBasePath::stem() const {
 }
 
 
-string PureBasePath::suffix() const {
+template <char SEP>
+string PureBasePath<SEP>::suffix() const {
     string suffix;
     tie(std::ignore, suffix) = splitext(name());
     if (suffix == ".") {
@@ -277,7 +286,8 @@ string PureBasePath::suffix() const {
 }
 
 
-vector<string> PureBasePath::suffixes() const {
+template <char SEP>
+vector<string> PureBasePath<SEP>::suffixes() const {
     const auto name(this->name());
     if (startswith(name, ".") or endswith(name, ".")) {
         return {};
@@ -291,7 +301,8 @@ vector<string> PureBasePath::suffixes() const {
 }
 
 
-short PureBasePath::compare(const PureBasePath& other) const {
+template <char SEP>
+short PureBasePath<SEP>::compare(const PureBasePath& other) const {
     const string lhs(*this);
     const string rhs(other);
     if (lhs == rhs) {
@@ -301,12 +312,14 @@ short PureBasePath::compare(const PureBasePath& other) const {
 }
 
 
-void PureBasePath::set_name(const std::string& name) {
-    // The backslash must be escaped inside a regular expression, so for
-    // Windows the path separator needs to be escaped twice, i.e. "\\\\"
-    static const string esc("\\");
-    const auto sep(this->sep());
-    const auto sep_re(sep == esc ? esc + sep : sep);
+template <char SEP>
+void PureBasePath<SEP>::set_name(const std::string& name) {
+    static const char esc{'\\'};
+    string sep_re(1, sep);
+    if (sep == esc) {
+        // This character must be escaped inside a regular expression.
+        sep_re = esc + sep_re;
+    }
     const regex valid_name("^[^.][^" + sep_re + "]*$");
     if (not regex_match(name, valid_name)) {
         throw invalid_argument("invalid name '" + name + "'");
@@ -319,12 +332,14 @@ void PureBasePath::set_name(const std::string& name) {
 }
 
 
-void PureBasePath::set_suffix(const string& suffix) {
-    // The backslash must be escaped inside a regular expression, so for
-    // Windows the path separator needs to be escaped twice, i.e. "\\\\"
-    static const string esc("\\");
-    const auto sep(this->sep());
-    const auto sep_re(sep == esc ? esc + sep : sep);
+template <char SEP>
+void PureBasePath<SEP>::set_suffix(const string& suffix) {
+    static const char esc{'\\'};
+    string sep_re(1, sep);
+    if (sep == esc) {
+        // This character must be escaped inside a regular expression.
+        sep_re = esc + sep_re;
+    }
     const regex valid_suffix("^\\.[^" + sep_re + "]+$");
     if (not (suffix.empty() or regex_match(suffix, valid_suffix))) {
         throw invalid_argument("invalid suffix '" + suffix + "'");
@@ -337,7 +352,7 @@ void PureBasePath::set_suffix(const string& suffix) {
 }
 
 
-PurePosixPath::PurePosixPath(string path): PureBasePath(move(path), "/") {}
+PurePosixPath::PurePosixPath(string path): PureBasePath(move(path)) {}
 
 
 PurePosixPath PurePosixPath::joinpath(const PurePosixPath& other) const {
@@ -347,7 +362,7 @@ PurePosixPath PurePosixPath::joinpath(const PurePosixPath& other) const {
 
 PurePosixPath PurePosixPath::joinpath(const string& other) const {
     const vector<string> parts({string(*this), other});
-    return PurePosixPath(::join(parts, sep()));
+    return PurePosixPath(::join(parts, sep));
 }
 
 
@@ -440,7 +455,7 @@ PurePosixPath PurePosixPath::with_suffix(const string& suffix) const {
 }
 
 
-PureWindowsPath::PureWindowsPath(string path): PureBasePath(move(path), "\\") {}
+PureWindowsPath::PureWindowsPath(string path): PureBasePath(move(path)) {}
 
 
 PureWindowsPath PureWindowsPath::joinpath(const PureWindowsPath& other) const {
@@ -449,7 +464,7 @@ PureWindowsPath PureWindowsPath::joinpath(const PureWindowsPath& other) const {
 
 
 PureWindowsPath PureWindowsPath::joinpath(const string& other) const {
-    return PureWindowsPath(::join({string(*this), other}, sep()));
+    return PureWindowsPath(::join({string(*this), other}, sep));
 }
 
 
@@ -540,3 +555,9 @@ PureWindowsPath PureWindowsPath::with_suffix(const string& suffix) const {
     path.set_suffix(suffix);
     return path;
 }
+
+
+// Explict instantiation of template classes used herein.
+
+template class pypp::path::PureBasePath<PYPP_POSIX_SEP>;  // PurePosixPath
+template class pypp::path::PureBasePath<PYPP_WINDOWS_SEP>;  // PureWindowsPath

@@ -202,14 +202,14 @@ TEST(path, islink) {
  * The fixture will be type-parametrized over all classes that implement the
  * PurePath interface.
  */
-template <typename Path>
+template <class Path>
 class PurePathTest: public Test {
 protected:
     /**
      * Replace separator with the class-specific value.
      */
     string sep(const string& path) {
-        const auto sep(Path().sep());
+        const string sep(1, Path::sep);
         return sep != "/" ? str::replace(path, "/", sep) : path;
     }
 };
@@ -230,7 +230,6 @@ TYPED_TEST(PurePathTest, copy) {
  * Test the PurePath equality operator.
  */
 TYPED_TEST(PurePathTest, eq_op) {
-    const auto sep(TypeParam().sep());
     ASSERT_TRUE(TypeParam() == TypeParam());
     ASSERT_TRUE(TypeParam("abc") == TypeParam("abc"));
     ASSERT_TRUE(TypeParam("abc") == TypeParam(this->sep("./abc")));
@@ -245,7 +244,6 @@ TYPED_TEST(PurePathTest, eq_op) {
  * Test the PurePath inequality operator.
  */
 TYPED_TEST(PurePathTest, ne_op) {
-    const auto sep(TypeParam().sep());
     ASSERT_FALSE(TypeParam() != TypeParam());
     ASSERT_FALSE(TypeParam("abc") != TypeParam("abc"));
     ASSERT_FALSE(TypeParam("abc") != TypeParam(this->sep("./abc")));

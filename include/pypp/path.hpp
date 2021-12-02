@@ -8,13 +8,16 @@
 #ifndef PYPP_PATH_HPP
 #define PYPP_PATH_HPP
 
+#define PYPP_POSIX_SEP '/'
+#define PYPP_WINDOWS_SEP '\\'
+
 
 namespace pypp { namespace path {
 
 /**
  * Platform-specific path separator.
  */
-extern const std::string SEP;
+extern const char SEP;
 
 
 /**
@@ -148,8 +151,11 @@ bool islink(const std::string& path);
 /**
  * Base class for system-independent path representations.
  */
+template <char SEP>
 class PureBasePath {
 public:
+    static const char sep{SEP};
+
     /**
      * Represent the path as a string.
      *
@@ -158,12 +164,6 @@ public:
     explicit operator std::string() const;
 
     virtual ~PureBasePath() = default;
-
-    /**
-     *
-     * @return: path separator
-     */
-    virtual std::string sep() const = 0;
 
     /**
      * Determine if the path is absolute.
@@ -224,7 +224,7 @@ protected:
      * @param path: path value
      * @param sep: path separator
      */
-    PureBasePath(std::string path, const std::string& sep);
+    PureBasePath(std::string path);
 
     /**
      * Lexical path comparison.
@@ -269,7 +269,7 @@ protected:
 /**
  * System-independent representation of a POSIX file path.
  */
-class PurePosixPath : public PureBasePath {
+class PurePosixPath : public PureBasePath<PYPP_POSIX_SEP> {
 public:
     /**
      * Create a path object.
@@ -374,18 +374,13 @@ public:
      * @return: new path
      */
     PurePosixPath with_suffix(const std::string& suffix) const;
-
-    /**
-     *
-     */
-    virtual std::string sep() const { return "/"; }
 };
 
 
 /**
  * System-independent representation of a Windows file path.
  */
-class PureWindowsPath : public PureBasePath {
+class PureWindowsPath : public PureBasePath<PYPP_WINDOWS_SEP> {
 public:
     /**
      * Create a path object.
@@ -490,11 +485,6 @@ public:
      * @return: path with new suffix
      */
     PureWindowsPath with_suffix(const std::string& suffix) const;
-
-    /**
-     *
-     */
-    virtual std::string sep() const { return "\\"; }
 };
 
 
