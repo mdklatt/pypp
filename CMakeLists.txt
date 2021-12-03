@@ -5,6 +5,10 @@ project(PyPP
     LANGUAGES CXX
 )
 
+option(PYPP_BUILD_DOCS "Build documentation" OFF)
+option(PYPP_BUILD_TESTS "Build test suite" OFF)
+option(PYPP_CMAKE_DEBUG "Display CMake config variables" OFF)
+
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -45,9 +49,9 @@ install(DIRECTORY include/pypp
     PATTERN win EXCLUDE
 )
 
-if(${UNIX})
+if(UNIX)
     set(PYPP_PLATFORM posix)
-elseif(${WIN32})
+elseif(WIN32)
     set(PYPP_PLATFORM win)
 else()
     message(FATAL_ERROR "Unsupported platform")
@@ -85,7 +89,6 @@ export(PACKAGE ${PYPP_PACKAGE})
 
 # Build test suite.
 
-option(PYPP_BUILD_TESTS "Build test suite" OFF)
 if(PYPP_BUILD_TESTS)
     add_subdirectory(test)
 endif()
@@ -93,7 +96,6 @@ endif()
 
 # Build documentation.
 
-option(PYPP_BUILD_DOCS "Build documentation" OFF)
 if(PYPP_BUILD_DOCS)
     add_subdirectory(doc)
 endif()

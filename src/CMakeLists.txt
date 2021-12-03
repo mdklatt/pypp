@@ -22,6 +22,14 @@ PRIVATE
     $<$<CXX_COMPILER_ID:GNU>:-pedantic>
 )
 
+if(PYPP_CMAKE_DEBUG)
+    set(props COMPILE_DEFINITIONS COMPILE_FLAGS COMPILE_OPTIONS INCLUDE_DIRECTORIES INTERFACE_INCLUDE_DIRECTORIES BINARY_DIR)
+    foreach(prop ${props})
+        get_target_property(value ${PYPP_TARGET} ${prop})
+        message(STATUS "${PYPP_TARGET}: ${prop}=${value}")
+    endforeach()
+endif()
+
 
 # Generate header file. Output is written to the same file for every build
 # type, so beware of content that is dependent on the build configuration
