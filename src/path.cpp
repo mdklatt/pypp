@@ -34,6 +34,7 @@ using path::PureWindowsPath;
 namespace {
 
 // Platform-agnostic implementations that are not part of the public API.
+// TODO: Should these be added to the public API?
 
 /**
  * Determine if a path is absolute.
