@@ -1,6 +1,5 @@
 message(STATUS "Building test suite")
 
-include(CTest)
 include(FetchContent)
 include(GoogleTest)
 

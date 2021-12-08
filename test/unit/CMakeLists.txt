@@ -12,9 +12,4 @@ PRIVATE
     PyPP::pypp gtest gtest_main
 )
 
-gtest_discover_tests(test_pypp)
-add_test(
-    NAME unit_tests
-    COMMAND test_pypp
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-)
+gtest_discover_tests(test_pypp WORKING_DIR ${CMAKE_SOURCE_DIR})

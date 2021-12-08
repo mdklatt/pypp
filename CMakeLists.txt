@@ -90,6 +90,7 @@ export(PACKAGE ${PYPP_PACKAGE})
 # Build test suite.
 
 if(PYPP_BUILD_TESTS)
+    include(CTest)
     add_subdirectory(test)
 endif()
 
