@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 #include <gtest/gtest.h>
-#include "pypp/pypp.hpp"
+#include "pypp/libtest.hpp"
 
 
 using pypp::path::abspath;

@@ -7,7 +7,7 @@
 #include <fstream>
 #include <string>
 #include <gtest/gtest.h>
-#include "pypp/pypp.hpp"
+#include "pypp/libtest.hpp"
 
 using pypp::path::basename;
 using pypp::path::dirname;

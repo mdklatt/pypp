@@ -35,5 +35,5 @@ endif()
 # type, so beware of content that is dependent on the build configuration
 # Lock the output file to prevent a race condition.
 
-file(LOCK ${PROJECT_SOURCE_DIR}/include/pypp/pypp.hpp)
-configure_file(pypp.hpp.in ${PROJECT_SOURCE_DIR}/include/pypp/pypp.hpp @ONLY)
+file(LOCK ${PROJECT_SOURCE_DIR}/include/pypp/libtest.hpp)
+configure_file(pypp.hpp.in ${PROJECT_SOURCE_DIR}/include/pypp/libtest.hpp @ONLY)

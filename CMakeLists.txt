@@ -83,7 +83,6 @@ export(EXPORT pypp_targets
     FILE ${CMAKE_CURRENT_BINARY_DIR}/${PYPP_PACKAGE}Targets.cmake
     NAMESPACE ${PYPP_PACKAGE}::
 )
-export(PACKAGE ${PYPP_PACKAGE})
 
 
 # Build test suite.
