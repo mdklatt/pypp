@@ -15,7 +15,7 @@ PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
-
+target_compile_features(${PYPP_TARGET} PUBLIC cxx_std_11)
 target_compile_options(${PYPP_TARGET}
 PRIVATE
     -Wall

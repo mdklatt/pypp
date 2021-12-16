@@ -9,7 +9,6 @@ option(PYPP_BUILD_DOCS "Build documentation" OFF)
 option(PYPP_BUILD_TESTS "Build test suite" OFF)
 option(PYPP_CMAKE_DEBUG "Display CMake config variables" OFF)
 
-set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
