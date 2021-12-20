@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(lib_test LANGUAGES CXX)
 
-
 message(STATUS "Building in ${CMAKE_CURRENT_BINARY_DIR}")
 if(IS_DIRECTORY "${LIB_SOURCE_DIR}")
     add_subdirectory(${LIB_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/lib)

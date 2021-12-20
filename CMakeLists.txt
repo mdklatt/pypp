@@ -6,7 +6,8 @@ project(PyPP
 )
 
 option(PYPP_BUILD_DOCS "Build documentation" OFF)
-option(PYPP_BUILD_TESTS "Build test suite" OFF)
+option(PYPP_BUILD_UNIT_TESTS "Build unit tests" OFF)
+option(PYPP_BUILD_CMAKE_TESTS "Build CMake integration tests" OFF)
 option(PYPP_CMAKE_DEBUG "Display CMake config variables" OFF)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -85,10 +86,10 @@ export(EXPORT pypp_targets
 )
 
 
-# Build test suite.
+# Build test suite. This will place the CTest confg at the build root.
 
-if(PYPP_BUILD_TESTS)
-    include(CTest)
+if(PYPP_BUILD_UNIT_TESTS OR PYPP_BUILD_CMAKE_TESTS)
+    include(CTest)  # calls enable_testing()
     add_subdirectory(test)
 endif()
 

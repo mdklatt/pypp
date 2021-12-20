@@ -1,31 +1,21 @@
-message(STATUS "Building test suite")
-
-include(FetchContent)
-include(GoogleTest)
-
-FetchContent_Declare(googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG release-1.8.1  # TODO: upgrade to v1.11.0
-)
-FetchContent_MakeAvailable(googletest)
-if(IS_DIRECTORY "${googletest_SOURCE_DIR}")
-    # CLion doesn't seem to respect EXCLUDE_FROM_ALL, so it will include all
-    # googletest targets anyway.
-    # https://youtrack.jetbrains.com/issue/CPP-1688
-    set_property(DIRECTORY ${googletest_SOURCE_DIR} PROPERTY EXCLUDE_FROM_ALL YES)
+if(PYPP_BUILD_UNIT_TESTS)
+    message(STATUS "Enabling unit tests")
+    add_subdirectory(unit)
 endif()
 
-enable_testing()
-
-add_subdirectory(unit)
-
-add_test(
-    NAME cmake_source
-    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/cmake/test_cmake.py source
-    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
-)
-add_test(
-    NAME cmake_install
-    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/cmake/test_cmake.py install
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-)
+if(PYPP_BUILD_CMAKE_TESTS)
+    find_package(Python COMPONENTS Interpreter)
+    if(NOT (Python_VERSION_MAJOR EQUAL 3 AND Python_VERSION_MINOR GREATER_EQUAL 7))
+        message(SEND_ERROR "Python 3.7+ required for CMake tests")
+        return()
+    endif()
+    message(STATUS "Enabling CMake integration tests")
+    set(test_types source install)
+    foreach(type ${test_types})
+        add_test(
+            NAME "cmake_${type}_build"
+            COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/cmake/test_cmake.py ${type}
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+        )
+    endforeach()
+endif()

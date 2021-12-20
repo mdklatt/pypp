@@ -22,7 +22,6 @@ def main() -> int:
     parser.add_argument("root", help="project root directory", nargs="?", default=Path.cwd())
     args = parser.parse_args()
     with TemporaryDirectory() as test_dir:
-        test_dir = "/tmp/pypp"
         test_dir = Path(test_dir)
         defines = {"CMAKE_BUILD_TYPE": "Release"}
         build_dir = test_dir / "build"
@@ -33,10 +32,10 @@ def main() -> int:
         elif args.type.lower() == "install":
             # Test installed library.
             source_dir = Path(args.root)
-            defines |= {
+            defines.update({
                 "CMAKE_INSTALL_PREFIX": install_dir,
                 "PyPP_DIR": install_dir / "lib/cmake/pypp",
-            }
+            })
             _build(source_dir, build_dir / "lib", defines, "install")
         else:
             raise ValueError(f"unknown test type: {args.type}")
