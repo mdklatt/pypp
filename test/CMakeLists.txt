@@ -14,7 +14,7 @@ if(PYPP_BUILD_CMAKE_TESTS)
     foreach(type ${test_types})
         add_test(
             NAME "cmake_${type}_build"
-            COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/cmake/test_cmake.py ${type}
+            COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/test_cmake.py ${type}
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         )
     endforeach()
