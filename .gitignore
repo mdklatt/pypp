@@ -1,11 +1,17 @@
+# Ignore auto-generated files.
+
+include/pypp/pypp.hpp
+
+
 # Ignore build artifacts.
 
 .build/
 
 
-# Ignore auto-generated files.
+# Ignore Python environments.
 
-include/pypp/pypp.hpp
+.python-version
+.venv/*
 
 
 # Ignore Vagrant runtime files.
@@ -13,7 +19,7 @@ include/pypp/pypp.hpp
 .vagrant/
 
 
-# Ignore settings for various IDEs.
+# Ignore IDEs settings.
 
 .idea/
 .project/
