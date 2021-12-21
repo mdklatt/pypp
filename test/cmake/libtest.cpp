@@ -5,7 +5,7 @@
 #include <cassert>
 #include <iostream>
 #include <string>
-#include "pypp/libtest.hpp"
+#include "pypp/pypp.hpp"
 
 
 /**

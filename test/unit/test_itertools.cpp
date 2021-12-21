@@ -9,7 +9,7 @@
 #include <limits>
 #include <vector>
 #include <gtest/gtest.h>
-#include "pypp/libtest.hpp"
+#include "pypp/pypp.hpp"
 
 
 using namespace pypp::itertools;
